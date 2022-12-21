@@ -1,12 +1,13 @@
 <template>
   <ConfigProvider :locale="getAntdLocale">
     <AppProvider>
-      <RouterView />a
+      <RouterView />
     </AppProvider>
   </ConfigProvider>
 </template>
 
 <script lang="ts" setup>
+//777
 import { ConfigProvider } from 'ant-design-vue'
 import { AppProvider } from '@/components/Application'
 import { useTitle } from '@/hooks/web/useTitle'
