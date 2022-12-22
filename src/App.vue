@@ -7,7 +7,6 @@
 </template>
 
 <script lang="ts" setup>
-//777
 import { ConfigProvider } from 'ant-design-vue'
 import { AppProvider } from '@/components/Application'
 import { useTitle } from '@/hooks/web/useTitle'

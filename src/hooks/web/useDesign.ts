@@ -13,7 +13,10 @@ export function useDesign(scope: string) {
   //     style[lowerFirst(k)] = $style[key];
   //   });
   // }
+  console.log(values.prefixCls,'...values...');
+  
   return {
+    
     // prefixCls: computed(() => `${values.prefixCls}-${scope}`),
     prefixCls: `${values.prefixCls}-${scope}`,
     prefixVar: values.prefixCls

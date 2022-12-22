@@ -112,7 +112,6 @@ export default defineComponent({
         ...(unref(propsRef) as any)
       }
     })
-
     const { handleFullScreen, getWrapClassName, fullScreenRef } = useFullScreen({
       modalWrapperRef,
       extHeightRef,
