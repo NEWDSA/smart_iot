@@ -1,7 +1,7 @@
 <template>
   <Footer :class="prefixCls" v-if="getShowLayoutFooter" ref="footerRef">
     <div :class="`${prefixCls}__links`"> </div>
-    <div>Copyright &copy;2022 广东智联蔚来科技有限公司</div>
+    <!-- <div>Copyright &copy;2022 广东智联蔚来科技有限公司</div> -->
   </Footer>
 </template>
 
