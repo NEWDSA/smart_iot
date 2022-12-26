@@ -80,7 +80,7 @@ export default {
 
     loginButton: 'Sign in',
     registerButton: 'Sign up',
-    rememberMe: 'Remember Password',
+    rememberMe: 'Remember me',
     forgetPassword: 'Forget Password?',
     otherSignIn: 'Sign in with',
 
