@@ -35,11 +35,14 @@ export interface RetryRequest {
   count: number
   waitTime: number
 }
+
+/**
+ * 修改返回结果接收的数据类型
+ */
 export interface Result<T = any> {
-  code: number
-  type: 'success' | 'error' | 'warning'
-  message: string
-  result: T
+  Code: number,
+  Data:T,
+  Msg: string
 }
 
 // multipart/form-data: upload file

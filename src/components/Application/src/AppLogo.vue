@@ -1,6 +1,6 @@
 <template>
   <div class="anticon" :class="getAppLogoClass" @click="goHome">
-    <!-- <img src="../../../assets/images/logo.png" /> -->
+    <img src="../../../assets/images/logo.png" />
     <div class="ml-2 truncate md:opacity-100" :class="getTitleClass" v-show="showTitle">
       {{ title }}
     </div>
@@ -53,9 +53,7 @@ function goHome() {
 .@{prefix-cls} {
   display: flex;
   align-items: center;
-  // padding-left: 7px;
-  background-color: rgb(42, 15, 141);
-  padding: 0 auto;
+  padding-left: 7px;
   cursor: pointer;
   transition: all 0.2s ease;
 

@@ -44,19 +44,20 @@ const transform: AxiosTransform = {
       return res.data
     }
     // 错误的时候返回
-
+    
     const { data } = res
     if (!data) {
       // return '[HTTP] Request has no return value';
       throw new Error(t('sys.api.apiRequestFailed'))
     }
-    //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-    const { code, result, message } = data
+    //  这里 Code，Data，Msg为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
+    const { Code, Data, Msg } = data
 
     // 这里逻辑可以根据项目进行修改
-    const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS
+
+    const hasSuccess = Data && Reflect.has(Data, 'Token') && Code === ResultEnum.SUCCESS
     if (hasSuccess) {
-      let successMsg = message
+      let successMsg = Msg
       if (successMsg === null || successMsg === undefined || successMsg === '') {
         successMsg = t('sys.api.operationSuccess')
       }
@@ -68,13 +69,13 @@ const transform: AxiosTransform = {
       } else if (options.successMessageMode === 'message') {
         createMessage.success(successMsg)
       }
-      return result
+      return Data
     }
 
     // 在此处根据自己项目的实际情况对不同的code执行不同的操作
     // 如果不希望中断当前请求，请return数据，否则直接抛出异常即可
     let timeoutMsg = ''
-    switch (code) {
+    switch (Code) {
       case ResultEnum.TIMEOUT:
         timeoutMsg = t('sys.api.timeoutMessage')
         const userStore = useUserStoreWithOut()
@@ -82,8 +83,8 @@ const transform: AxiosTransform = {
         userStore.logout(true)
         break
       default:
-        if (message) {
-          timeoutMsg = message
+        if (Msg) {
+          timeoutMsg = Msg
         }
     }
 

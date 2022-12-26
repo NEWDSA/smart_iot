@@ -91,10 +91,22 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, mode, ...loginParams } = params
         const data = await loginApi(loginParams, mode)
-        const { token } = data
-
+        console.log(data, '...data...')
+        const { Token } = data
+        // let userInfo = {
+        //   avatar: 'https://q1.qlogo.cn/g?b=qq&nk=190848757&s=640',
+        //   token: 'fakeToken1',
+        //   username: 'vEN',
+        //   userId: '1',
+        //   desc: 'manager',
+        //   homePath: '/dashboard/analysis',
+        //   password: '123456',
+        //   realName: 'Vben Admin',
+        //   roles: [{ roleName: 'Super Admin', value: 'super' }]
+        // }
         // save token
-        this.setToken(token)
+        this.setToken(Token)
+     
         return this.afterLoginAction(goHome)
       } catch (error) {
         return Promise.reject(error)

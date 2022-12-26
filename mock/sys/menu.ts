@@ -18,7 +18,6 @@ const dashboardRoute = {
       name: 'Analysis',
       component: '/dashboard/analysis/index',
       meta: {
-
         hideBreadcrumb: true,
         title: 'routes.dashboard.analysis',
         currentActiveMenu: '/dashboard',
@@ -30,7 +29,6 @@ const dashboardRoute = {
       name: 'Workbench',
       component: '/dashboard/workbench/index',
       meta: {
-      
         hideBreadcrumb: true,
         title: 'routes.dashboard.workbench',
         currentActiveMenu: '/dashboard',
@@ -39,8 +37,6 @@ const dashboardRoute = {
     }
   ]
 }
-
-
 
 // 后台控制
 const backRoute = {
@@ -236,36 +232,56 @@ const linkRoute = {
     }
   ]
 }
-const RoleManage={
-  path:'/roleMana',
-  name:'roleMana',
-  component:'LAYOUT',
-  meta:{
-    title:'角色管理',
-    icon:'ion:tv-outline'
+const RoleManage = {
+  path: '/roleMana',
+  name: 'roleMana',
+  component: 'LAYOUT',
+  meta: {
+    title: '角色管理',
+    icon: 'ion:tv-outline'
   },
-  children:[
+  children: [
     {
-      path:'orgnazitional',
-      name: 'orgnazitional',
-      component: '/rolemanger/orgnazitional/index',
+      path: 'dept',
+      name: 'dept',
+      component: '/rolemanger/dept/index',
       meta: {
         title: '组织架构管理'
       }
-
-    },{
-      path:'member',
-      name: 'member',
-      component: '/rolemanger/member/index',
+    },
+    {
+      path: 'account',
+      name: 'account',
+      component: '/rolemanger/account/index',
       meta: {
         title: '成员管理'
       }
-    },{
-      path:'visitor',
+    },
+    {
+      path: 'visitor',
       name: 'visitor',
       component: '/rolemanger/visitor/index',
       meta: {
         title: '访客管理'
+      }
+    }
+  ]
+}
+const Permission = {
+  path: '/roleMana',
+  name: 'roleMana',
+  component: 'LAYOUT',
+  meta: {
+    title: '角色管理',
+    icon: 'ion:tv-outline'
+  },
+  children: [
+    {
+      path: 'dept',
+      name: 'dept',
+      component: '/rolemanger/dept/index',
+      meta: {
+        title: '组织架构管理'
       }
     }
   ]
@@ -289,11 +305,11 @@ export default [
       switch (id) {
         case '1':
           dashboardRoute.redirect = dashboardRoute.path + '/' + dashboardRoute.children[0].path
-          menu = [RoleManage,dashboardRoute, authRoute, levelRoute, sysRoute, linkRoute]
+          menu = [Permission,RoleManage,dashboardRoute, authRoute, levelRoute, sysRoute, linkRoute]
           break
         case '2':
           dashboardRoute.redirect = dashboardRoute.path + '/' + dashboardRoute.children[1].path
-          menu = [RoleManage,dashboardRoute, authRoute, levelRoute, linkRoute]
+          menu = [Permission,RoleManage, dashboardRoute, authRoute, levelRoute, linkRoute]
           break
         default:
           menu = []
