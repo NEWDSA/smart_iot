@@ -1,8 +1,9 @@
 /**
  * @description: Request result set
  */
+// TODO: 根据后端需要进行更改:   SUCCESS = 200
 export enum ResultEnum {
-  SUCCESS = 200,
+  SUCCESS = 0,
   ERROR = -1,
   TIMEOUT = 401,
   TYPE = 'success'

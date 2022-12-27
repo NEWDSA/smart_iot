@@ -14,9 +14,10 @@ export interface RoleInfo {
 /**
  * @description: Login interface return value
  */
+//  TODO:根据后端接口进行修改
 export interface LoginResultModel {
   userId: string | number
-  Token: string
+  token: string    
   role: RoleInfo
 }
 

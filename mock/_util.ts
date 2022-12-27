@@ -1,12 +1,13 @@
 // Interface data format used to return a unified format
 import { ResultEnum } from '@/enums/httpEnum'
 
+// TODOl:模拟数据后端响应结果/** Code: ResultEnum.SUCCESS,Data,Msg, */
 export function resultSuccess<T = Recordable>(result: T, { message = 'ok' } = {}) {
   return {
     code: ResultEnum.SUCCESS,
     result,
     message,
-    type: 'success'
+    type: 'sucess'
   }
 }
 
@@ -27,6 +28,7 @@ export function resultPageSuccess<T = any>(
   }
 }
 
+// TODO:模拟数据根据后端需要进行模拟  /**Code,Data,Msg,type: 'error' */
 export function resultError(
   message = 'Request failed',
   { code = ResultEnum.ERROR, result = null } = {}

@@ -92,20 +92,9 @@ export const useUserStore = defineStore({
         const { goHome = true, mode, ...loginParams } = params
         const data = await loginApi(loginParams, mode)
         console.log(data, '...data...')
-        const { Token } = data
-        // let userInfo = {
-        //   avatar: 'https://q1.qlogo.cn/g?b=qq&nk=190848757&s=640',
-        //   token: 'fakeToken1',
-        //   username: 'vEN',
-        //   userId: '1',
-        //   desc: 'manager',
-        //   homePath: '/dashboard/analysis',
-        //   password: '123456',
-        //   realName: 'Vben Admin',
-        //   roles: [{ roleName: 'Super Admin', value: 'super' }]
-        // }
-        // save token
-        this.setToken(Token)
+        // TODO:token 根据真实接口进行修改
+        const { token } = data
+        this.setToken(token)
      
         return this.afterLoginAction(goHome)
       } catch (error) {

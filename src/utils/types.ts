@@ -40,8 +40,9 @@ export type ComponentSize = 'large' | 'medium' | 'small' | 'mini'
 export type StyleValue = string | CSSProperties | Array<StyleValue>
 
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] }
-export type Result<T = any> = {
-  Code: number;
-  Data: T;
-  Msg: String;
-};
+// TODO:根据后端接口进行调整 /**Code: number;Data: T;Msg: String; */
+// export type Result<T = any> = {
+//   Code: number;
+//   Data: T;
+//   Msg: String;
+// };

@@ -268,20 +268,28 @@ const RoleManage = {
   ]
 }
 const Permission = {
-  path: '/roleMana',
-  name: 'roleMana',
+  path: '/permssion',
+  name: 'permssion',
   component: 'LAYOUT',
   meta: {
-    title: '角色管理',
-    icon: 'ion:tv-outline'
+    title: '用户权限管理',
+    icon: 'carbon:user-role'
   },
   children: [
     {
-      path: 'dept',
-      name: 'dept',
-      component: '/rolemanger/dept/index',
+      path: 'menu',
+      name: 'menu',
+      component: '/permission/menu/index',
       meta: {
-        title: '组织架构管理'
+        title: '菜单管理'
+      }
+    },
+    {
+      path:'userPermission',
+      name:'userPermission',
+      component: '/rolemanger/dept/index',
+      meta:{
+        title:'用户权限'
       }
     }
   ]
@@ -305,11 +313,19 @@ export default [
       switch (id) {
         case '1':
           dashboardRoute.redirect = dashboardRoute.path + '/' + dashboardRoute.children[0].path
-          menu = [Permission,RoleManage,dashboardRoute, authRoute, levelRoute, sysRoute, linkRoute]
+          menu = [
+            Permission,
+            RoleManage,
+            dashboardRoute,
+            authRoute,
+            levelRoute,
+            sysRoute,
+            linkRoute
+          ]
           break
         case '2':
           dashboardRoute.redirect = dashboardRoute.path + '/' + dashboardRoute.children[1].path
-          menu = [Permission,RoleManage, dashboardRoute, authRoute, levelRoute, linkRoute]
+          menu = [Permission, RoleManage, dashboardRoute, authRoute, levelRoute, linkRoute]
           break
         default:
           menu = []

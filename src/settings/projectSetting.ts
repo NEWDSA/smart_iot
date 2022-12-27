@@ -50,7 +50,7 @@ const setting: ProjectConfig = {
   // 是否显示logo
   showLogo: true,
   // 是否显示底部信息 copyright
-  showFooter: true,
+  showFooter: false,
   // 头部配置
   headerSetting: {
     // 背景色
