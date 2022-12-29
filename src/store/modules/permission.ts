@@ -41,6 +41,7 @@ interface PermissionState {
   frontMenuList: Menu[]
 }
 
+// 代码权限列表
 export const usePermissionStore = defineStore({
   id: 'app-permission',
   state: (): PermissionState => ({
@@ -121,6 +122,7 @@ export const usePermissionStore = defineStore({
 
       let routes: AppRouteRecordRaw[] = []
       const roleList = toRaw(userStore.getRoleList) || []
+      // 获取权限模式
       const { permissionMode = projectSetting.permissionMode } = appStore.getProjectConfig
 
       // 路由过滤器 在 函数filter 作为回调传入遍历使用

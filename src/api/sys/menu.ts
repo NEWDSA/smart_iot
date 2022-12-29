@@ -1,14 +1,20 @@
-import { defHttp } from '@/utils/http/axios'
+import { realHttp } from '@/utils/http/axios'
 import { getMenuListResultModel } from './model/menuModel'
 
 enum Api {
-  GetMenuList = '/getMenuList'
+  // GetMenuList = '/getMenuList' // 模拟数据
+  GetMenuListReal = '/system/menu' //后端接口
 }
 
 /**
  * @description: Get user menu based on id
  */
-
+//获取菜单列表
 export const getMenuList = () => {
-  return defHttp.get<getMenuListResultModel>({ url: Api.GetMenuList })
+  // return defHttp.get<getMenuListResultModel>({ url: Api.GetMenuList }) // 模拟数据
+  return realHttp.get<getMenuListResultModel>(
+    {
+      url: Api.GetMenuListReal
+    }
+  )
 }

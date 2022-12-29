@@ -40,11 +40,21 @@ export interface RetryRequest {
  * 修改返回结果接收的数据类型
  */
 // TODO:根据后端进行修改   /** Code: number,Data:T,Msg: string*/ 
+//模拟数据
+// export interface Result<T = any> {
+//   code: number,
+//   type:'success' | 'error' | 'warning',
+//   message: string,
+//   result:T
+// }
+
+
+//后端接口
 export interface Result<T = any> {
-  code: number,
+  Code: number,
   type:'success' | 'error' | 'warning',
-  message: string,
-  result:T
+  Msg: string,
+  Data:T
 }
 
 // multipart/form-data: upload file

@@ -91,10 +91,11 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, mode, ...loginParams } = params
         const data = await loginApi(loginParams, mode)
-        console.log(data, '...data...')
         // TODO:token 根据真实接口进行修改
-        const { token } = data
-        this.setToken(token)
+        // const { token } = data //模拟数据
+        // this.setToken(token) //模拟数据
+        const {Token}=data; //真实数据
+        this.setToken(Token) //真实数据
      
         return this.afterLoginAction(goHome)
       } catch (error) {
@@ -112,28 +113,32 @@ export const useUserStore = defineStore({
       } else {
         const permissionStore = usePermissionStore()
         if (!permissionStore.isDynamicAddedRoute) {
-          const routes = await permissionStore.buildRoutesAction()
+          const routes = await permissionStore.buildRoutesAction()  //创建路由
           routes.forEach((route) => {
             router.addRoute(route as unknown as RouteRecordRaw)
           })
           router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw)
           permissionStore.setDynamicAddedRoute(true)
         }
-        goHome && (await router.replace(userInfo?.homePath || PageEnum.BASE_HOME))
+        // goHome && (await router.replace(userInfo?.homePath || PageEnum.BASE_HOME))
+        goHome && (await router.replace(PageEnum.BASE_HOME))
       }
       return userInfo
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
       if (!this.getToken) return null
-      const userInfo = await getUserInfo()
-      const { roles = [] } = userInfo
-      if (isArray(roles)) {
-        const roleList = roles.map((item) => item.value) as RoleEnum[]
+      const userInfo = await getUserInfo() // 模拟数据
+      debugger
+      const { user} = userInfo
+      if (isArray(user.Roles)) {
+        const roleList = user.Roles.map((item) => item.RoleKey) as RoleEnum[]
+        // 设置用户信息，并存储本地缓存
         this.setRoleList(roleList)
       } else {
-        userInfo.roles = []
+        userInfo.Roles = []
         this.setRoleList([])
       }
+      // 设置用户信息，并存储本地缓存
       this.setUserInfo(userInfo)
       return userInfo
     },

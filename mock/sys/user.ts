@@ -1,7 +1,9 @@
 import { MockMethod } from 'vite-plugin-mock'
 import { resultError, resultSuccess, getRequestToken, requestParams } from '../_util'
+// import {getUserInfo} from '@/api/sys/user'
 
 export function createFakeUserList() {
+  
   return [
     {
       userId: '1',
@@ -45,47 +47,48 @@ const fakeCodeList: any = {
 }
 export default [
   // mock user login
-  {
-    url: '/basic-api/login',
-    timeout: 200,
-    method: 'post',
-    response: ({ body }) => {
-      const { username, password } = body
-      const checkUser = createFakeUserList().find(
-        (item) => item.username === username && password === item.password
-      )
-      if (!checkUser) {
-        return resultError('Incorrect account or password！')
-      }
-      const { userId, username: _username, token, realName, desc, roles } = checkUser
-      return resultSuccess({
-        roles,
-        userId,
-        username: _username,
-        token,
-        realName,
-        desc
-      })
-    }
-  },
-  {
-    url: '/basic-api/getUserInfo',
-    method: 'get',
-    response: (request: requestParams) => {
-      const token = getRequestToken(request)
-      if (!token) return resultError('Invalid token')
-      const checkUser = createFakeUserList().find((item) => item.token === token)
-      if (!checkUser) {
-        return resultError('The corresponding user information was not obtained!')
-      }
-      return resultSuccess(checkUser)
-    }
-  },
+  // {
+  //   url: '/basic-api/login',
+  //   timeout: 200,
+  //   method: 'post',
+  //   response: ({ body }) => {
+  //     const { username, password } = body
+  //     const checkUser = createFakeUserList().find(
+  //       (item) => item.username === username && password === item.password
+  //     )
+  //     if (!checkUser) {
+  //       return resultError('Incorrect account or password！')
+  //     }
+  //     const { userId, username: _username, token, realName, desc, roles } = checkUser
+  //     return resultSuccess({
+  //       roles,
+  //       userId,
+  //       username: _username,
+  //       token,
+  //       realName,
+  //       desc
+  //     })
+  //   }
+  // },
+  // {
+  //   url: '/basic-api/getUserInfo',
+  //   method: 'get',
+  //   response: (request: requestParams) => {
+  //     const token = getRequestToken(request)
+  //     if (!token) return resultError('Invalid token')
+  //     const checkUser = createFakeUserList().find((item) => item.token === token)
+  //     if (!checkUser) {
+  //       return resultError('The corresponding user information was not obtained!')
+  //     }
+  //     return resultSuccess(checkUser)
+  //   }
+  // },
   {
     url: '/basic-api/getPermCode',
     timeout: 200,
     method: 'get',
     response: (request: requestParams) => {
+      
       const token = getRequestToken(request)
       if (!token) return resultError('Invalid token')
       const checkUser = createFakeUserList().find((item) => item.token === token)
@@ -93,8 +96,8 @@ export default [
         return resultError('Invalid token!')
       }
       const codeList = fakeCodeList[checkUser.userId]
-
-      return resultSuccess(codeList)
+      console.log(codeList,'....')
+      console.log(getUserInfo(),'...getUserInfo...');
     }
   },
   {

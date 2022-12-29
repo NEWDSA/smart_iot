@@ -17,7 +17,8 @@ export interface RoleInfo {
 //  TODO:根据后端接口进行修改
 export interface LoginResultModel {
   userId: string | number
-  token: string    
+  // token: string    // 模拟数据
+  Token:string,
   role: RoleInfo
 }
 
@@ -25,7 +26,7 @@ export interface LoginResultModel {
  * @description: Get user information return value
  */
 export interface GetUserInfoModel {
-  roles: RoleInfo[]
+  Roles: RoleInfo[]
   // 用户id
   userId: string | number
   // 用户名
@@ -35,5 +36,6 @@ export interface GetUserInfoModel {
   // 头像
   avatar: string
   // 介绍
-  desc?: string
+  desc?: string,
+  user?:any
 }

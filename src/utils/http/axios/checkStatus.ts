@@ -19,8 +19,8 @@ export function checkStatus(
   const { t } = useI18n()
   const userStore = useUserStoreWithOut()
   let errMessage = ''
-
   switch (status) {
+
     case 400:
       errMessage = `${msg}`
       break

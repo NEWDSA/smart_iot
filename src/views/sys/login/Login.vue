@@ -38,9 +38,9 @@
           >
             <LoginForm />
             <ForgetPasswordForm />
-            <RegisterForm />
+            <!-- <RegisterForm />
             <MobileForm />
-            <QrCodeForm />
+            <QrCodeForm /> -->
           </div>
         </div>
       </div>

@@ -51,15 +51,16 @@ const transform: AxiosTransform = {
     }
     //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
     // TODO:根据后端进行修改  const { code, result, message } = data
-    const { code, result, message } = data
+    // const { code, result, message } = data   //模拟数据接口
+    const { Code, Data, Msg } = data
 
     // 这里逻辑可以根据项目进行修改
-  
-    // TODO:根据后端真实接口进行更改 token
-    
-    const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS
+    // TODO:根据后端真实接口进行更改 code
+    // const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS //模拟数据
+    const hasSuccess = Data && Reflect.has(data, 'Code') && Code === ResultEnum.SUCCESS // 后端接口数据
     if (hasSuccess) {
-      let successMsg = message
+      // let successMsg = message //模拟数据
+      let successMsg = Msg //后端接口数据
       if (successMsg === null || successMsg === undefined || successMsg === '') {
         successMsg = t('sys.api.operationSuccess')
       }
@@ -71,13 +72,32 @@ const transform: AxiosTransform = {
       } else if (options.successMessageMode === 'message') {
         createMessage.success(successMsg)
       }
-      return result
+      // return result  // 模拟数据
+      // 对数据结构进行判断
+      //真实数据
+      return Data.hasOwnProperty('List') ? Data.List : Data
+      
     }
 
     // 在此处根据自己项目的实际情况对不同的code执行不同的操作
     // 如果不希望中断当前请求，请return数据，否则直接抛出异常即可
     let timeoutMsg = ''
-    switch (code) {
+    // 模拟数据
+    // switch (code) {
+    //   case ResultEnum.TIMEOUT:
+    //     timeoutMsg = t('sys.api.timeoutMessage')
+    //     const userStore = useUserStoreWithOut()
+    //     userStore.setToken(undefined)
+    //     userStore.logout(true)
+    //     break
+    //   default:
+    //     if (message) {
+    //       timeoutMsg = message
+    //     }
+    // }
+
+    //真实数据
+    switch (Code) {
       case ResultEnum.TIMEOUT:
         timeoutMsg = t('sys.api.timeoutMessage')
         const userStore = useUserStoreWithOut()
@@ -85,8 +105,8 @@ const transform: AxiosTransform = {
         userStore.logout(true)
         break
       default:
-        if (message) {
-          timeoutMsg = message
+        if (Msg) {
+          timeoutMsg = Msg
         }
     }
 
@@ -280,6 +300,13 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
   )
 }
 export const defHttp = createAxios()
+
+// TODO:创建自定义axios实例，专用于调取线上api
+export const realHttp = createAxios({
+  requestOptions: {
+    apiUrl: '/admin-api'
+  }
+})
 
 // other api url
 // export const otherHttp = createAxios({
