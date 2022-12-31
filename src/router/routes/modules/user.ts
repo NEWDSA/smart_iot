@@ -3,37 +3,37 @@ import type { AppRouteModule } from '@/router/types'
 import { LAYOUT } from '@/router/constant'
 import { t } from '@/hooks/web/useI18n'
 
-const permission: AppRouteModule = {
-  path: '/permission',
-  name: 'permission',
+const user: AppRouteModule = {
+  path: '/user',
+  name: 'user',
   component: LAYOUT,
   meta: {
     orderNo: 10,
     icon: 'carbon:user-role',
-    title: t('routes.dashboard.dashboard')
+    title: t('用户管理')
   },
   children: [
     {
       path: 'menu',
       name: 'menu',
-      component: () => import('@/views/permission/menu/index.vue'),
+      component: () => import('@/views/rolemanger/dept/index.vue'),
       meta: {
         // affix: true,
-        title: '菜单管理'
+        title: '部门管理'
       }
     },
     {
       path: 'userPermission',
       name: 'userPermission',
-      component: () => import('@/views/permission/userPermission/index.vue'),
+      component: () => import('@/views/rolemanger/account/index.vue'),
       meta: {
-        title:'用户权限'
+        title:'用户管理'
       }
     }
   ]
 }
 
-export default permission
+export default user
 
 
 

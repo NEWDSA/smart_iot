@@ -55,10 +55,9 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         const values = await validate();
-        console.log(values, '...values...打印')
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
-        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole(values)
+        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({...values,MenuIds:values.menu})
         emit('success');
 
       } finally {

@@ -6,21 +6,21 @@ import { Tag } from 'ant-design-vue';
 export const columns: BasicColumn[] = [
   {
     title: '部门名称',
-    dataIndex: 'deptName',
+    dataIndex: 'DeptName',
     width: 160,
     align: 'left',
   },
   {
     title: '排序',
-    dataIndex: 'orderNo',
+    dataIndex: 'OrderNum',
     width: 50,
   },
   {
     title: '状态',
-    dataIndex: 'status',
+    dataIndex: 'Status',
     width: 80,
     customRender: ({ record }) => {
-      const status = record.status;
+      const status = record.Status;
       const enable = ~~status === 0;
       const color = enable ? 'green' : 'red';
       const text = enable ? '启用' : '停用';
@@ -29,18 +29,18 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '创建时间',
-    dataIndex: 'createTime',
+    dataIndex: 'CreateTime',
     width: 180,
   },
-  {
-    title: '备注',
-    dataIndex: 'remark',
-  },
+  // {
+  //   title: '备注',
+  //   dataIndex: 'remark',
+  // },
 ];
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'deptName',
+    field: 'DeptName',
     label: '部门名称',
     component: 'Input',
     colProps: { span: 8 },
@@ -61,7 +61,7 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'deptName',
+    field: 'DeptName',
     label: '部门名称',
     component: 'Input',
     required: true,
@@ -73,9 +73,9 @@ export const formSchema: FormSchema[] = [
 
     componentProps: {
       fieldNames: {
-        label: 'deptName',
-        key: 'id',
-        value: 'id',
+        label: 'Name',
+        key: 'Id',
+        value: 'Id',
       },
       getPopupContainer: () => document.body,
     },

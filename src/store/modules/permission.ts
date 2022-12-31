@@ -116,6 +116,7 @@ export const usePermissionStore = defineStore({
 
     // 构建路由
     async buildRoutesAction(): Promise<AppRouteRecordRaw[]> {
+      debugger
       const { t } = useI18n()
       const userStore = useUserStore()
       const appStore = useAppStoreWithOut()
@@ -130,6 +131,7 @@ export const usePermissionStore = defineStore({
         const { meta } = route
         // 抽出角色
         const { roles } = meta || {}
+        console.log(roles,'...roles..22')
         if (!roles) return true
         // 进行角色权限判断
         return roleList.some((role) => roles.includes(role))
@@ -147,6 +149,7 @@ export const usePermissionStore = defineStore({
        * @description 根据设置的首页path，修正routes中的affix标记（固定首页）
        * */
       const patchHomeAffix = (routes: AppRouteRecordRaw[]) => {
+        debugger
         if (!routes || routes.length === 0) return
         let homePath: string = userStore.getUserInfo.homePath || PageEnum.BASE_HOME
 

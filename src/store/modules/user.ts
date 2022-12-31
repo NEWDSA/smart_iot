@@ -106,7 +106,7 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null
       // get user info
       const userInfo = await this.getUserInfoAction()
-
+      debugger
       const sessionTimeout = this.sessionTimeout
       if (sessionTimeout) {
         this.setSessionTimeout(false)
@@ -120,15 +120,13 @@ export const useUserStore = defineStore({
           router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw)
           permissionStore.setDynamicAddedRoute(true)
         }
-        // goHome && (await router.replace(userInfo?.homePath || PageEnum.BASE_HOME))
-        goHome && (await router.replace(PageEnum.BASE_HOME))
+        goHome && (await router.replace(userInfo?.homePath || PageEnum.BASE_HOME))
       }
       return userInfo
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
       if (!this.getToken) return null
-      const userInfo = await getUserInfo() // 模拟数据
-      debugger
+      const userInfo = await getUserInfo() 
       const { user} = userInfo
       if (isArray(user.Roles)) {
         const roleList = user.Roles.map((item) => item.RoleKey) as RoleEnum[]

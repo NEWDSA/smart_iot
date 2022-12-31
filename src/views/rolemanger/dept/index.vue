@@ -1,5 +1,5 @@
 <template>
-  <PageWrapper contentFullHeight title="组织架构管理">
+  <PageWrapper contentFullHeight title="部门管理">
     <BasicTable :canResize="true" @register="registerTable">
       <template #tableTitle>
         <a-button preIcon="mdi:plus" @click="handleCreate" type="primary">创建部门</a-button>
@@ -31,7 +31,7 @@
 import { defineComponent } from 'vue';
 
 import { BasicTable, useTable, TableAction } from '@/components/Table';
-import { getDeptList } from '@/api/demo/system';
+import { getDeptList, DelDept } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import { useModal } from '@/components/Modal';
 import DeptModal from './DeptModal.vue';
@@ -45,7 +45,7 @@ export default defineComponent({
     const [registerModal, { openModal }] = useModal();
     let source = 0;
     let target = 0;
-    const [registerTable, { reload, getDataSource }] = useTable({
+    const [registerTable, { reload,deleteTableDataRecord,getDataSource }] = useTable({
       title: '部门列表',
       api: getDeptList,
       columns,
@@ -112,8 +112,8 @@ export default defineComponent({
           // 这里就是让数据位置互换，让视图更新 你们可以看record，index的输出，看是什么
           [record[source], record[target]] = [record[target], record[source]];
           console.log(record, index, 'target', source, target);
-          console.log(getDataSource(),'...getDataSource')
-         
+          console.log(getDataSource(), '...getDataSource')
+
         },
       };
     }
@@ -121,7 +121,7 @@ export default defineComponent({
       openModal(true, {
         isUpdate: false,
       });
-      
+
     }
 
     function handleEdit(record: Recordable) {
@@ -131,8 +131,10 @@ export default defineComponent({
       });
     }
 
-    function handleDelete(record: Recordable) {
-      console.log(record);
+    async function handleDelete(record: Recordable) {
+      await deleteTableDataRecord(record.RoleId);
+      await DelDept({DeptId:record.DeptId})
+      reload();
     }
 
     function handleSuccess() {

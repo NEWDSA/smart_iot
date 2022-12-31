@@ -6,10 +6,10 @@ export type AccountParams = BasicPageParams & {
 }
 
 export type RoleParams = {
+  RoleId: number
   roleName?: string
   status?: string
-  menu?:[],
-  RoleId?: [] // 添加角色ID
+  MenuIds?: [] // 添加角色ID
 }
 
 export type RolePageParams = BasicPageParams & RoleParams
@@ -17,6 +17,11 @@ export type RolePageParams = BasicPageParams & RoleParams
 export type DeptParams = {
   deptName?: string
   status?: string
+  DeptId: number
+  id: string
+  orderNo: string
+  createTime: string
+  remark: string
 }
 
 export type MenuParams = {
@@ -36,6 +41,7 @@ export interface AccountListItem {
 }
 
 export interface DeptListItem {
+  DeptId: number
   id: string
   orderNo: string
   createTime: string
@@ -69,6 +75,15 @@ export interface MenuListItem {
   Status: number
   UpdateBy: string
   UpdateTime: string
+  TreeSelect: any
+}
+
+export interface TreeListItem {
+  TreeSelect
+  Id: number
+  ParentId: number
+  Name: string
+  Children: []
 }
 
 export interface RoleListItem {
@@ -76,8 +91,8 @@ export interface RoleListItem {
   roleName: string
   RoleKey: string
   Status: number
-  Remark: string,
-  MenuIds:[],
+  Remark: string
+  MenuIds: []
 }
 
 /**

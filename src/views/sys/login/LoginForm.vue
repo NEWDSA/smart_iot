@@ -133,7 +133,6 @@ async function handleLogin() {
   const data = await validForm()
   if (!data) return
   try {
-    debugger
     loading.value = true
     const userInfo = await userStore.login({
       password: data.password,
