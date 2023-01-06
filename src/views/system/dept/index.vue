@@ -63,7 +63,6 @@ export default defineComponent({
       api: getDeptList,
       afterFetch(res) {
         let result = res;
-        console.log(result,'ddd')
         function listToTreeSimple(data) {
           const res: any = [];
           data.forEach((item) => {

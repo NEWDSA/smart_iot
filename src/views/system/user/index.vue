@@ -33,15 +33,15 @@
         </template>
       </template>
     </BasicTable>
-    <component :is="currentModal" v-model:visible="modalVisible" :userData="userData" />
+    <component :is="currentModal" v-model:visible="modalVisible" @success="Dat" :isUpdate="true" />
     <AccountModal @register="registerModal" @success="handleSuccess" />
-    <AccountTable @register="registerMyTable" @success="handleSuccess" />
+    <AccountTable @register="registerMyTable" @success="Dat" />
   </PageWrapper>
 </template>
 <script lang="ts">
-import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions,nextTick } from 'vue';
-
+import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
+import { useMessage } from '@/hooks/web/useMessage';
 import { getAccountList, getDeptList, BulkDept } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
@@ -64,6 +64,9 @@ export default defineComponent({
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
     const basicData: any = ref('');
     const modalVisible = ref<Boolean>(false);
+    const {
+      createConfirm
+    } = useMessage();
     const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys }] = useTable({
       title: '用户列表',
       rowSelection: {
@@ -119,19 +122,25 @@ export default defineComponent({
       console.log(checkedKeys.value, '...dddd...')
     }
     function handleBulk(record: Recordable) {
-      currentModal.value = AccountTable;
-      nextTick(() => {
-        modalVisible.value = true;
-      })
-      console.log(getSelectRowKeys(), '...批量调动...')
-      // openModal(true, {
-      //   record,
-      //   isUpdate: true
-      // })
+      if (getSelectRowKeys().length > 0) {
+        currentModal.value = AccountTable;
+        nextTick(() => {
+          modalVisible.value = true;
+        })
+      } else {
+        createConfirm({
+          iconType: 'info',
+          title: '提示',
+          content: '至少选择一项',
+        });
+
+      }
+
     }
     // 编辑用户
     function handleEdit(record: Recordable) {
       console.log(record);
+
       openModal(true, {
         record,
         isUpdate: true,
@@ -141,7 +150,21 @@ export default defineComponent({
     function handleDelete(record: Recordable) {
       console.log(record);
     }
+    function Dat(values) {
+      let Detp = toRaw(values).join();
+      let user = toRaw(checkedKeys.value)
+      try {
+        BulkDept({
+          UserIds: user,
+          DeptId:  Number(Detp) 
+        })
+      } finally {
+        reload();
+      }
 
+
+
+    }
     function handleSuccess({ isUpdate, values }) {
       if (isUpdate) {
         // 演示不刷新表格直接更新内部数据。
@@ -153,6 +176,7 @@ export default defineComponent({
       }
     }
     function handleEditPwd(record: Recordable) {
+      
       console.log(record, '...record...')
     }
     function handleSelect(DeptId = '') {
@@ -177,6 +201,7 @@ export default defineComponent({
       handleBulk,
       onSelectChange,
       openModal2,
+      Dat,
       modalVisible,
       currentModal,
       checkedKeys,
