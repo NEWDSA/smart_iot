@@ -74,7 +74,6 @@ export function usePermission() {
     
     // 如果为后端模式
     if (PermissionModeEnum.BACK === permMode) {
-      debugger
       const allCodeList = permissionStore.getPermCodeList as string[]
       if (!isArray(value)) {
         return allCodeList.includes(value)

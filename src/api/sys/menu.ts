@@ -1,9 +1,10 @@
 import { realHttp } from '@/utils/http/axios'
 import { getMenuListResultModel } from './model/menuModel'
 
+
 enum Api {
   // GetMenuList = '/getMenuList' // 模拟数据
-  GetMenuListReal = '/system/menu' //后端接口
+  GetMenuListReal = '/system/user/getRouters' //后端接口
 }
 
 /**
@@ -15,6 +16,8 @@ export const getMenuList = () => {
   return realHttp.get<getMenuListResultModel>(
     {
       url: Api.GetMenuListReal
+    },{
+      isTransformResponse:true
     }
   )
 }

@@ -83,23 +83,23 @@ export default [
   //     return resultSuccess(checkUser)
   //   }
   // },
-  {
-    url: '/basic-api/getPermCode',
-    timeout: 200,
-    method: 'get',
-    response: (request: requestParams) => {
+  // {
+  //   url: '/basic-api/getPermCode',
+  //   timeout: 200,
+  //   method: 'get',
+  //   response: (request: requestParams) => {
       
-      const token = getRequestToken(request)
-      if (!token) return resultError('Invalid token')
-      const checkUser = createFakeUserList().find((item) => item.token === token)
-      if (!checkUser) {
-        return resultError('Invalid token!')
-      }
-      const codeList = fakeCodeList[checkUser.userId]
-      console.log(codeList,'....')
-      console.log(getUserInfo(),'...getUserInfo...');
-    }
-  },
+  //     const token = getRequestToken(request)
+  //     if (!token) return resultError('Invalid token')
+  //     const checkUser = createFakeUserList().find((item) => item.token === token)
+  //     if (!checkUser) {
+  //       return resultError('Invalid token!')
+  //     }
+  //     const codeList = fakeCodeList[checkUser.userId]
+  //     console.log(codeList,'....')
+  //     console.log(getUserInfo(),'...getUserInfo...');
+  //   }
+  // },
   {
     url: '/basic-api/logout',
     timeout: 200,

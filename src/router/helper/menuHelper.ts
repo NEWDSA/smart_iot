@@ -12,7 +12,7 @@ export function getAllParentPath<T = Recordable>(treeData: T[], path: string) {
 }
 
 // 路径处理
-function joinParentPath(menus: Menu[], parentPath = '') {
+function joinParentPath(menus, parentPath = '') {
   for (let index = 0; index < menus.length; index++) {
     const menu = menus[index]
     // https://next.router.vuejs.org/guide/essentials/nested-routes.html

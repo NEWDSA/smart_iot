@@ -102,7 +102,7 @@ export function useDataSource(
     })
   }
 
-  const getAutoCreateKey = computed(() => {
+  const getAutoCreateKey =  computed(() => {
     return unref(propsRef).autoCreateKey && !unref(propsRef).rowKey
   })
 

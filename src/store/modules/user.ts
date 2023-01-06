@@ -94,9 +94,9 @@ export const useUserStore = defineStore({
         // TODO:token 根据真实接口进行修改
         // const { token } = data //模拟数据
         // this.setToken(token) //模拟数据
-        const {Token}=data; //真实数据
+        const { Token } = data //真实数据
         this.setToken(Token) //真实数据
-     
+
         return this.afterLoginAction(goHome)
       } catch (error) {
         return Promise.reject(error)
@@ -106,28 +106,27 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null
       // get user info
       const userInfo = await this.getUserInfoAction()
-      debugger
       const sessionTimeout = this.sessionTimeout
       if (sessionTimeout) {
         this.setSessionTimeout(false)
       } else {
         const permissionStore = usePermissionStore()
         if (!permissionStore.isDynamicAddedRoute) {
-          const routes = await permissionStore.buildRoutesAction()  //创建路由
+          const routes = await permissionStore.buildRoutesAction() //创建路由
           routes.forEach((route) => {
             router.addRoute(route as unknown as RouteRecordRaw)
           })
           router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw)
           permissionStore.setDynamicAddedRoute(true)
         }
-        goHome && (await router.replace(userInfo?.homePath || PageEnum.BASE_HOME))
+        goHome && router.replace(PageEnum.BASE_HOME)
       }
       return userInfo
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
       if (!this.getToken) return null
-      const userInfo = await getUserInfo() 
-      const { user} = userInfo
+      const userInfo = await getUserInfo()
+      const { user } = userInfo
       if (isArray(user.Roles)) {
         const roleList = user.Roles.map((item) => item.RoleKey) as RoleEnum[]
         // 设置用户信息，并存储本地缓存

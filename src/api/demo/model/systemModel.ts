@@ -75,11 +75,10 @@ export interface MenuListItem {
   Status: number
   UpdateBy: string
   UpdateTime: string
-  TreeSelect: any
 }
 
 export interface TreeListItem {
-  TreeSelect
+  TreeSelect:any
   Id: number
   ParentId: number
   Name: string

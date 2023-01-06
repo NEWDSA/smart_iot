@@ -178,14 +178,14 @@ export default [
   //     return resultSuccess(deptList);
   //   },
   // },
-  {
-    url: '/basic-api/system/getMenuList',
-    timeout: 100,
-    method: 'get',
-    response: () => {
-      return resultSuccess(menuList);
-    },
-  },
+  // {
+  //   url: '/basic-api/system/getMenuList',
+  //   timeout: 100,
+  //   method: 'get',
+  //   response: () => {
+  //     return resultSuccess(menuList);
+  //   },
+  // },
   {
     url: '/basic-api/system/accountExist',
     timeout: 500,

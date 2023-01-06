@@ -116,7 +116,6 @@ export const usePermissionStore = defineStore({
 
     // 构建路由
     async buildRoutesAction(): Promise<AppRouteRecordRaw[]> {
-      debugger
       const { t } = useI18n()
       const userStore = useUserStore()
       const appStore = useAppStoreWithOut()
@@ -149,7 +148,6 @@ export const usePermissionStore = defineStore({
        * @description 根据设置的首页path，修正routes中的affix标记（固定首页）
        * */
       const patchHomeAffix = (routes: AppRouteRecordRaw[]) => {
-        debugger
         if (!routes || routes.length === 0) return
         let homePath: string = userStore.getUserInfo.homePath || PageEnum.BASE_HOME
 
@@ -229,18 +227,17 @@ export const usePermissionStore = defineStore({
           // 模拟从后台获取权限码，
           // this function may only need to be executed once, and the actual project can be put at the right time by itself
           // 这个功能可能只需要执行一次，实际项目可以自己放在合适的时间
-          let routeList: AppRouteRecordRaw[] = []
+          let routeList:any=[]
           try {
-            await this.changePermissionCode()
+            // await this.changePerm/*  */issionCode()
             routeList = (await getMenuList()) as AppRouteRecordRaw[]
-            console.log(routeList,'...routeList...')
           } catch (error) {
             console.error(error)
           }
 
           // Dynamically introduce components
           // 动态引入组件
-          routeList = transformObjToRoute(routeList)
+          routeList = transformObjToRoute(routeList.buildMenus)
 
           //  Background routing to menu structure
           //  后台路由到菜单结构
