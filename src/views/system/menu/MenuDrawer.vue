@@ -16,7 +16,7 @@
   import { formSchema } from './menu.data';
   import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
 
-  import { getMenuList,editMenuList,createMenuList } from '@/api/demo/system';
+  import { getMenTree,editMenuList,createMenuList } from '@/api/demo/system';
 
   export default defineComponent({
     name: 'MenuDrawer',
@@ -24,7 +24,7 @@
     emits: ['success', 'register'],
     setup(_, { emit }) {
       const isUpdate = ref(true);
-
+      const MenuId=ref('');
       const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
         labelWidth: 100,
         schemas: formSchema,
@@ -34,17 +34,23 @@
 
       const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
         resetFields();
+        
         setDrawerProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
-
+      
+   
         if (unref(isUpdate)) {
           setFieldsValue({
             ...data.record,
           });
+          MenuId.value=data.record.MenuId
+          
         }
-        const treeData = await getMenuList();
+        const treeData = await getMenTree().then((res) => {
+        return res.TreeSelect
+      });
         updateSchema({
-          field: 'parentMenu',
+          field: 'ParentId',
           componentProps: { treeData },
         });
       });
@@ -56,7 +62,11 @@
           const values = await validate();
           setDrawerProps({ confirmLoading: true });
           // TODO custom api
-          !unref(isUpdate) ? await createMenuList(values) : await editMenuList(values)
+          console.log(values,'...values...')
+          if(!values.ParentId){
+            values.ParentId=0;
+          }
+          !unref(isUpdate) ? await createMenuList(values) : await editMenuList({...values,MenuId:MenuId.value})
           closeDrawer();
           emit('success');
         } finally {

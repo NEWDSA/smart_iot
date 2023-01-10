@@ -6,7 +6,7 @@ import { ErrorMessageMode } from '/#/axios'
 enum Api {
   Login = '/login',
   LoginReal='/user/login',
-  Logout = '/logout',
+  Logout = '/system/user/logout',
   GetUserInfo = '/getUserInfo',
   GetUserInfoReal='/system/user/getInfo',
   GetPermCode = '/getPermCode',
@@ -17,17 +17,8 @@ enum Api {
 /**
  * @description: user login api
  */
-// TODO:更改为 后端真实接口
+// 登录
 export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') {
-  // return defHttp.post<LoginResultModel>(
-  //   {
-  //     url: Api.Login,
-  //     params
-  //   },
-  //   {
-  //     errorMessageMode: mode
-  //   }
-  // )
   return realHttp.post<LoginResultModel>({
     url:Api.LoginReal,
     params
@@ -52,8 +43,9 @@ export function getPermCode() {
   return defHttp.get<string[]>({ url: Api.GetPermCode })
 }
 
+// 登出
 export function doLogout() {
-  return defHttp.get({ url: Api.Logout })
+  return realHttp.get({ url: Api.Logout })
 }
 
 export function testRetry() {

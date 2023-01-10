@@ -25,8 +25,19 @@ export type DeptParams = {
 }
 
 export type MenuParams = {
-  menuName?: string
-  status?: string
+  MenuId?:number,
+  MenuName?:string
+  ParentId?: 0
+  OrderNum?: number
+  Path?:string,
+  Component?:string
+  IsFrame?:string
+  IsCache?:string
+  MenuType?:string
+  Visible?: string
+  Status?: string
+  Perms?: string
+  Icon?: string
 }
 
 export interface AccountListItem {
@@ -78,7 +89,7 @@ export interface MenuListItem {
 }
 
 export interface TreeListItem {
-  TreeSelect:any
+  TreeSelect: any
   Id: number
   ParentId: number
   Name: string

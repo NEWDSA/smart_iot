@@ -99,29 +99,28 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
     required: true,
   },
-
   {
-    field: 'parentMenu',
+    field: 'ParentId',
     label: '上级菜单',
     component: 'TreeSelect',
     componentProps: {
       fieldNames: {
-        label: 'menuName',
-        key: 'id',
-        value: 'id',
+        label: 'Name',
+        key: 'Id',
+        value: 'Id',
       },
       getPopupContainer: () => document.body,
     },
   },
 
   {
-    field: 'orderNo',
+    field: 'OrderNum',
     label: '排序',
     component: 'InputNumber',
     required: true,
   },
   {
-    field: 'icon',
+    field: 'Icon',
     label: '图标',
     component: 'IconPicker',
     required: true,
@@ -129,27 +128,22 @@ export const formSchema: FormSchema[] = [
   },
 
   {
-    field: 'routePath',
+    field: 'Component',
+    label: '组件地址',
+    component: 'Input',
+    required: true,
+    ifShow: ({ values }) => !isButton(values.type),
+  },
+  {
+    field: 'Path',
     label: '路由地址',
     component: 'Input',
     required: true,
     ifShow: ({ values }) => !isButton(values.type),
   },
   {
-    field: 'component',
-    label: '组件路径',
-    component: 'Input',
-    ifShow: ({ values }) => isMenu(values.type),
-  },
-  {
-    field: 'permission',
-    label: '权限标识',
-    component: 'Input',
-    ifShow: ({ values }) => !isDir(values.type),
-  },
-  {
-    field: 'status',
-    label: '状态',
+    field: 'Status',
+    label: '菜单状态',
     component: 'RadioButtonGroup',
     defaultValue: '0',
     componentProps: {
@@ -160,36 +154,8 @@ export const formSchema: FormSchema[] = [
     },
   },
   {
-    field: 'isExt',
-    label: '是否外链',
-    component: 'RadioButtonGroup',
-    defaultValue: '0',
-    componentProps: {
-      options: [
-        { label: '否', value: '0' },
-        { label: '是', value: '1' },
-      ],
-    },
-    ifShow: ({ values }) => !isButton(values.type),
-  },
-
-  {
-    field: 'keepalive',
-    label: '是否缓存',
-    component: 'RadioButtonGroup',
-    defaultValue: '0',
-    componentProps: {
-      options: [
-        { label: '否', value: '0' },
-        { label: '是', value: '1' },
-      ],
-    },
-    ifShow: ({ values }) => isMenu(values.type),
-  },
-
-  {
-    field: 'show',
-    label: '是否显示',
+    field: 'Visible',
+    label: '显示状态',
     component: 'RadioButtonGroup',
     defaultValue: '0',
     componentProps: {

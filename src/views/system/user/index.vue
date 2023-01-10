@@ -42,7 +42,7 @@
 import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
-import { getAccountList, getDeptList, BulkDept } from '@/api/demo/system';
+import { getAccountList, getDeptList, BulkDept,delAccount } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
 
@@ -138,17 +138,22 @@ export default defineComponent({
 
     }
     // 编辑用户
-    function handleEdit(record: Recordable) {
-      console.log(record);
+    function handleEdit(record: Recordable) {;
 
       openModal(true, {
         record,
         isUpdate: true,
       });
     }
-
+    // 删除账号
     function handleDelete(record: Recordable) {
-      console.log(record);
+      
+      try {
+        delAccount({UserId:record.UserId} );
+      } finally {
+        reload();
+      }
+
     }
     function Dat(values) {
       let Detp = toRaw(values).join();

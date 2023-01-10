@@ -3,6 +3,7 @@
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
         <a-button type="primary" @click="handleCreate"> 新增菜单 </a-button>
+        <a-button @click="changeexpandAll(),checkAll=!checkAll" class="mr-2"> 展开/折叠全部 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -28,10 +29,10 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, nextTick } from 'vue';
+import { defineComponent, nextTick, ref } from 'vue';
 
 import { BasicTable, useTable, TableAction } from '@/components/Table';
-import { getMenuList } from '@/api/demo/system';
+import { getMenuList, DelMenuList } from '@/api/demo/system';
 
 import { useDrawer } from '@/components/Drawer';
 import MenuDrawer from './MenuDrawer.vue';
@@ -43,7 +44,8 @@ export default defineComponent({
   components: { BasicTable, MenuDrawer, TableAction },
   setup() {
     const [registerDrawer, { openDrawer }] = useDrawer();
-    const [registerTable, { reload, expandAll }] = useTable({
+    const checkAll=ref(true);
+    const [registerTable, { reload, expandAll, collapseAll }] = useTable({
       title: '菜单列表',
       api: getMenuList,
       afterFetch(res) {
@@ -92,7 +94,6 @@ export default defineComponent({
         isUpdate: false,
       });
     }
-
     function handleEdit(record: Recordable) {
       openDrawer(true, {
         record,
@@ -101,7 +102,14 @@ export default defineComponent({
     }
 
     function handleDelete(record: Recordable) {
-      console.log(record);
+
+      try {
+        DelMenuList({ MenuId: record.MenuId });
+      } finally {
+        reload();
+      }
+      // 删除菜单
+
     }
 
     function handleSuccess() {
@@ -112,6 +120,10 @@ export default defineComponent({
       // 演示默认展开所有表项
       nextTick(expandAll);
     }
+    function changeexpandAll() {
+      checkAll.value? expandAll() : collapseAll();
+
+    }
 
     return {
       registerTable,
@@ -121,6 +133,8 @@ export default defineComponent({
       handleDelete,
       handleSuccess,
       onFetchSuccess,
+      changeexpandAll,
+      checkAll
     };
   },
 });

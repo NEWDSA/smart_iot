@@ -22,6 +22,7 @@ enum Api {
   setRoleStatus = '/system/role/changeStatus',
   MenuList = '/system/getMenuList',
   MenuRealList = '/system/menu',
+  MenuTree='/system/menu/treeSelect',
   RouterList = '/system/user/getRouters',
   CreateDept = '/system/dept',
   RolePageList = '/system/getRoleListByPage',
@@ -49,6 +50,12 @@ export const modifiAccountList = (params: AccountParams) =>
 // 新增用户信息
 export const createAccountList = (params: AccountParams) =>
   realHttp.post<AccountListGetResultModel>(
+    { url: Api.AccountList, params },
+    { isTransformResponse: true }
+  )
+// 删除用户信息
+export const delAccount = (params) =>
+  realHttp.delete<AccountListGetResultModel>(
     { url: Api.AccountList, params },
     { isTransformResponse: true }
   )
@@ -102,7 +109,7 @@ export const editMenuList = (params?: MenuParams) =>
   )
 // 新增菜单
 export const createMenuList = (params?: MenuParams) =>
-  realHttp.put<MenuListGetResultModel>(
+  realHttp.post<MenuListGetResultModel>(
     {
       url: Api.MenuRealList,
       params
@@ -111,12 +118,22 @@ export const createMenuList = (params?: MenuParams) =>
       isTransformResponse: true
     }
   )
+
+// 删除菜单
+export const DelMenuList = (params?: MenuParams) =>
+  realHttp.delete<MenuListGetResultModel>(
+    {
+      url: Api.MenuRealList,
+      params
+    },
+    {
+      isTransformResponse: true
+    }
+  )
+
 // 获取菜单下拉列表树
-export const getMenTree=(params){
-  realHttp.get({
-    // url:Api
-  })
-}
+export const getMenTree = (params?) =>
+  realHttp.get({ url: Api.MenuTree, params },{isTransformResponse: true})
 
 export const getRoleListByPage = (params?: RolePageParams) =>
   // defHttp.get<RolePageListGetResultModel>({ url: Api.RolePageList, params }); //模拟数据
