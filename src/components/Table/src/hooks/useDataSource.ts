@@ -48,7 +48,7 @@ export function useDataSource(
   })
   const dataSourceRef = ref<Recordable[]>([])
   const rawDataSourceRef = ref<Recordable>({})
-
+// 立即运行一个函数
   watchEffect(() => {
     tableData.value = unref(dataSourceRef)
   })
@@ -57,10 +57,12 @@ export function useDataSource(
     () => unref(propsRef).dataSource,
     () => {
       const { dataSource, api } = unref(propsRef)
+      console.log(dataSource,'ddddd')
       !api && dataSource && (dataSourceRef.value = dataSource)
     },
     {
-      immediate: true
+      immediate: true,
+      deep:true
     }
   )
 

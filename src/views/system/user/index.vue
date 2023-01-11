@@ -1,7 +1,7 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
-    <BasicTable @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+    <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
       <template #toolbar>
         <a-button type="primary" @click="handleBulk">批量调动</a-button>
         <a-button type="primary" @click="handleCreate">新增账号</a-button>
@@ -39,10 +39,10 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick } from 'vue';
+import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
-import { getAccountList, getDeptList, BulkDept,delAccount } from '@/api/demo/system';
+import { getAccountList, getDeptList, BulkDept, delAccount } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
 
@@ -57,6 +57,8 @@ export default defineComponent({
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction },
   setup() {
     const go = useGo();
+    const dataSource: any = ref([]);
+    const update = getCurrentInstance() as ComponentInternalInstance | null
     const [registerModal, { openModal }] = useModal();
     const [registerMyTable, { openModal: openModal2 }] = useModal();
     const searchInfo = reactive<Recordable>({});
@@ -67,59 +69,67 @@ export default defineComponent({
     const {
       createConfirm
     } = useMessage();
+    const internalInstance = getCurrentInstance()
+    const params = {
+      page: 1,
+      pageSize: 10
+    }
     const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys }] = useTable({
-      title: '用户列表',
-      rowSelection: {
-        type: 'checkbox',
-        selectedRowKeys: checkedKeys,
-        onChange: onSelectChange,
-      },
-      api: getAccountList,
-      afterFetch(res) {
-        // 通过ID取出部门
-        let result = res;
-        const datas = toRaw(basicData.value);
-        result.map(item => {
-          item.DeptName = datas.find(item1 => item1.DeptId == item.DeptId).DeptName
-        })
-        return result;
-      },
-      rowKey: 'UserId',
-      columns,
-      formConfig: {
-        labelWidth: 120,
-        schemas: searchFormSchema,
-        autoSubmitOnEnter: true,
-      },
-      useSearchForm: true,
-      showTableSetting: true,
-      bordered: true,
-      handleSearchInfoFn(info) {
-        console.log('handleSearchInfoFn', info);
-        return info;
-      },
-      actionColumn: {
-        width: 120,
-        title: '操作',
-        dataIndex: 'action',
-        // slots: { customRender: 'action' },
-      },
-    });
-    onMounted(() => {
-      getDeptList().then(res => {
-        basicData.value = res;
-        // basicData.value=toRaw(basicData.value);
+        title: '用户列表',
+        rowKey: 'DeptName',
+        rowSelection: {
+          type: 'checkbox',
+          selectedRowKeys: checkedKeys,
+          onChange: onSelectChange,
+        },
+        columns,
+        formConfig: {
+          labelWidth: 120,
+          schemas: searchFormSchema,
+          autoSubmitOnEnter: true,
+        },
+        useSearchForm: true,
+        showTableSetting: true,
+        bordered: true,
+        handleSearchInfoFn(info) {
+          console.log('handleSearchInfoFn', info);
+          return info;
+        },
+        actionColumn: {
+          width: 120,
+          title: '操作',
+          dataIndex: 'action',
+          // slots: { customRender: 'action' },
+        },
       });
-    });
+    onMounted(() => {
+
+      getData(params);
+
+
+    })
     function handleCreate() {
       openModal(true, {
         isUpdate: false,
       });
     }
+    // 获取table数据
+    function getData(params) {
+      dataSource.value = [];
+      getAccountList({
+        ...params
+      }).then(async res => {
+        const result = res;
+        result.map(async item => {
+          const deptList = await getDeptList();
+
+          item.DeptName = deptList.find(item1 => item1.DeptId == item.DeptId)?.DeptName
+          dataSource.value.push(item)
+        })
+      });
+    }
     function onSelectChange(selectedRowKeys: (string | number)[]) {
-      console.log(selectedRowKeys);
       checkedKeys.value = selectedRowKeys;
-      console.log(checkedKeys.value, '...dddd...')
     }
     function handleBulk(record: Recordable) {
       if (getSelectRowKeys().length > 0) {
@@ -138,8 +148,7 @@ export default defineComponent({
 
     }
     // 编辑用户
-    function handleEdit(record: Recordable) {;
-
+    function handleEdit(record: Recordable) {
       openModal(true, {
         record,
         isUpdate: true,
@@ -147,9 +156,9 @@ export default defineComponent({
     }
     // 删除账号
     function handleDelete(record: Recordable) {
-      
+
       try {
-        delAccount({UserId:record.UserId} );
+        delAccount({ UserId: record.UserId });
       } finally {
         reload();
       }
@@ -161,7 +170,7 @@ export default defineComponent({
       try {
         BulkDept({
           UserIds: user,
-          DeptId:  Number(Detp) 
+          DeptId: Number(Detp)
         })
       } finally {
         reload();
@@ -181,11 +190,19 @@ export default defineComponent({
       }
     }
     function handleEditPwd(record: Recordable) {
-      
+
       console.log(record, '...record...')
     }
     function handleSelect(DeptId = '') {
       searchInfo.DeptId = DeptId;
+      // 调用接口进行处理
+      let param = {
+        ...params,
+        ...searchInfo
+      }
+      getData({
+        ...param
+      })
       reload();
     }
     // 页面跳转
@@ -204,14 +221,19 @@ export default defineComponent({
       handleSelect,
       handleEditPwd,
       handleBulk,
+      getData,
       onSelectChange,
       openModal2,
       Dat,
+      internalInstance,
       modalVisible,
       currentModal,
       checkedKeys,
       searchInfo,
-      basicData
+      basicData,
+      dataSource,
+      update,
+      params
     };
   },
 });

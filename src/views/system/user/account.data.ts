@@ -23,13 +23,7 @@ export const columns: BasicColumn[] = [
   // 需对部门信息进行处理
   {
     title: '部门',
-    dataIndex:'DeptName',
-    format(text, record, index) {
-      // 需要调用接口获取用户部门信息
-     const result =getDeptList().then(res=>{return res})
-     console.log(result);
-      return record.DeptName
-    }
+    dataIndex:'DeptName'
   },
   {
     title: '状态',

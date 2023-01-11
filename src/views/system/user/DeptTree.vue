@@ -21,7 +21,6 @@ export default defineComponent({
 
     // 获取部门数据
     async function fetch() {
-      treeData.value = (await getDeptList()) as unknown as TreeItem[];
       // 组装后端数据
       function listToTreeSimple(data) {
         const res: any = [];
@@ -37,18 +36,15 @@ export default defineComponent({
         });
         return res;
       }
-      let datas = listToTreeSimple(treeData.value);
+      let datas = listToTreeSimple(await getDeptList());
       treeData.value=datas;
       return treeData
 
     }
 
-
-
     function handleSelect(keys) {
       emit('select', keys[0]);
     }
-
     onMounted(() => {
       fetch();
     });

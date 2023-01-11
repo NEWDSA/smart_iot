@@ -36,7 +36,7 @@ enum Api {
 
 // 获取用户列表
 export const getAccountList = (params: AccountParams) =>
-  realHttp.get<AccountListGetResultModel>(
+  realHttp.get(
     { url: Api.AccountList, params },
     { isTransformResponse: true }
   )
@@ -62,7 +62,7 @@ export const delAccount = (params) =>
 
 // 获取部门列表
 export const getDeptList = (params?: DeptParams) =>
-  realHttp.get<DeptListGetResultModel>({ url: Api.DeptReal, params }, { isTransformResponse: true })
+  realHttp.get({ url: Api.DeptReal, params }, { isTransformResponse: true })
 
 // 部门下拉列表
 export const getDeptDrop = (params?: DeptParams) =>
