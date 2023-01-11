@@ -1,0 +1,313 @@
+<template>
+  <div class="p-5">
+    <div class="p-5 bg-white">
+      <div class="text-lg font-bold">设备分类</div>
+      <div>
+        <!-- <BasicForm @register="register"></BasicForm> -->
+      </div>
+      <div>
+        <a-button type="primary" preIcon="ic:baseline-plus" @click="openModal()">
+          创建新的分类
+        </a-button>
+      </div>
+    </div>
+
+    <div>
+      <BasicTable @register="registertab" @edit-change="onEditChange" :dataSource="[...TreeTableData]">
+        <!-- <template #toolbar>
+        <a-button type="primary" @click="expandAll">展开全部</a-button>
+        <a-button type="primary" @click="collapseAll">折叠全部</a-button>
+      </template> -->
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'action'">
+            <TableAction :actions="createActions(record, column)" />
+          </template>
+        </template>
+      </BasicTable>
+      <!-- </div> -->
+    </div>
+
+    <addclass ref="addmodel" @ok="ClassOK" @close="ClassClose"></addclass>
+
+  </div>
+</template>
+<script lang="ts">
+import { ref, reactive, nextTick, defineComponent, onMounted,watch } from 'vue';
+import { BasicForm, useForm } from '@/components/Form';
+// import { Button } from '@/components/Button';
+import { BasicTable, useTable, TableAction, BasicColumn, EditRecordRow, ActionItem } from '@/components/Table';
+import { getBasicColumns, getTreeTableData } from './tableData';
+
+import { facilityTypeTreeApi, facilityTypeSaveApi, facilityTypeSameGradeApi, facilityTypeDeleteApi, facilityTypeEditApi } from '@/api/facility/facility'
+
+import addclass from './components/addclass.vue';
+import console from 'console';
+import { useMessage } from '@/hooks/web/useMessage';
+const { createMessage: msg } = useMessage();
+
+// const openModal = ref({false,1});
+
+export default defineComponent({
+  name: 'AccountDetail',
+  components: { BasicTable, TableAction, addclass },
+  setup() {
+    onMounted(()=>{
+      FengfacilityTypeTree();
+    })
+    // 获取data
+    const TreeTableData = reactive([])
+    // 获取树状列表，自己封装
+    function FengfacilityTypeTree() {
+      TreeTableData.length = 0
+
+      facilityTypeTreeApi().then(res => {
+        console.log(res)
+        for (let i = 0; i < res.length; i++) {
+          TreeTableData.push(res[i].SelfData)
+
+          if (res[i].SonData) {
+            TreeTableData[i].children = []
+            // console.log('res[i].SonData',res[i].SonData)
+            for (let y = 0; y < res[i].SonData.length; y++) {
+              TreeTableData[i].children.push(res[i].SonData[y].SelfData)
+
+              if (res[i].SonData[y].SonData) {
+                // console.log(res[i].SonData[y].SonData)
+                TreeTableData[i].children[y].children = []
+                // console.log('res[i].SonData',TreeTableData)
+                for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
+                  TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
+                }
+              }
+            }
+          }
+
+        }
+        // 完成后自动展开
+        nextTick(expandAll);
+        console.log('TreeTableData', TreeTableData)
+      })
+
+    }
+
+    // const TreeTabColumns = ref()
+    const [registertab, { expandAll, deleteTableDataRecord }] = useTable({
+      // title: '树形表格',
+      // api:FengfacilityTypeTreeApi,
+      isTreeTable: true,
+      // canRowDrag: true
+      actionColumn: {
+        width: 80,
+        title: '操作',
+        dataIndex: 'action',
+        // slots: { customRender: 'action' },
+        fixed: undefined,
+      },
+      // titleHelpMessage: '树形组件不能和序列号列同时存在',
+      columns: getBasicColumns(),
+      // dataSource: toRaw(TreeTableData),
+      // rowKey: 'id',
+    })
+
+    const addmodel = ref() //获取子组件
+
+    // 打开弹窗
+    function openModal(type, data) {
+      console.log('45', type)
+      // 编辑
+      if (type) {
+        addmodel.value.parent = true
+
+        if (type == 'edit') {
+          // 如果是edit添加数据到弹窗里面
+          if (!data.ParentId) {
+            addmodel.value.parent = false
+          } else {
+            addmodel.value.parentSelect[0].selectId = data.ParentId
+            addmodel.value.parentSelect[0].selectValue = checkSlectVlaue(data.ParentId)
+            console.log(checkSlectVlaue(data.ParentId))
+            getSelect(data.ParentId)
+            // console.log(addmodel.value.parentSelect[0].select)
+            // addmodel.value.parentSelect[0].select = checkAddSlect('TOP')
+            // console.log( addmodel.value.parentSelect[0].selectValue)
+          }
+          addmodel.value.deviceid = data.TypeId
+          addmodel.value.from[1].value = data.SortPosition
+          addmodel.value.from[0].value = data.TypeName
+        }
+
+        if (type == 'add') {
+           // 如果是add添加数据到弹窗里面
+          addmodel.value.parentSelect[0].selectId = data.TypeId
+          addmodel.value.parentSelect[0].selectValue = data.TypeName
+          getSelect(data.TypeId)
+        }
+      }
+
+      // addmodel.value.parentSelect[0].value = data.
+      addmodel.value.ClassType = type
+      addmodel.value.visible = true
+    }
+
+    // 点击确定后
+    function ClassOK(type, from, parentFrom, deviceid) {
+      console.log(type,from,parentFrom,deviceid)
+
+      if (type == 'edit') {
+        let obj = {
+          TypeId: deviceid,
+          TypeName: from[0].value,
+          SortPosition: Number(from[1].value),
+          ParentId: Number(parentFrom[0].selectId)
+        }
+
+        facilityTypeEditApi(obj).then(res => {
+          FengfacilityTypeTree();
+          // reload()
+        })
+      } else if (type == 'add') {
+        let obj = {
+          // TypeId: deviceid,
+          TypeName: from[0].value,
+          SortPosition: Number(from[1].value),
+          ParentId: Number(parentFrom[0].selectId)
+        }
+
+        facilityTypeSaveApi(obj).then(res => {
+          FengfacilityTypeTree();
+          // reload()
+        })
+      } else {
+        let obj = {
+          TypeName: from[0].value,
+          // SortPosition: Number(from[1].value),
+          ParentId: 0
+        }
+        facilityTypeSaveApi(obj).then(res => {
+          FengfacilityTypeTree();
+          // reload()
+        })
+      }
+
+      addmodel.value.handleClock()
+        addmodel.value.visible = false
+
+    }
+
+    // 取消?关闭弹窗
+    function ClassClose() {
+
+      addmodel.value.ClassType = ''
+      // console.log(editClassType.value, addClassType.value)
+    }
+
+    // 操作
+    const editableData = ref('');
+
+    function createActions(record: EditRecordRow, column: BasicColumn): ActionItem[] {
+      // console.log(record)
+      return [
+        {
+          icon: 'ic:baseline-plus',
+          // disabled: editableData.value ? editableData.value !== record.key : false,
+          onClick: handleAdd.bind(null, record),
+        },
+        {
+          label: '编辑',
+          // disabled: editableData.value ? editableData.value !== record.key : false,
+          onClick: handleEdit.bind(null, record),
+        },
+        {
+          icon: 'ant-design:delete-outlined',
+          color: 'error',
+          popConfirm: {
+            title: '是否确认删除',
+            placement: 'left',
+            confirm: handleDelete.bind(null, record),
+          },
+        },
+      ];
+    }
+
+
+    function onEditChange({ column, value, record }) {
+      // 本例
+      if (column.dataIndex === 'id') {
+        record.editValueRefs.name4.value = `${value}`;
+      }
+      console.log(column, value, record);
+    }
+
+
+    async function handleDelete(record: Recordable) {
+      await deleteTableDataRecord(record.TypeId)
+      await facilityTypeDeleteApi({ 'Ids': [record.TypeId] })
+      FengfacilityTypeTree();
+
+      console.log(TreeTableData);
+    }
+
+
+    function handleEdit(record: Recordable) {
+      // editableData.value = record.key;
+      // editClassType.value = true
+      openModal('edit', record);
+      // console.log(record.key)
+    }
+
+    function handleAdd(record: Recordable) {
+      // console.log(addClassType.value,editClassType.value)
+      openModal('add', record);
+
+    }
+
+    function checkSlectVlaue(id) {
+      // console.log(id)
+      for (var i = 0; i < TreeTableData.length; i++) {
+        if (TreeTableData[i].TypeId == id) {
+          return TreeTableData[i].TypeName
+        }
+        if (TreeTableData[i].children) {
+          for (var y = 0; y < TreeTableData[i].children.length; y++) {
+            if (TreeTableData[i].children[y].TypeId == id) {
+              return TreeTableData[i].children[y].TypeName
+            }
+          }
+        }
+      }
+    }
+
+    function getSelect(id) {
+      facilityTypeSameGradeApi({ 'ParentId': id }).then(res => {
+        addmodel.value.parentSelect[0].select = res
+        //   let obj=[]
+        //   for(let i=0;i<res.length){
+        //     obj.push(item)
+        //   }
+        //   console.log(obj)
+        //  return res
+      })
+    }
+
+
+    return {
+      TreeTableData,
+      FengfacilityTypeTree,
+      registertab,
+      addmodel,
+      openModal,
+      ClassOK,
+      ClassClose,
+      editableData,
+      createActions,
+      onEditChange,
+      handleDelete,
+      handleEdit,
+      handleAdd,
+      checkSlectVlaue,
+      getSelect,
+    };
+  },
+});
+</script>
+
