@@ -82,6 +82,7 @@ export interface ColEx {
 
 export type ComponentType =
   | 'Input'
+  | 'Button'
   | 'InputGroup'
   | 'InputPassword'
   | 'InputSearch'

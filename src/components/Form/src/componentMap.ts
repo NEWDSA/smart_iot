@@ -6,6 +6,7 @@ import type { ComponentType } from './types/index'
  */
 import {
   Input,
+  Button,
   Select,
   Radio,
   Checkbox,
@@ -36,6 +37,7 @@ import { CountdownInput } from '@/components/CountDown'
 const componentMap = new Map<ComponentType, Component>()
 
 componentMap.set('Input', Input)
+componentMap.set('Button', Button)
 componentMap.set('InputGroup', Input.Group)
 componentMap.set('InputPassword', Input.Password)
 componentMap.set('InputSearch', Input.Search)

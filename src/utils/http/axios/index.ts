@@ -53,6 +53,7 @@ const transform: AxiosTransform = {
     // TODO:根据后端进行修改  const { code, result, message } = data
     // const { code, result, message } = data   //模拟数据接口
     const { Code, Data, Msg } = data
+    
 
     // 这里逻辑可以根据项目进行修改
     // TODO:根据后端真实接口进行更改 code
@@ -72,9 +73,6 @@ const transform: AxiosTransform = {
       } else if (options.successMessageMode === 'message') {
         createMessage.success(successMsg)
       }
-      // return result  // 模拟数据
-      // 对数据结构进行判断
-      //真实数据
       return Data.hasOwnProperty('List') ? Data.List : Data
       
     }

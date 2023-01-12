@@ -1,6 +1,6 @@
 export interface BasicPageParams {
-  page: number
-  pageSize: number
+  PageNum: number
+  PageSize: number
 }
 
 export interface BasicFetchResult<T> {

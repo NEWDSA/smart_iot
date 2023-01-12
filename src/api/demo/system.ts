@@ -136,15 +136,12 @@ export const getMenTree = (params?) =>
   realHttp.get({ url: Api.MenuTree, params },{isTransformResponse: true})
 
 export const getRoleListByPage = (params?: RolePageParams) =>
-  // defHttp.get<RolePageListGetResultModel>({ url: Api.RolePageList, params }); //模拟数据
   realHttp.get<RolePageListGetResultModel>({ url: Api.RoleRealPageList, params }) //后端接口
 
 // 获取角色列表
 export const getAllRoleList = (params?: RoleParams) =>
   realHttp.get<RoleListGetResultModel>({ url: Api.GetAllRoleList, params })
 
-// export const setRoleStatus = (id: number, status: string) =>
-//   defHttp.post({ url: Api.setRoleStatus, params: { id, status } });  //
 
 // 创建角色
 export const CreateRole = (params?: RoleParams) =>
@@ -161,6 +158,7 @@ export const ModifiRole = (params?: RoleParams) => {
 // 修改角色状态
 export const setRoleStatus = (RoleId: number, Status: string) =>
   realHttp.put({ url: Api.RoleStatus, params: { RoleId, Status } }) //后端接口
+  //admin12345
 
 export const isAccountExist = (account: string) =>
   defHttp.post({ url: Api.IsAccountExist, params: { account } }, { errorMessageMode: 'none' })

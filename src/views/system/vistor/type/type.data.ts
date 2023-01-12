@@ -7,35 +7,22 @@ import dayjs from 'dayjs'
 
 export const columns: BasicColumn[] = [
   {
-    title: '菜单名称',
-    dataIndex: 'MenuName',
+    title: '分类名称',
+    dataIndex: 'VisitorTypeName',
     width: 200,
     align: 'left'
   },
   {
-    title: '图标',
-    dataIndex: 'Icon',
-    width: 50,
-    customRender: ({ record }) => {
-      return h(Icon, { icon: record.Icon })
-    }
-  },
-  {
     title: '排序',
-    dataIndex: 'OrderNum',
-    width: 50
-  },
-  {
-    title: '请求地址',
-    dataIndex: 'Path',
+    dataIndex: 'VisitorTypeSort',
     width: 50
   },
   {
     title: '状态',
-    dataIndex: 'status',
+    dataIndex: 'VisitorTypeState',
     width: 80,
     customRender: ({ record }) => {
-      const status = record.status
+      const status = record.VisitorTypeState
       const enable = ~~status === 0
       const color = enable ? 'green' : 'red'
       const text = enable ? '启用' : '停用'

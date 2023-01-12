@@ -5,6 +5,11 @@ export type AccountParams = BasicPageParams & {
   nickname?: string
 }
 
+export type regionParam = BasicPageParams & {
+  RegionId: number
+  TypeId: number
+  Sort: number
+}
 export type RoleParams = {
   RoleId: number
   roleName?: string
@@ -25,15 +30,15 @@ export type DeptParams = {
 }
 
 export type MenuParams = {
-  MenuId?:number,
-  MenuName?:string
+  MenuId?: number
+  MenuName?: string
   ParentId?: 0
   OrderNum?: number
-  Path?:string,
-  Component?:string
-  IsFrame?:string
-  IsCache?:string
-  MenuType?:string
+  Path?: string
+  Component?: string
+  IsFrame?: string
+  IsCache?: string
+  MenuType?: string
   Visible?: string
   Status?: string
   Perms?: string

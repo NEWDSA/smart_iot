@@ -1,5 +1,5 @@
 <template>
-  <BasicModal  v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
+  <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
     <BasicForm @register="registerForm" />
   </BasicModal>
 </template>
@@ -19,9 +19,12 @@ export default defineComponent({
 
     const [registerForm, { setFieldsValue, updateSchema, resetFields, validate }] = useForm({
       labelWidth: 100,
-      baseColProps: { lg: 12, md: 12 },
+      baseColProps: { span: 24},
       schemas: accountFormSchema,
-      showActionButtonGroup: false
+      showActionButtonGroup: false,
+      actionColOptions: {
+        span: 24,
+      },
     });
 
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
@@ -42,23 +45,11 @@ export default defineComponent({
         field: 'DeptId',
         componentProps: { treeData },
       });
-      // 需要对部门数据进行处理
-      // updateSchema([
-      //   {
-      //     field: 'pwd',
-      //     show: !unref(isUpdate),
-      //   },
-      //   {
-      //     field: 'ParentId',
-      //     componentProps: { treeData },
-      //   },
-      // ]);
-
     });
 
 
 
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增账号' : '编辑账号'));
+    const getTitle = computed(() => (!unref(isUpdate) ? '选择添加设备' : '编辑账号'));
 
     async function handleSubmit() {
       try {

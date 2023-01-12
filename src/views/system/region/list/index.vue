@@ -3,8 +3,9 @@
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
     <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleBulk">批量调动</a-button>
-        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+        <a-button type="primary" @click="handleBulk">批量设置权限</a-button>
+        <a-button type="primary" @click="handleout">批量移出</a-button>
+        <a-button type="primary" @click="handleCreate">添加设备</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -39,10 +40,10 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
+import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, onMounted } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
-import { getAccountList, getDeptList, BulkDept, delAccount } from '@/api/demo/system';
+import { getReginDevice } from '@/api/demo/region';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
 
@@ -57,78 +58,67 @@ export default defineComponent({
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction },
   setup() {
     const go = useGo();
-    const dataSource: any = ref([]);
-    const update = getCurrentInstance() as ComponentInternalInstance | null
+    const data = ref([]);
     const [registerModal, { openModal }] = useModal();
-    const [registerMyTable, { openModal: openModal2 }] = useModal();
-    const searchInfo = reactive<Recordable>({});
+    const [registerMyTable, { openModal: openModal2 }] = useModal(); let searchInfo = reactive<Recordable>({});
     const checkedKeys = ref<Array<string | number>>([]);
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
-    const basicData: any = ref('');
+    const dataSource: any = ref([]);
     const modalVisible = ref<Boolean>(false);
+    const params = {
+      TypeId: 2,
+      Sort: 0,
+      RegionId: 1,
+      PageNum: 1,
+      PageSize: 10
+    }
     const {
       createConfirm
     } = useMessage();
-    const internalInstance = getCurrentInstance()
-    const params = {
-      page: 1,
-      pageSize: 10
-    }
     const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys }] = useTable({
-        title: '用户列表',
-        rowKey: 'DeptName',
-        rowSelection: {
-          type: 'checkbox',
-          selectedRowKeys: checkedKeys,
-          onChange: onSelectChange,
-        },
-        columns,
-        formConfig: {
-          labelWidth: 120,
-          schemas: searchFormSchema,
-          autoSubmitOnEnter: true,
-        },
-        useSearchForm: true,
-        showTableSetting: true,
-        bordered: true,
-        handleSearchInfoFn(info) {
-          console.log('handleSearchInfoFn', info);
-          return info;
-        },
-        actionColumn: {
-          width: 120,
-          title: '操作',
-          dataIndex: 'action',
-          // slots: { customRender: 'action' },
-        },
-      });
+      title: '区域设备管理',
+      rowSelection: {
+        type: 'checkbox',
+        selectedRowKeys: checkedKeys,
+        onChange: onSelectChange,
+      },
+      rowKey: 'DeviceId',
+      columns,
+      formConfig: {
+        labelWidth: 120,
+        schemas: searchFormSchema,
+        autoSubmitOnEnter: true,
+      },
+      pagination: true,
+      useSearchForm: true,
+      showTableSetting: true,
+      showIndexColumn: false,
+      bordered: true,
+      handleSearchInfoFn(info) {
+        console.log('handleSearchInfoFn', info);
+        return info;
+      },
+      actionColumn: {
+        width: 120,
+        title: '操作',
+        dataIndex: 'action'
+      },
+    });
     onMounted(() => {
-
-      getData(params);
-
-
+      getData(params)
     })
     function handleCreate() {
       openModal(true, {
         isUpdate: false,
       });
     }
-    function getData(params) {
-      dataSource.value = [];
-      getAccountList({
-        ...params
-      }).then(async res => {
-        const result = res;
-        result.map(async item => {
-          const deptList = await getDeptList();
-
-          item.DeptName = deptList.find(item1 => item1.DeptId == item.DeptId)?.DeptName
-          dataSource.value.push(item)
-        })
-      });
-    }
     function onSelectChange(selectedRowKeys: (string | number)[]) {
+      console.log(selectedRowKeys);
       checkedKeys.value = selectedRowKeys;
+      console.log(checkedKeys.value, '...dddd...')
+    }
+    function handleout(){
+
     }
     function handleBulk(record: Recordable) {
       if (getSelectRowKeys().length > 0) {
@@ -163,20 +153,11 @@ export default defineComponent({
       }
 
     }
-    function Dat(values) {
-      let Detp = toRaw(values).join();
-      let user = toRaw(checkedKeys.value)
-      try {
-        BulkDept({
-          UserIds: user,
-          DeptId: Number(Detp)
-        })
-      } finally {
-        reload();
-      }
-
-
-
+    // 获取table数据
+    async function getData(params) {
+      //  获取数据
+      const { Page } = await getReginDevice(params)
+      dataSource.value = Page.List
     }
     function handleSuccess({ isUpdate, values }) {
       if (isUpdate) {
@@ -192,23 +173,16 @@ export default defineComponent({
 
       console.log(record, '...record...')
     }
-    function handleSelect(DeptId = '') {
-      searchInfo.DeptId = DeptId;
-      // 调用接口进行处理
-      let param = {
-        ...params,
-        ...searchInfo
+    function handleSelect(RegionId = '') {
+
+      params.RegionId = Number(RegionId)
+      searchInfo = {
+        ...params
       }
-      getData({
-        ...param
-      })
+      getData({ ...searchInfo })
+      // 通过区域ID显示数据
       reload();
     }
-    // 页面跳转
-    // function handleView(record: Recordable) {
-    //   go('/system/account_detail/' + record.id);
-    // }
-
     return {
       registerTable,
       registerMyTable,
@@ -220,19 +194,16 @@ export default defineComponent({
       handleSelect,
       handleEditPwd,
       handleBulk,
-      getData,
       onSelectChange,
       openModal2,
-      Dat,
-      internalInstance,
+      handleout,
+      dataSource,
+      params,
       modalVisible,
       currentModal,
       checkedKeys,
       searchInfo,
-      basicData,
-      dataSource,
-      update,
-      params
+      getData
     };
   },
 });
