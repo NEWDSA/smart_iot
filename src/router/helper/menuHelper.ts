@@ -64,7 +64,12 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
   const list = treeMap(routeList, {
     conversion: (node: AppRouteRecordRaw) => {
       const { meta: { title, hideMenu = false } = {} } = node
-
+      if(node.name == 'Facilitylist'){
+        node.meta.ignoreKeepAlive = false
+      }
+      // : false,
+      console.log(node);
+      // debugger;
       return {
         ...(node.meta || {}),
         meta: node.meta,

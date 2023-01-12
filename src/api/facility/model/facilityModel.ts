@@ -2,6 +2,7 @@ export interface facilityListParams {
     TypeId: string
     PageSize: string
     PageNum: string
+    DeviceName:string
 }
 
 export interface facilityDetailParams {

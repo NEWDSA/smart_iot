@@ -46,11 +46,14 @@
                 <div class="flex items-center justify-between">
                   <div class="font-bold">{{ facility.DeviceName }}</div>
                   <div class="rounded-md px-2 flex items-center"
-                    :class="facility.DeviceStatus == 1 ? 'bg-green-100 text-green-500' : facility.DeviceStatus == 2 ? 'bg-red-100 text-red-500' : 'bg-yellow-400 text-white'">
+                    :class="facility.NetworkStatus == 1 ? 'bg-green-100 text-green-500' : facility.NetworkStatus == 2 ? 'bg-red-100 text-red-500' : 'bg-yellow-400 text-white'">
                     <div class="w-1 h-1 mr-2"
-                      :class="facility.DeviceStatus == 1 ? 'bg-green-500' : facility.DeviceStatus == 2 ? 'bg-red-500' : 'bg-white'"
+                      :class="facility.NetworkStatus == 1 ? 'bg-green-500' : facility.NetworkStatus == 2 ? 'bg-red-500' : 'bg-white'"
                       style="border-radius: 50%;"></div>
-                    {{ facility.DeviceStatus == 1 ? '在线' : facility.DeviceStatus == 2 ? '离线' : '异常' }}
+                    {{
+                      facility.NetworkStatus == 1 ? '在线' : facility.NetworkStatus == 2 ? '离线' : facility.NetworkStatus
+                        == 3 ? '异常' : facility.NetworkStatus == 4 ? '故障' : '运行'
+                    }}
                   </div>
                 </div>
                 <div class="text-gray-500 mb-5">ID:{{ facility.DeviceId }}</div>
@@ -64,9 +67,9 @@
                   </Modal>
                   <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click="showModalClick(index, index2)">删除</div>
                   <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click="pathDetail(facility.DeviceId)">编辑</div>
-                  <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded" v-if="facility.DeviceStatus == 2"
+                  <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded" v-if="facility.NetworkStatus == 2"
                     @click="enableDevice(facility.DeviceId, index, index2)">启用</div>
-                  <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded" v-if="facility.DeviceStatus == 1"
+                  <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded" v-if="facility.NetworkStatus == 1"
                     @click="disableDevice(facility.DeviceId, index, index2)">禁用</div>
                 </div>
               </div>
@@ -88,8 +91,9 @@
       </div>
 
     </div>
-  </div>
 
+    <Loading :loading="compState.loading" :absolute="compState.absolute" :tip="compState.tip" :background="compState.background"/>
+  </div>
 </template>
 <script lang="ts" >
 import { ref, reactive, defineComponent, nextTick, watch } from 'vue';
@@ -98,10 +102,11 @@ import { useGo } from '@/hooks/web/usePage';
 import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityDeleteApi } from '@/api/facility/facility'
 import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
 import { message } from 'ant-design-vue';
+import { Loading } from '@/components/Loading';
 import console from 'console';
 export default defineComponent({
   name: 'Facilitylist',
-  components: { Select, Modal, TreeSelect },
+  components: { Select, Modal, TreeSelect,Loading },
   setup() {
     const go = useGo();
     const searchValue = ref('');
@@ -129,6 +134,14 @@ export default defineComponent({
         TypeName: '全部'
       },
     ]);
+
+    // loading
+    const compState = reactive({
+      absolute: false,
+      loading: false,
+      tip: '加载中...',
+      background: 'rgba(0,0,0,.5)'
+    });
 
     //切换分类 
     function cutTab(TypeId, index) {
@@ -216,7 +229,7 @@ export default defineComponent({
         console.log(SelectFacilityList[0])
         // console.log('console.log(res.Total / (res.PageSize * res.PageNum))',res.Total / (res.PageSize * res.PageNum))
         if (res.Total / (res.PageSize * res.PageNum) <= 1) {
-          
+
           SelectFacilityLock.value = true
         } else {
           SelectFacilityLock.value = false
@@ -263,6 +276,7 @@ export default defineComponent({
     // 初始化
     getTypeList()
     function getTypeList() {
+      openLoading(false);
       facilityTypeTreeApi().then(res => {
         console.log('res', res)
         for (let i = 0; i < res.length; i++) {
@@ -472,14 +486,14 @@ export default defineComponent({
     // 启动
     function enableDevice(id, index1, index2) {
       console.log(index1, index2)
-      console.log(facilityList[index1].facility[index2].DeviceStatus)
+      console.log(facilityList[index1].facility[index2].NetworkStatus)
       if (facilityTabIndex.value == '0') {
         nextTick(() => {
-          facilityList[index1].facility[index2].DeviceStatus = 1
+          facilityList[index1].facility[index2].NetworkStatus = 1
         })
       } else {
         nextTick(() => {
-          SelectFacilityList[index1].facility[index2].DeviceStatus = 1
+          SelectFacilityList[index1].facility[index2].NetworkStatus = 1
         })
       }
       console.log(facilityList)
@@ -499,11 +513,11 @@ export default defineComponent({
     function disableDevice(id, index1, index2) {
       if (facilityTabIndex.value == '0') {
         nextTick(() => {
-          facilityList[index1].facility[index2].DeviceStatus = 2
+          facilityList[index1].facility[index2].NetworkStatus = 2
         })
       } else {
         nextTick(() => {
-          SelectFacilityList[index1].facility[index2].DeviceStatus = 2
+          SelectFacilityList[index1].facility[index2].NetworkStatus = 2
         })
       }
 
@@ -563,6 +577,16 @@ export default defineComponent({
       children: 'children', label: 'TypeName', key: 'TypeId', value: 'TypeId'
     })
 
+
+    // loading
+    function openLoading(absolute: boolean) {
+      compState.absolute = absolute;
+      compState.loading = true;
+      setTimeout(() => {
+        compState.loading = false;
+      }, 2000);
+    }
+
     // 设备登录
     const titles = ref([])
     registerTopAreaRef(titles)
@@ -603,7 +627,8 @@ export default defineComponent({
       ModalShow,
       showModalClick,
       resetObj,
-      SearchStatus
+      SearchStatus,
+      compState
     }
   },
 
