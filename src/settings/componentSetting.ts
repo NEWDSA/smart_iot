@@ -13,7 +13,7 @@ export default {
       // 传给后台的每页显示多少条的字段
       sizeField: 'PageSize',
       // 接口返回表格数据的字段
-      listField: 'Detail',
+      listField: 'List' || 'Detail',
       // 接口返回表格总数的字段
       totalField: 'Total'
     },
