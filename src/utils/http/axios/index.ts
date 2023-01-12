@@ -73,13 +73,26 @@ const transform: AxiosTransform = {
       } else if (options.successMessageMode === 'message') {
         createMessage.success(successMsg)
       }
-      return Data.hasOwnProperty('List') ? Data.List : Data
-      
+      // return result  // 模拟数据
+      // 对数据结构进行判断
+      //真实数据
+      // if(Data.hasOwnProperty('List')|| )
+
+      // return Data.hasOwnProperty('List') ? Data.List : Data
+      return Data.hasOwnProperty('Detail') ? Data.Detail : Data
+      // return Data
     }
 
     // 在此处根据自己项目的实际情况对不同的code执行不同的操作
     // 如果不希望中断当前请求，请return数据，否则直接抛出异常即可
     let timeoutMsg = ''
+
+    // 如果code==0没data
+    const hasSuccesss = !Data && Reflect.has(data, 'Code') && Code === ResultEnum.SUCCESS // 后端接口数据
+    if (hasSuccesss) {
+      return 0
+    }
+
     // 模拟数据
     // switch (code) {
     //   case ResultEnum.TIMEOUT:

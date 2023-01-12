@@ -13,9 +13,9 @@ export default {
       // 传给后台的每页显示多少条的字段
       sizeField: 'PageSize',
       // 接口返回表格数据的字段
-      listField: 'items',
+      listField: 'Detail',
       // 接口返回表格总数的字段
-      totalField: 'total'
+      totalField: 'Total'
     },
     // 可选的分页选项
     pageSizeOptions: ['10', '50', '80', '100'],

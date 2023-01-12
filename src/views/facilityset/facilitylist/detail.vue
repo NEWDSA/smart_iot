@@ -14,10 +14,10 @@
         </div>
       </div>
 
-      <info v-if="facilityDetailTabIndex == 0 && infoFacility" :infoFacility="infoFacility" @ingoEdit="getfacilityId"></info>
-      <log v-if="facilityDetailTabIndex == 1" :DeviceName="infoFacility.DeviceName"></log>
-      <control v-if="facilityDetailTabIndex == 2" :DeviceModel="infoFacility.DeviceModel" :DeviceId="infoFacility.DeviceSerial" :ModelId="infoFacility.DeviceModelId"></control>
-      <warn v-if="facilityDetailTabIndex == 3" :DeviceName="infoFacility.DeviceName"></warn>
+      <info v-if="facilityDetailTabIndex == '0'" :infoFacility="infoFacility" @ingoEdit="getfacilityId"></info>
+      <log v-if="facilityDetailTabIndex == '1'" :DeviceName="infoFacility.DeviceName"></log>
+      <control v-if="facilityDetailTabIndex == '2'" :DeviceModel="infoFacility.DeviceModel" :DeviceId="infoFacility.DeviceSerial" :ModelId="infoFacility.DeviceModelId"></control>
+      <warn v-if="facilityDetailTabIndex == '3'" :DeviceName="infoFacility.DeviceName"></warn>
 
     </div>
   </PageWrapper>
@@ -35,7 +35,7 @@ import { useGo } from '@/hooks/web/usePage';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const go = useGo();
-const infoFacility = ref()
+const infoFacility = ref('')
 
 onMounted(() => {
   // 此处可以得到用户ID
@@ -53,7 +53,7 @@ const getfacilityId = (id) => {
 }
 
 
-const facilityDetailTabIndex = ref('')
+const facilityDetailTabIndex = ref('5')
 const facilityDetailTab = reactive([
   {
     id: 1,
