@@ -46,7 +46,7 @@ export default defineComponent({
       });
     });
 
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增部门' : '编辑部门'));
+    const getTitle = computed(() => (!unref(isUpdate) ? '新增部门' : '修改部门'));
 
     async function handleSubmit() {
       try {

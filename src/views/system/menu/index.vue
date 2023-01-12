@@ -3,7 +3,7 @@
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
         <a-button type="primary" @click="handleCreate"> 新增菜单 </a-button>
-        <a-button @click="changeexpandAll(),checkAll=!checkAll" class="mr-2"> 展开/折叠全部 </a-button>
+        <a-button @click="changeexpandAll(), checkAll = !checkAll" class="mr-2"> 展开/折叠全部 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -44,10 +44,17 @@ export default defineComponent({
   components: { BasicTable, MenuDrawer, TableAction },
   setup() {
     const [registerDrawer, { openDrawer }] = useDrawer();
-    const checkAll=ref(true);
+    const checkAll = ref(true);
     const [registerTable, { reload, expandAll, collapseAll }] = useTable({
       title: '菜单列表',
-      api: getMenuList,
+      // api: getData,
+      api: async (p) => {
+        // 对数据进行特殊处理
+        const { List } = await getMenuList(p);
+
+        return List;
+
+      },
       afterFetch(res) {
         let result = res;
         function listToTreeSimple(data) {
@@ -84,11 +91,9 @@ export default defineComponent({
         width: 80,
         title: '操作',
         dataIndex: 'action',
-        // slots: { customRender: 'action' },
         fixed: undefined,
       },
     });
-
     function handleCreate() {
       openDrawer(true, {
         isUpdate: false,
@@ -121,7 +126,7 @@ export default defineComponent({
       nextTick(expandAll);
     }
     function changeexpandAll() {
-      checkAll.value? expandAll() : collapseAll();
+      checkAll.value ? expandAll() : collapseAll();
 
     }
 

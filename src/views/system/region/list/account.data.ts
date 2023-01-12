@@ -6,7 +6,7 @@ import { h } from 'vue'
 async function getTree() {
   const { Data } = await getTreeList()
 
-  let treeData: any = [];
+  let treeData: any = []
   // 树形结构进行封装
   // Data.forEach((item) => {
   //   item.forEach((item2) => {
@@ -19,8 +19,15 @@ async function getTree() {
   //     })
   //   })
   // })
-  return Data
+  // return Data
   // 对数据进行重新组装
+  function listTotreeSimple(Data) {
+    const res: any = [];
+    data.forEach((item)=>{
+      
+    })
+  }
+  let datas = listTotreeSimple(data)
 }
 export const columns: BasicColumn[] = [
   {

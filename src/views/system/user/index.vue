@@ -70,61 +70,47 @@ export default defineComponent({
       createConfirm
     } = useMessage();
     const internalInstance = getCurrentInstance()
-    const params = {
-      page: 1,
-      pageSize: 10
-    }
     const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys }] = useTable({
-        title: '用户列表',
-        rowKey: 'DeptName',
-        rowSelection: {
-          type: 'checkbox',
-          selectedRowKeys: checkedKeys,
-          onChange: onSelectChange,
-        },
-        columns,
-        formConfig: {
-          labelWidth: 120,
-          schemas: searchFormSchema,
-          autoSubmitOnEnter: true,
-        },
-        useSearchForm: true,
-        showTableSetting: true,
-        bordered: true,
-        handleSearchInfoFn(info) {
-          console.log('handleSearchInfoFn', info);
-          return info;
-        },
-        actionColumn: {
-          width: 120,
-          title: '操作',
-          dataIndex: 'action',
-          // slots: { customRender: 'action' },
-        },
-      });
-    onMounted(() => {
+      title: '用户列表',
+      rowKey: 'DeptName',
+      rowSelection: {
+        type: 'checkbox',
+        selectedRowKeys: checkedKeys,
+        onChange: onSelectChange,
+      },
+      api: async (p) => {
+        const { List } = await getAccountList(p)
 
-      getData(params);
-
-
-    })
+        List?.map(async item => {
+          const deptList = await getDeptList();
+          item.DeptName = deptList.List.find(item1 => item1.DeptId == item.DeptId)?.DeptName
+        })
+        return new Promise((resolve) => {
+          resolve([...List]);
+        })
+      },
+      columns,
+      formConfig: {
+        labelWidth: 120,
+        schemas: searchFormSchema,
+        autoSubmitOnEnter: true,
+      },
+      useSearchForm: true,
+      showTableSetting: true,
+      bordered: true,
+      handleSearchInfoFn(info) {
+        console.log('handleSearchInfoFn', info);
+        return info;
+      },
+      actionColumn: {
+        width: 120,
+        title: '操作',
+        dataIndex: 'action'
+      },
+    });
     function handleCreate() {
       openModal(true, {
         isUpdate: false,
-      });
-    }
-    function getData(params) {
-      dataSource.value = [];
-      getAccountList({
-        ...params
-      }).then(async res => {
-        const result = res;
-        result.map(async item => {
-          const deptList = await getDeptList();
-
-          item.DeptName = deptList.find(item1 => item1.DeptId == item.DeptId)?.DeptName
-          dataSource.value.push(item)
-        })
       });
     }
     function onSelectChange(selectedRowKeys: (string | number)[]) {
@@ -195,13 +181,13 @@ export default defineComponent({
     function handleSelect(DeptId = '') {
       searchInfo.DeptId = DeptId;
       // 调用接口进行处理
-      let param = {
-        ...params,
-        ...searchInfo
-      }
-      getData({
-        ...param
-      })
+      // let param = {
+      //   ...params,
+      //   ...searchInfo
+      // }
+      // getData({
+      //   ...param
+      // })
       reload();
     }
     // 页面跳转
@@ -220,7 +206,6 @@ export default defineComponent({
       handleSelect,
       handleEditPwd,
       handleBulk,
-      getData,
       onSelectChange,
       openModal2,
       Dat,
@@ -231,8 +216,7 @@ export default defineComponent({
       searchInfo,
       basicData,
       dataSource,
-      update,
-      params
+      update
     };
   },
 });

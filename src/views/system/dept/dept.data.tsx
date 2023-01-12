@@ -63,12 +63,6 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'DeptName',
-    label: '部门名称',
-    component: 'Input',
-    required: true
-  },
-  {
     field: 'ParentId',
     label: '上级部门',
     component: 'TreeSelect',
@@ -84,11 +78,18 @@ export const formSchema: FormSchema[] = [
     required: true
   },
   {
+    field: 'DeptName',
+    label: '部门名称',
+    component: 'Input',
+    required: true
+  },
+  {
     field: 'orderNo',
     label: '排序',
     component: 'InputNumber',
     required: true
   },
+
   {
     field: 'status',
     label: '状态',
@@ -101,11 +102,6 @@ export const formSchema: FormSchema[] = [
       ]
     },
     required: true
-  },
-  {
-    label: '备注',
-    field: 'remark',
-    component: 'InputTextArea'
   }
 ]
 

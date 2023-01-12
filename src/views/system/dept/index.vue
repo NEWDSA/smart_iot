@@ -7,28 +7,28 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
-  {
-    icon: 'clarity:note-edit-line',
-    onClick: handleEdit.bind(null, record),
-  },
-  {
-    icon: 'ion:add-circle-outline',
-    popConfirm: {
-      title: '添加',
-      placement: 'left',
-      confirm: handleCreate.bind(null),
-    }
-  },
-  {
-    icon: 'ant-design:delete-outlined',
-    color: 'error',
-    popConfirm: {
-      title: '是否确认删除',
-      placement: 'left',
-      confirm: handleDelete.bind(null, record),
-    },
-  }
-]" />
+            {
+              icon: 'clarity:note-edit-line',
+              onClick: handleEdit.bind(null, record),
+            },
+            {
+              icon: 'ion:add-circle-outline',
+              popConfirm: {
+                title: '添加',
+                placement: 'left',
+                confirm: handleCreate.bind(null),
+              }
+            },
+            {
+              icon: 'ant-design:delete-outlined',
+              color: 'error',
+              popConfirm: {
+                title: '是否确认删除',
+                placement: 'left',
+                confirm: handleDelete.bind(null, record),
+              },
+            }
+          ]" />
         </template>
       </template>
     </BasicTable>
@@ -60,7 +60,13 @@ export default defineComponent({
         labelWidth: 120,
         schemas: searchFormSchema,
       },
-      api: getDeptList,
+      // api: getDeptList,
+      api: async (p) => {
+        const { List } = await getDeptList(p);
+        return new Promise((resolve) => {
+          resolve([...List]);
+        })
+      },
       afterFetch(res) {
         let result = res;
         function listToTreeSimple(data) {

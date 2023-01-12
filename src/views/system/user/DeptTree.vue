@@ -24,8 +24,8 @@ export default defineComponent({
       // 组装后端数据
       function listToTreeSimple(data) {
         const res: any = [];
-        data.forEach((item) => {
-          const parent = data.find((node) => node.DeptId === item.ParentId);
+        data.List.forEach((item) => {
+          const parent = data.List.find((node) => node.DeptId === item.ParentId);
           if (parent) {
             parent.children = parent.children || [];
             parent.children.push(item);
@@ -34,10 +34,11 @@ export default defineComponent({
             res.push(item);
           }
         });
-        return res;
+
+        return res
       }
       let datas = listToTreeSimple(await getDeptList());
-      treeData.value=datas;
+      treeData.value = datas;
       return treeData
 
     }
