@@ -22,7 +22,7 @@ enum Api {
   setRoleStatus = '/system/role/changeStatus',
   MenuList = '/system/getMenuList',
   MenuRealList = '/system/menu',
-  MenuTree = '/system/menu/treeSelect',
+  MenuTree='/system/menu/treeSelect',
   RouterList = '/system/user/getRouters',
   CreateDept = '/system/dept',
   RolePageList = '/system/getRoleListByPage',
@@ -36,7 +36,10 @@ enum Api {
 
 // 获取用户列表
 export const getAccountList = (params: AccountParams) =>
-  realHttp.get({ url: Api.AccountList, params }, { isTransformResponse: true })
+  realHttp.get(
+    { url: Api.AccountList, params },
+    { isTransformResponse: true }
+  )
 
 // 修改用户信息
 export const modifiAccountList = (params: AccountParams) =>
@@ -130,7 +133,7 @@ export const DelMenuList = (params?: MenuParams) =>
 
 // 获取菜单下拉列表树
 export const getMenTree = (params?) =>
-  realHttp.get({ url: Api.MenuTree, params }, { isTransformResponse: true })
+  realHttp.get({ url: Api.MenuTree, params },{isTransformResponse: true})
 
 export const getRoleListByPage = (params?: RolePageParams) =>
   realHttp.get({ url: Api.RoleRealPageList, params }) //后端接口
@@ -138,6 +141,7 @@ export const getRoleListByPage = (params?: RolePageParams) =>
 // 获取角色列表
 export const getAllRoleList = (params?: RoleParams) =>
   realHttp.get<RoleListGetResultModel>({ url: Api.GetAllRoleList, params })
+
 
 // 创建角色
 export const CreateRole = (params?: RoleParams) =>
@@ -154,7 +158,7 @@ export const ModifiRole = (params?: RoleParams) => {
 // 修改角色状态
 export const setRoleStatus = (RoleId: number, Status: string) =>
   realHttp.put({ url: Api.RoleStatus, params: { RoleId, Status } }) //后端接口
-//admin12345
+  //admin12345
 
 export const isAccountExist = (account: string) =>
   defHttp.post({ url: Api.IsAccountExist, params: { account } }, { errorMessageMode: 'none' })

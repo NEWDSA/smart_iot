@@ -93,19 +93,6 @@ const transform: AxiosTransform = {
       return 0
     }
 
-    // 模拟数据
-    // switch (code) {
-    //   case ResultEnum.TIMEOUT:
-    //     timeoutMsg = t('sys.api.timeoutMessage')
-    //     const userStore = useUserStoreWithOut()
-    //     userStore.setToken(undefined)
-    //     userStore.logout(true)
-    //     break
-    //   default:
-    //     if (message) {
-    //       timeoutMsg = message
-    //     }
-    // }
 
     //真实数据
     switch (Code) {

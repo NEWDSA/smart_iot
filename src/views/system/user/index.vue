@@ -79,17 +79,34 @@ export default defineComponent({
         onChange: onSelectChange,
       },
       api: async (p) => {
-        const { List } = await getAccountList(p)
+        const { List,Total } = await getAccountList(p)
 
         List?.map(async item => {
           const deptList = await getDeptList();
           item.DeptName = deptList.List.find(item1 => item1.DeptId == item.DeptId)?.DeptName
         })
-        return new Promise((resolve) => {
-          resolve([...List]);
-        })
+        // 给返回的数据再包装一层
+        let re = {
+          result: {
+            Total,
+            List
+          }
+        }
+        return re.result;
+        // return new Promise((resolve) => {
+        //   resolve([...re.result]);
+        // })
       },
       columns,
+      fetchSetting: {
+        pageField: 'PageNum',
+        // 传给后台的每页显示多少条的字段
+        sizeField: 'PageSize',
+        // 接口返回表格数据的字段
+        listField: 'List',
+        // 接口返回表格总数的字段
+        totalField: 'Total'
+      },
       formConfig: {
         labelWidth: 120,
         schemas: searchFormSchema,
