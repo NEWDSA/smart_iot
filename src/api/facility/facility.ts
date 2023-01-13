@@ -52,9 +52,10 @@ export function facilityTypeTreeApi() {
 }
 
 // 父类同级分类列表
-export function facilityTypeSameGradeApi() {
+export function facilityTypeSameGradeApi(params) {
     return realHttp.get({
         url: Api.DeviceTypeSameGrade,
+        params
     });
 }
 
@@ -168,8 +169,6 @@ export const facilityAlertListApi = (params:facilityAlertParams) =>
     realHttp.get({
         url: Api.DeviceAlertList,
         params
-    },{
-        isTransformResponse:true
     });
 
 
