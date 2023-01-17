@@ -25,7 +25,7 @@ export {
 }
 
 function connect() {
-    ws = new WebSocket("ws://192.168.8.180:8899/");
+    ws = new WebSocket("ws://192.168.8.208:8899/");
     ws.onopen = login;
     ws.onmessage = function (evt) {
         var msg = JSON.parse(evt.data);

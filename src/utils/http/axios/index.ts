@@ -53,7 +53,7 @@ const transform: AxiosTransform = {
     // TODO:根据后端进行修改  const { code, result, message } = data
     // const { code, result, message } = data   //模拟数据接口
     const { Code, Data, Msg } = data
-    
+
 
     // 这里逻辑可以根据项目进行修改
     // TODO:根据后端真实接口进行更改 code
@@ -79,8 +79,8 @@ const transform: AxiosTransform = {
       // if(Data.hasOwnProperty('List')|| )
 
       // return Data.hasOwnProperty('List') ? Data.List : Data
-      return Data.hasOwnProperty('Detail') ? Data.Detail : Data
-      // return Data
+      // return Data.hasOwnProperty('Detail') ? Data.Detail : Data
+      return Data
     }
 
     // 在此处根据自己项目的实际情况对不同的code执行不同的操作
@@ -93,6 +93,11 @@ const transform: AxiosTransform = {
       return 0
     }
 
+    // 如果code==10000
+    const halkblank = Code == 10000 // 后端接口数据
+    if (halkblank) {
+      return true
+    }
 
     //真实数据
     switch (Code) {
@@ -180,7 +185,7 @@ const transform: AxiosTransform = {
     const token = getToken()
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
-      ;(config as Recordable).headers.Authorization = options.authenticationScheme
+      ; (config as Recordable).headers.Authorization = options.authenticationScheme
         ? `${options.authenticationScheme} ${token}`
         : token
     }
