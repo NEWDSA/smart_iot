@@ -47,7 +47,6 @@ export default defineComponent({
     const checkAll = ref(true);
     const [registerTable, { reload, expandAll, collapseAll }] = useTable({
       title: '菜单列表',
-      // api: getData,
       api: async (p) => {
         // 对数据进行特殊处理
         const { List } = await getMenuList(p);

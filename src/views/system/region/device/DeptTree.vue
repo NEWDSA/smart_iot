@@ -23,13 +23,15 @@ export default defineComponent({
     // 获取部门数据
     async function fetch() {
       // treeData.value = (await getReginList()) as unknown as TreeItem[];
-    const {Detail}=await getReginList() 
-    treeData.value=Detail;
+      const region = await getReginList()
+      console.log(region,'....region...')
+      treeData.value = region
     }
 
 
 
     function handleSelect(RegionId) {
+      console.log(RegionId,'...RegionId12')
       emit('select', RegionId[0]);
     }
 

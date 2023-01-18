@@ -31,8 +31,6 @@ export default defineComponent({
       isUpdate.value = !!data?.isUpdate;
       if (unref(isUpdate)) {
         deptId.value = data.record.DeptId;
-        console.log(deptId
-          , '...data.record...')
         setFieldsValue({
           ...data.record,
         });

@@ -11,46 +11,41 @@
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
-              icon: 'ant-design:delete-outlined',
-              color: 'error',
-              tooltip: '删除此账号',
+              label:'移出',
               popConfirm: {
-                title: '是否确认删除',
+                title: '是否确认移出',
                 placement: 'left',
                 confirm: handleDelete.bind(null, record),
               },
             },
             {
-              icon: 'ri:lock-password-fill',
-              tooltip: '修改密码',
+              label:'权限设置',
               onClick: handleEditPwd.bind(null, record)
             },
             {
-              icon: 'clarity:note-edit-line',
-              tooltip: '编辑用户资料',
+              label:'更多',
               onClick: handleEdit.bind(null, record),
             }
           ]" />
         </template>
       </template>
     </BasicTable>
-    <component :is="currentModal" v-model:visible="modalVisible" @success="Dat" :isUpdate="true" />
+    <component :is="currentModal" v-model:visible="modalVisible" @success="bulkPermission" :isUpdate="true" />
     <AccountModal @register="registerModal" @success="handleSuccess" />
-    <AccountTable @register="registerMyTable" @success="Dat" />
+    <AccountTable @register="registerMyTable" @success="bulkPermission" />
   </PageWrapper>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, onMounted } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
-import { getReginDevice } from '@/api/demo/region';
+import { getReginDevice, getDeviceType, devicePermission, bulkDeviceOut } from '@/api/demo/region';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
 
 import { useModal } from '@/components/Modal';
+import AccountTable from './AccountTable.vue';
 import AccountModal from './AccountModal.vue';
-import AccountTable from './AccountTable.vue'
-
 import { columns, searchFormSchema } from './account.data';
 import { useGo } from '@/hooks/web/usePage';
 export default defineComponent({
@@ -58,25 +53,30 @@ export default defineComponent({
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction },
   setup() {
     const go = useGo();
-    const data = ref([]);
+    const searchInfo = reactive<Recordable>({});
     const [registerModal, { openModal }] = useModal();
-    const [registerMyTable, { openModal: openModal2 }] = useModal(); let searchInfo = reactive<Recordable>({});
+    const [registerMyTable, { openModal: openModal2 }] = useModal();
     const checkedKeys = ref<Array<string | number>>([]);
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
+    const PermisionList = reactive({
+      DeviceId: [],
+      DepartmentId: []
+    })
     const dataSource: any = ref([]);
     const modalVisible = ref<Boolean>(false);
-    const params = {
-      TypeId: 2,
-      Sort: 0,
-      RegionId: 1,
-      PageNum: 1,
-      PageSize: 10
-    }
+    var pagination = reactive({ TypeId: 2, Sort: 0, RegionId: 1, PageNum: 1, PageSize: 10 })
     const {
       createConfirm
     } = useMessage();
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys }] = useTable({
+    function onChange() {
+      pagination.PageNum = arguments[0].current;
+      getData()
+
+
+    }
+    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination }] = useTable({
       title: '区域设备管理',
+      onChange,
       rowSelection: {
         type: 'checkbox',
         selectedRowKeys: checkedKeys,
@@ -95,8 +95,8 @@ export default defineComponent({
       showIndexColumn: false,
       bordered: true,
       handleSearchInfoFn(info) {
-        console.log('handleSearchInfoFn', info);
-        return info;
+        Object.assign(pagination, info);
+        getData()
       },
       actionColumn: {
         width: 120,
@@ -105,23 +105,61 @@ export default defineComponent({
       },
     });
     onMounted(() => {
-      getData(params)
+      getData()
     })
     function handleCreate() {
-      openModal(true, {
-        isUpdate: false,
-      });
+      if (searchInfo.RegionId) {
+        let params = searchInfo.RegionId
+        openModal(true, {
+          params,
+          isUpdate: false
+        });
+      } else {
+        createConfirm({
+          iconType: 'info',
+          title: '提示',
+          content: '至少选择一项区域',
+        });
+      }
+
     }
-    function onSelectChange(selectedRowKeys: (string | number)[]) {
-      console.log(selectedRowKeys);
+    function onSelectChange(selectedRowKeys: []) {
       checkedKeys.value = selectedRowKeys;
-      console.log(checkedKeys.value, '...dddd...')
+      PermisionList.DeviceId = Object.values(selectedRowKeys);
     }
-    function handleout(){
+    function handleout() {
+      // 请选择需要移出的设备
+      if (toRaw(checkedKeys.value)) {
+        let param = {
+          DeviceId: toRaw(checkedKeys.value),
+          RegionId: 0
+        }
+        try {
+          bulkDeviceOut(param)
+        } finally {
+          reload()
+        }
+
+
+      } else {
+        createConfirm({
+          iconType: 'info',
+          title: '提示',
+          content: '请至少选择一项进行移出',
+        });
+      }
+    }
+    // 
+    function bulkPermission(params) {
+      PermisionList.DepartmentId = Object.values(params);
+      // 调用接口进行处理
+      devicePermission({ DeviceId: PermisionList.DeviceId, DepartmentId: PermisionList.DepartmentId })
+      reload()
 
     }
     function handleBulk(record: Recordable) {
       if (getSelectRowKeys().length > 0) {
+
         currentModal.value = AccountTable;
         nextTick(() => {
           modalVisible.value = true;
@@ -154,10 +192,27 @@ export default defineComponent({
 
     }
     // 获取table数据
-    async function getData(params) {
-      //  获取数据
-      const { Page } = await getReginDevice(params)
-      dataSource.value = Page.List
+    async function getData() {
+      //  获取区域设备
+      dataSource.value = [];
+      const { Page } = await getReginDevice(pagination)
+      const result = Page.List;
+      const TypeList: any = [];
+      setPagination({
+        total: Page.Total
+      })
+      result.map(async (item) => {
+        const DeviceList = await getDeviceType({
+          Id: item.TypeId
+        })
+
+        TypeList.push(...DeviceList)
+        item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
+        dataSource.value.push(item)
+      })
+
+
+      // dataSource.value.push(result)
     }
     function handleSuccess({ isUpdate, values }) {
       if (isUpdate) {
@@ -175,11 +230,13 @@ export default defineComponent({
     }
     function handleSelect(RegionId = '') {
 
-      params.RegionId = Number(RegionId)
-      searchInfo = {
-        ...params
-      }
-      getData({ ...searchInfo })
+      console.log(RegionId)
+      // 请选择区域
+
+      searchInfo.RegionId = Number(RegionId);
+      // 和并数据处理
+      Object.assign(pagination, searchInfo);
+      getData()
       // 通过区域ID显示数据
       reload();
     }
@@ -197,13 +254,15 @@ export default defineComponent({
       onSelectChange,
       openModal2,
       handleout,
+      bulkPermission,
+      getData,
       dataSource,
-      params,
       modalVisible,
       currentModal,
       checkedKeys,
       searchInfo,
-      getData
+      pagination,
+      PermisionList
     };
   },
 });

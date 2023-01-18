@@ -10,6 +10,9 @@ export type regionParam = BasicPageParams & {
   TypeId: number
   Sort: number
 }
+export type deviceParam={
+  Id?:number
+}
 export type RoleParams = {
   RoleId: number
   roleName?: string

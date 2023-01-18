@@ -1,4 +1,5 @@
-import { getAllRoleList, isAccountExist, getDeptList} from '@/api/demo/system'
+import { getAllRoleList, isAccountExist, getDeptList } from '@/api/demo/system'
+import { toRaw } from 'vue'
 import { BasicColumn } from '@/components/Table'
 import { FormSchema } from '@/components/Table'
 import { Tag } from 'ant-design-vue'
@@ -22,8 +23,9 @@ export const columns: BasicColumn[] = [
   },
   // 需对部门信息进行处理
   {
+
     title: '部门',
-    dataIndex:'DeptName'
+    dataIndex: 'DeptName'
   },
   {
     title: '状态',
@@ -46,8 +48,6 @@ export const columns: BasicColumn[] = [
     }
   }
 ]
-
-
 
 export const searchFormSchema: FormSchema[] = [
   {
@@ -83,9 +83,8 @@ export const searchFormSchema: FormSchema[] = [
 export const accountFormSchema: FormSchema[] = [
   {
     field: 'UserName',
-    label: '用户名',
+    label: '昵称',
     component: 'Input',
-    helpMessage: ['本字段演示异步验证', '不能输入带有admin的用户名'],
     rules: [
       {
         required: true,

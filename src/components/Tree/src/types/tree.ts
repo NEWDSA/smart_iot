@@ -30,6 +30,7 @@ export interface TreeState {
 
 export interface FieldNames {
   children?: string
+  RegionName?:string
   title?: string
   key?: string
 }

@@ -2,11 +2,19 @@
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
     <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+      <!-- <template #bodyCell="{column,record,text}">
+         <template v-if="column">
+               {{ column }}rrr
+         </template>
+      </template> -->
       <template #toolbar>
         <a-button type="primary" @click="handleBulk">批量调动</a-button>
         <a-button type="primary" @click="handleCreate">新增账号</a-button>
       </template>
       <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'DeptName'">
+          {{ record.DeptName }}
+        </template>
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
@@ -69,33 +77,22 @@ export default defineComponent({
     const {
       createConfirm
     } = useMessage();
+    function onChange() {
+      pagination.PageNum=arguments[0].current;
+      getData()
+
+
+    }
+    var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys }] = useTable({
+    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getPaginationRef }] = useTable({
       title: '用户列表',
-      rowKey: 'DeptName',
+      rowKey: 'UserId',
+      onChange,
       rowSelection: {
         type: 'checkbox',
         selectedRowKeys: checkedKeys,
         onChange: onSelectChange,
-      },
-      api: async (p) => {
-        const { List,Total } = await getAccountList(p)
-
-        List?.map(async item => {
-          const deptList = await getDeptList();
-          item.DeptName = deptList.List.find(item1 => item1.DeptId == item.DeptId)?.DeptName
-        })
-        // 给返回的数据再包装一层
-        let re = {
-          result: {
-            Total,
-            List
-          }
-        }
-        return re.result;
-        // return new Promise((resolve) => {
-        //   resolve([...re.result]);
-        // })
       },
       columns,
       fetchSetting: {
@@ -117,7 +114,7 @@ export default defineComponent({
       bordered: true,
       handleSearchInfoFn(info) {
         console.log('handleSearchInfoFn', info);
-        return info;
+        // return info;
       },
       actionColumn: {
         width: 120,
@@ -129,6 +126,22 @@ export default defineComponent({
       openModal(true, {
         isUpdate: false,
       });
+    }
+    async function getData() {
+ 
+      dataSource.value = [];
+      const { List, Total } = await getAccountList(pagination);
+      setPagination({
+        total: Total
+      })
+      const accountList = List;
+      accountList?.map(async item => {
+        const { List } = await getDeptList();
+        item.DeptName = List.find(async item1 => await item1.DeptId == await item.DeptId)?.DeptName
+        dataSource.value.push(item);
+      })
+
+
     }
     function onSelectChange(selectedRowKeys: (string | number)[]) {
       checkedKeys.value = selectedRowKeys;
@@ -166,6 +179,9 @@ export default defineComponent({
       }
 
     }
+    onMounted(() => {
+      getData()
+    })
     function Dat(values) {
       let Detp = toRaw(values).join();
       let user = toRaw(checkedKeys.value)
@@ -181,6 +197,7 @@ export default defineComponent({
 
 
     }
+
     function handleSuccess({ isUpdate, values }) {
       if (isUpdate) {
         // 演示不刷新表格直接更新内部数据。
@@ -197,21 +214,10 @@ export default defineComponent({
     }
     function handleSelect(DeptId = '') {
       searchInfo.DeptId = DeptId;
-      // 调用接口进行处理
-      // let param = {
-      //   ...params,
-      //   ...searchInfo
-      // }
-      // getData({
-      //   ...param
-      // })
+      Object.assign(pagination, searchInfo);
+      getData()
       reload();
     }
-    // 页面跳转
-    // function handleView(record: Recordable) {
-    //   go('/system/account_detail/' + record.id);
-    // }
-
     return {
       registerTable,
       registerMyTable,
@@ -224,8 +230,11 @@ export default defineComponent({
       handleEditPwd,
       handleBulk,
       onSelectChange,
+      onChange,
       openModal2,
       Dat,
+      getData,
+      pagination,
       internalInstance,
       modalVisible,
       currentModal,
