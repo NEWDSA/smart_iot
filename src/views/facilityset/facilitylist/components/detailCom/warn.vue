@@ -20,10 +20,14 @@ import { facilityAlertListApi, facilityAlertIgnoreApi, facilityAlertNoticeApi } 
 
 // console.log(demoListApi)
 const props = defineProps({
-  DeviceName: {
+  DeviceSerial: {
     type: String,
     default: ''
-  }
+  },
+  NetworkStatus: {
+    type: Number,
+    default: 0
+  },
 })
 
 const checkedKeys = ref<Array<string | number>>([]);
@@ -32,13 +36,23 @@ const [registerTable, { getForm, reload }] = useTable({
   // searchInfo: searchType.value,
   columns: getBasicColumns(),
   searchInfo: {
-    DeviceSerial: '37a2b4a881'  //props.DeviceName
+    DeviceSerial: props.DeviceSerial  // 37a2b4a881 props.DeviceName
   },
   useSearchForm: true,
   bordered: true,
   handleSearchInfoFn(info) {
     console.log('handleSearchInfoFn', info);
     return info;
+  },
+  fetchSetting: {
+    // 传给后台的当前页字段
+    pageField: 'PageNum',
+    // 传给后台的每页显示多少条的字段
+    sizeField: 'PageSize',
+    // 接口返回表格数据的字段
+    listField: 'List',
+    // 接口返回表格总数的字段
+    totalField: 'Total'
   },
   actionColumn: {
     width: 80,
@@ -90,6 +104,15 @@ function handleLost(record) {
 
 // 操作
 const createActions = (record) => {
+  if (props.NetworkStatus == 0 || props.NetworkStatus == 2) {
+    return [
+      {
+        label: '设备禁用中',
+        disabled: true
+      },
+    ]
+  }
+
   if (!record.Status) {
     return [
       {
@@ -106,21 +129,21 @@ const createActions = (record) => {
       return [
         {
           label: '已上报',
-          disabled:true
+          disabled: true
         }
       ]
-    }else if (record.Status == 1) {
+    } else if (record.Status == 1) {
       return [
         {
           label: '已处理',
-          disabled:true
+          disabled: true
         }
       ]
-    }else {
+    } else {
       return [
         {
           label: '已忽略',
-          disabled:true
+          disabled: true
         }
       ]
     }

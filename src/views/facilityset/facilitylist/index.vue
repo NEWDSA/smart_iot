@@ -11,24 +11,31 @@
             {{ item.TypeName }}
           </div>
         </div>
-        <div class="search md:ml-10 mt-3 md:mt-0">
-          <a-input-search v-model:value="searchValue" placeholder="搜索" class="w-full md:w-50 " @search="onSearch" />
+        <div class="search md:ml-10 mt-3 md:mt-0 flex">
+          <Select :value="searchSlect.selectValue" class="w-50" @change="searchSlectCut">
+            <div :value="item.lable" v-for="(item, index2) in searchSlect.select" :key="item.value">
+              {{ item.lable }}
+            </div>
+          </Select>
+          <a-input-search v-model:value="searchValue" placeholder="搜索" class="w-full md:w-50 pl-3" @search="onSearch" />
         </div>
       </div>
 
 
       <div class="facility-list">
         <div class="mb-5"
-          v-for="(item, index) in facilityTabIndex == 0 && !SearchStatus ? facilityList : SelectFacilityList ">
+          v-for="(item, index) in facilityTabIndex == '0' && !SearchStatus ? facilityList : SelectFacilityList ">
           <div class="flex items-center mb-5" v-if="!SearchStatus">
+            <!--v-if="!SearchStatus && item.facility.length > 0" -->
             <div class="text-df font-bold mr-5">{{ item.facilityTab.TypeName }}</div>
 
             <div>
               <div class="fasility-class-select" v-if="item.facilityTab.children">
                 <!-- //v-for="(Sonvalue, index) in item.facilitySonTab" -->
                 <TreeSelect :defaultValue="faTypeName[facilityTabIndex == '0' ? index : 0]"
+                  v-if="facilityTabIndex == '0' ? facilityTab[index + 1].children : facilityTab[facilityTabIndex].children"
                   v-model:value="faTypeName[facilityTabIndex == '0' ? index : faTypeName.length - 1]"
-                  :tree-data="facilityTabIndex == 0 ? facilityTab[index + 1].children : facilityTab[facilityTabIndex].children"
+                  :tree-data="facilityTabIndex == '0' ? facilityTab[index + 1].children : facilityTab[facilityTabIndex].children"
                   @change="SelectCut($event, index, item.facilityTab.TypeId)" :field-names="filedName"
                   style="width: 200px;" tree-default-expand-all>
                 </TreeSelect>
@@ -40,81 +47,111 @@
           </div>
           <div class="flex items-center flex-wrap" v-if="item.facility.length > 0">
 
-            <div v-for="(facility, index2) in item.facility" :key="facility.DeviceId" class="w-100 mb-5">
+            <div v-for="(facility, index2) in item.facility" :key="facility.DeviceId" class="w-100 mb-5"
+              @click="pathDetail(facility.DeviceId)">
 
               <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5">
                 <div class="flex items-center justify-between">
                   <div class="font-bold">{{ facility.DeviceName }}</div>
-                  <div class="rounded-md px-2 flex items-center"
-                    :class="facility.NetworkStatus == 1 ? 'bg-green-100 text-green-500' : facility.NetworkStatus == 2 ? 'bg-red-100 text-red-500' : 'bg-yellow-400 text-white'">
-                    <div class="w-1 h-1 mr-2"
-                      :class="facility.NetworkStatus == 1 ? 'bg-green-500' : facility.NetworkStatus == 2 ? 'bg-red-500' : 'bg-white'"
+                  <div class="rounded-md px-2 flex items-center" :class="computedStatus(facility.NetworkStatus, true)">
+                    <div class="w-1 h-1 mr-2" :class="computedStatus(facility.NetworkStatus, false)"
                       style="border-radius: 50%;"></div>
                     {{
-                      facility.NetworkStatus == 1 ? '在线' : facility.NetworkStatus == 2 ? '离线' : facility.NetworkStatus
-                        == 3 ? '异常' : facility.NetworkStatus == 4 ? '故障' : '运行'
+                      facility.NetworkStatus == 1 ? '启用' : facility.NetworkStatus == 2 ? '禁用' : facility.NetworkStatus
+                        == 3 ? '异常' : facility.NetworkStatus == 4 ? '故障' : facility.NetworkStatus == 5 ? '运行' : '离线'
                     }}
                   </div>
                 </div>
                 <div class="text-gray-500 mb-5">ID:{{ facility.DeviceId }}</div>
-                <div class="text-gray-500">设备类型 <span class="text-black">{{ facility.TypeId }}</span></div>
-                <div class="text-gray-500">设备名称 <span class="text-black">{{ facility.RegionId }}</span></div>
+                <div class="text-gray-500">设备类型 <span class="text-black">{{ checkcheckTypeTree(facility.TypeId )}}</span></div>
+                <div class="text-gray-500">设备区域 <span class="text-black">{{ checkcheckRegionTree(facility.RegionId) }}</span></div>
 
                 <div class="bottom-but flex items-center mt-2 justify-end">
                   <Modal v-model:visible="ModalShow[facilityTabIndex == '0' && !SearchStatus ? index : 0].model[index2]"
-                    @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="删除设备">
-                    <div class="p-3">确认删除此设备？</div>
+                    @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
+                    <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
                   </Modal>
-                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click="showModalClick(index, index2)">删除</div>
-                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click="pathDetail(facility.DeviceId)">编辑</div>
-                  <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded" v-if="facility.NetworkStatus == 2"
-                    @click="enableDevice(facility.DeviceId, index, index2)">启用</div>
-                  <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded" v-if="facility.NetworkStatus == 1"
-                    @click="disableDevice(facility.DeviceId, index, index2)">禁用</div>
+                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index, index2)"
+                    v-if="facility.TypeId != -1">移出</div>
+                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="handleEdit(index, index2)">编辑</div>
+                  <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded"
+                    v-if="facility.NetworkStatus == 2 || !facility.NetworkStatus"
+                    @click.stop="enableDevice(facility.DeviceId, index, index2)">启用</div>
+                  <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded"
+                    v-if="facility.NetworkStatus == 1 || facility.NetworkStatus == 5"
+                    @click.stop="disableDevice(facility.DeviceId, index, index2)">禁用</div>
+                  <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
+                    v-if="facility.NetworkStatus == 3 || facility.NetworkStatus == 4">启用</div>
                 </div>
               </div>
             </div>
             <div class="w-100 mb-5"
-              v-if="facilityTabIndex == 0 && !SearchStatus ? facilityListLock[index] == false : SelectFacilityLock == false">
+              v-if="facilityTabIndex == '0' && !SearchStatus ? facilityListLock[index] == false : SelectFacilityLock == false">
               <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5"
-                @click="addpage(index, facilityTabIndex)">
+                @click="addpage(index, facilityTabIndex)" style="height:195px;">
                 更多+
               </div>
             </div>
           </div>
 
           <div v-else class="w-100 mb-5">
+            <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5"
+              @click="addpage(index, facilityTabIndex)" style="height:195px;">
+              暂无设备
+            </div>
+
+          </div>
+
+          <!-- <div v-else-if="facilityTabIndex!='0' && SelectFacilityList[0].facility.length < 1 &&!SearchStatus" class="w-100 mb-5">
             暂无设备
           </div>
+
+          <div v-if="SearchStatus ? SelectFacilityList[0].facility.length < 1 || SearchStatus && SelectFacilityList[0].facility.length < 1 : ''" class="w-100 mb-5">
+            暂无设备
+          </div> -->
 
         </div>
       </div>
 
     </div>
 
-    <Loading :loading="compState.loading" :absolute="compState.absolute" :tip="compState.tip" :background="compState.background"/>
+    <Loading :loading="compState.loading" :absolute="compState.absolute" :tip="compState.tip"
+      :background="compState.background" />
+
+    <EditModel @register="registerModal" @success="handleSuccess"></EditModel>
   </div>
 </template>
 <script lang="ts" >
 import { ref, reactive, defineComponent, nextTick, watch } from 'vue';
 import { Select, Modal, TreeSelect } from 'ant-design-vue';
 import { useGo } from '@/hooks/web/usePage';
-import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityDeleteApi } from '@/api/facility/facility'
+import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityCheckRuleApi, facilityRegionListApi } from '@/api/facility/facility'
 import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
 import { message } from 'ant-design-vue';
 import { Loading } from '@/components/Loading';
-import console from 'console';
+import { useModal } from '@/components/Modal';
+import EditModel from './EditModal/index.vue'
+
 export default defineComponent({
   name: 'Facilitylist',
-  components: { Select, Modal, TreeSelect,Loading },
+  components: { Select, Modal, TreeSelect, Loading, EditModel },
   setup() {
     const go = useGo();
+    const [registerModal, { openModal }] = useModal();
     const searchValue = ref('');
+    const searchSlect = ref({
+      select: [
+        { lable: '设备名称', value: '1' },
+        { lable: '设备Id', value: '2' }
+      ],
+      selectId: '1',
+      selectValue: '设备名称'
+    })
     const facilityTabIndex = ref('0');
-    const faTypeName = ref([])
-    const facilityListObj = reactive([]);
-    const facilityListLock = reactive([]);
-    const SelectFacilityList = reactive([]);
+    const faTypeName: any = ref([])
+    const facilityListObj: any = reactive([]);
+    const facilityListLock: any = reactive([]);
+    const SelectFacilityList: any = reactive([]);
     const SelectFacilityListObj = reactive({
       TypeId: '',
       PageSize: 7,
@@ -125,7 +162,9 @@ export default defineComponent({
 
     const SearchStatus = ref(false)  //搜索
 
-    const ModalShow = ref([])
+    // 移出弹窗
+    const ModalShow: any = ref([])
+    const ModalDeviceName = ref()
     // const showFacilityTab = ref()
 
     const facilityTab = reactive([
@@ -143,18 +182,67 @@ export default defineComponent({
       background: 'rgba(0,0,0,.5)'
     });
 
+    // 编辑
+    function handleEdit(index, index2) {
+      if (SearchStatus.value || facilityTabIndex.value != '0') {
+        var record = SelectFacilityList[index].facility[index2]
+      } else {
+        var record = facilityList[index].facility[index2]
+      }
+
+      if (record.NetworkStatus == 2) {
+        message.warn('设备处于禁用状态，无法更新')
+        return
+      }
+      if (record.Longitude && record.Latitude) {
+        record.LongitudeLatitude = record.Latitude + ',' + record.Longitude
+      }
+      record.CreatedTime = checkTime(record.Basic.CreatedAt.seconds)
+      // console.log(record)
+      openModal(true, {
+        isUpdate: true,
+        record,
+        index
+      });
+    }
+    // 编辑成功
+    function handleSuccess() {
+      message.success('操作成功')
+
+      if (SearchStatus.value == true) {
+        SelectGetfacilityList(true)
+      }
+
+      if (facilityTabIndex.value == '0') {
+        resetObj(null, 'all')
+        // console.log(index)
+        // console.log('facilityListObj',facilityListObj[index])
+        setTimeout(() => {
+          text();
+        }, 300);
+
+      } else {
+        resetObj(null, 'sou')
+        // SelectFacilityListObj.TypeId = fuId
+        SelectFacilityListObj.PageSize = 7
+        SelectFacilityListObj.PageNum = 1
+        // console.log('SelectFacilityListObj',SelectFacilityListObj)
+        SelectGetfacilityList(true)
+      }
+
+    }
+
+
     //切换分类 
     function cutTab(TypeId, index) {
       SelectFacilityList.length = 0
       SelectFacilityListObj.PageNum = 1
-      facilityListObj.PageNum = 1
+      // facilityListObj[index].PageNum = 1
 
       facilityTabIndex.value = index
 
       if (index == 0) {
         ModalShow.value = []
-
-
         // console.log(facilityList)
         for (let o = 0; o < facilityList.length; o++) { //添加设备
           ModalShow.value.push({
@@ -175,7 +263,7 @@ export default defineComponent({
       // nextTick(() => {
       //   for (let o = 0; o < faTypeName.value.length; o++) {
 
-      faTypeName.value[faTypeName.value.length - 1] = '全部' //重置分类列表页的select
+      faTypeName.value[faTypeName.value.length - 1] = '全部' //重置分类列表页的子分类select
       //   }
       // })
       console.log(faTypeName)
@@ -191,8 +279,8 @@ export default defineComponent({
               facility: []
             })
             // 其余分类的设备获取
-            SelectGetfacilityList()
-
+            SelectGetfacilityList(true)
+            return;
           }
         }
       }
@@ -219,7 +307,10 @@ export default defineComponent({
       }
 
       facilityListApi(SelectFacilityListObj).then(res => {
-        console.log(res)
+        if (res == true) {
+          return;
+        }
+
         for (let o = 0, valt; valt = res.List[o++];) {
           SelectFacilityList[0].facility.push(valt)
           ModalShow.value[0].model.push(false) //弹窗
@@ -237,7 +328,7 @@ export default defineComponent({
       })
     }
 
-    const facilityList = reactive([
+    const facilityList: any = reactive([
       // {
       //   facilityTab: '网关设备',
       //   facilityClass: [
@@ -265,10 +356,10 @@ export default defineComponent({
     function addpage(index, type) {
       if (type == 0 && !SearchStatus.value) {
         facilityListObj[index].PageNum += 1
-        getfacilityList(index)
+        getfacilityList(index, null, null)
       } else {
         SelectFacilityListObj.PageNum += 1
-        SelectGetfacilityList()
+        SelectGetfacilityList(null)
       }
 
     }
@@ -328,9 +419,28 @@ export default defineComponent({
               }
             }
           }
-
         }
-        // console.log('faTypeName',faTypeName)
+
+        // 固定添加
+        ModalShow.value.push({
+          model: []
+        })
+        facilityListObj.push({         //push根据设备类别 查询设备的条件
+          PageNum: 1,
+          PageSize: 7,
+          TypeId: -1
+        })
+        facilityTab.push(
+          {
+            TypeId: -1,
+            TypeName: '待分类设备'
+          },
+        )
+        facilityList.push({            //push设备类别下的小tab栏，初始化
+          facilityTab: { TypeId: -1, TypeName: "待分类设备" },
+          facility: []
+        })
+        // 固定添加结束
       })
       console.log('facilityList', facilityTab)
 
@@ -351,6 +461,7 @@ export default defineComponent({
       // console.log('y', y)
       new Promise((resove, reject) => {
         //自定义请求参数
+        console.log('facilityListObj[y].TypeId', facilityListObj[y].TypeId, y)
         let obj = {
           'TypeId': facilityListObj[y].TypeId,
           'PageSize': facilityListObj[y].PageSize,
@@ -369,7 +480,7 @@ export default defineComponent({
           console.log('obj', obj)
           console.log(res, 'dddd')
 
-          if (res == '') { //如果没数据
+          if (res == true) { //如果没数据
             return;
           }
           // debugger;
@@ -419,43 +530,62 @@ export default defineComponent({
       SelectFacilityListObj.PageSize = 7
       SelectFacilityListObj.PageNum = 1
       SelectFacilityListObj.TypeId = ''
-      SelectFacilityListObj.DeviceName = searchValue.value
+
+      if (searchSlect.value.selectId == '1') {
+        SelectFacilityListObj.DeviceName = searchValue.value
+      } else if (searchSlect.value.selectId == '2') {
+        SelectFacilityListObj.DeviceId = searchValue.value
+      } else {
+        message.warn('请选择搜索类型')
+        return;
+      }
 
       SelectFacilityList.length = 0
       SelectFacilityList.push({  //搜索
         facility: []
       })
 
-
       SelectGetfacilityList(true)
-
-
       console.log('搜索设备')
     }
 
     // 重置页数
-    function resetObj() {
-      for (let y = 0; y < facilityListObj.length; y++) {
-        // facilityListObj[y].TypeId = ''
+    function resetObj(y, type) {
+      // console.log(index)
+      // for (let y = 0; y < facilityListObj.length; y++) {
+      // facilityListObj[y].TypeId = ''
+      if (type == 'index') {
         facilityListObj[y].PageSize = 7
         facilityListObj[y].PageNum = 1
-      }
+      } else if (type == 'sou') {
+        SelectFacilityListObj.PageSize = 7
+        SelectFacilityListObj.PageNum = 1
+      } else if (type == 'indexAll') {
+        for (let y = 0; y < facilityListObj.length; y++) {
+          // facilityListObj[y].TypeId = ''
+          facilityListObj[y].PageSize = 7
+          facilityListObj[y].PageNum = 1
 
-      // SelectFacilityListObj.TypeId = ''
-      SelectFacilityListObj.PageSize = 7
-      SelectFacilityListObj.PageNum = 1
+        }
+        // SelectFacilityListObj.TypeId = ''
+
+      }
     }
+
+    // }
+
 
     // 分类型查询
     function SelectCut(id, index, fuId) {
-      resetObj()
-      if (id == '0') {
 
+      if (id == '0') {
+        resetObj(index, 'index')
         if (facilityTabIndex.value == '0') {
           console.log(index)
           getfacilityList(index, true)
 
         } else {
+          resetObj(null, 'sou')
           SelectFacilityListObj.TypeId = fuId
           SelectFacilityListObj.PageSize = 7
           SelectFacilityListObj.PageNum = 1
@@ -463,12 +593,13 @@ export default defineComponent({
         }
         // console.log(fuId)
       } else {
-
+        resetObj(index, 'index')
         if (facilityTabIndex.value == '0') {
           console.log(index)
           getfacilityList(index, true, id)
 
         } else {
+          resetObj(null, 'sou')
           SelectFacilityListObj.TypeId = id
           SelectFacilityListObj.PageSize = 7
           SelectFacilityListObj.PageNum = 1
@@ -487,14 +618,14 @@ export default defineComponent({
     function enableDevice(id, index1, index2) {
       console.log(index1, index2)
       console.log(facilityList[index1].facility[index2].NetworkStatus)
-      if (facilityTabIndex.value == '0') {
-        nextTick(() => {
-          facilityList[index1].facility[index2].NetworkStatus = 1
-        })
+      if (facilityTabIndex.value == '0' && !SearchStatus.value) {
+        // nextTick(() => {
+        facilityList[index1].facility[index2].NetworkStatus = 1
+        // })
       } else {
-        nextTick(() => {
-          SelectFacilityList[index1].facility[index2].NetworkStatus = 1
-        })
+        // nextTick(() => {
+        SelectFacilityList[index1].facility[index2].NetworkStatus = 1
+        // })
       }
       console.log(facilityList)
 
@@ -511,20 +642,29 @@ export default defineComponent({
 
     // 禁用
     function disableDevice(id, index1, index2) {
-      if (facilityTabIndex.value == '0') {
-        nextTick(() => {
-          facilityList[index1].facility[index2].NetworkStatus = 2
-        })
-      } else {
-        nextTick(() => {
-          SelectFacilityList[index1].facility[index2].NetworkStatus = 2
-        })
-      }
+      facilityCheckRuleApi({ 'Id': id }).then(res => {
+        console.log('dsajdisa', res)
+        if (res == 2) {
+          if (facilityTabIndex.value == '0' && !SearchStatus.value) {
+            // nextTick(() => {
+            facilityList[index1].facility[index2].NetworkStatus = 2
+            // })
+          } else {
+            // nextTick(() => {
+            SelectFacilityList[index1].facility[index2].NetworkStatus = 2
+            // })
+          }
 
-      facilityDisableApi({ 'Id': id }).then(res => {
-        console.log(res)
+          facilityDisableApi({ 'Id': id }).then(res => {
+            console.log(res)
+          })
+          message.success('操作成功')
+
+        } else {
+          message.error('操作失败')
+        }
+
       })
-
     }
 
     // 关闭删除弹窗
@@ -532,6 +672,7 @@ export default defineComponent({
       ModalShow.value[index].model[index2] = false
     };
 
+    // 确认移出
     const handleOk = (index, index2) => {
       // console.log()
       if (facilityTabIndex.value == '0' && !SearchStatus.value) {
@@ -540,27 +681,25 @@ export default defineComponent({
         var id = SelectFacilityList[0].facility[index2].DeviceId
       }
 
-      facilityDeleteApi({ 'Ids': [id] }).then(res => {
+      facilityRelieveApi({ 'DeviceId': id }).then(res => {
         if (res == 0) {
           // ModalShow.value[index].model[index2].
-          nextTick(() => {
-            message.success('删除成功')
+          message.success('移出成功')
 
-            if (facilityTabIndex.value == '0' && !SearchStatus.value) {
-              facilityList[index].facility.splice(index2, 1)
-              ModalShow.value[index].model[index2] = false
+          if (facilityTabIndex.value == '0' && !SearchStatus.value) {
+            facilityList[index].facility.splice(index2, 1)
+            ModalShow.value[index].model[index2] = false
 
-              ModalShow.value[index].model.splice(index2, 1)
-            } else {
-              SelectFacilityList[0].facility.splice(index2, 1)
+            ModalShow.value[index].model.splice(index2, 1)
+          } else {
+            SelectFacilityList[0].facility.splice(index2, 1)
 
-              ModalShow.value[0].model[index2] = false
+            ModalShow.value[0].model[index2] = false
 
-              ModalShow.value[0].model.splice(index2, 1)
-            }
-          })
+            ModalShow.value[0].model.splice(index2, 1)
+          }
         } else {
-          message.success('删除失败')
+          message.success('移出失败')
 
         }
         // console.log(res)
@@ -568,15 +707,105 @@ export default defineComponent({
       ModalShow.value[index].model[index2] = true
     };
 
+    // 搜索select 赋值
+    function searchSlectCut(val, data) {
+      searchSlect.value.selectId = data.key
+      searchSlect.value.selectValue = val
+    }
+
     const showModalClick = (index, index2) => {
+      if (facilityList[index].facility[index2].NetworkStatus == 2) {
+        message.warn('设备处于禁用状态，无法移出')
+        return
+      }
+      ModalDeviceName.value = facilityList[index].facility[index2].DeviceName
+
       ModalShow.value[index].model[index2] = true
     };
 
+    const computedStatus = (status, type) => {
+      // console.log(status)
+      switch (status) {
+        case 1:
+          return type ? 'bg-green-200' : 'bg-green-500'
+        case 2:
+          return type ? 'bg-gray-200' : 'bg-gray-500'
+        case 3:
+          return type ? 'bg-yellow-500' : 'bg-white'
+        case 4:
+          return type ? 'bg-red-200' : 'bg-red-500'
+        case 5:
+          return type ? 'bg-blue-500' : 'bg-white'
+
+        default:
+          return type ? 'bg-gray-200' : 'bg-gray-500'
+      }
+    }
 
     const filedName = ref({
       children: 'children', label: 'TypeName', key: 'TypeId', value: 'TypeId'
     })
 
+    function checkTime(time) {
+      let date = new Date(time * 1000);
+      let Y = date.getFullYear() + '-';
+      let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+      let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+
+      let h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
+      let m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
+      let s = (date.getSeconds() < 10 ? '0' + (date.getSeconds()) : date.getSeconds());
+      let strDate = Y + M + D + h + m + s;
+      return strDate
+    }
+
+    function checkcheckTypeTree(id) {
+      for (var i = 0; i < facilityList.length; i++) {
+        if (facilityList[i].facilityTab.TypeId == id) {
+          return facilityList[i].facilityTab.TypeName
+        }
+        if (facilityList[i].facilityTab.children) {
+          for (var y = 0; y < facilityList[i].facilityTab.children.length; y++) {
+            if (facilityList[i].facilityTab.children[y].TypeId == id) {
+              return facilityList[i].facilityTab.children[y].TypeName
+            }
+
+            if (facilityList[i].facilityTab.children[y].children) {
+              for (var x = 0; x < facilityList[i].facilityTab.children[y].children; x++) {
+                if (facilityList[i].facilityTab.children[y].children[x].TypeId == id) {
+                  return facilityList[i].facilityTab.children[y].children[x].TypeName
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return '待分类设备'
+    }
+
+    const RegionList = ref()
+    getRegion()
+    function getRegion(){
+      facilityRegionListApi().then((res) => {
+      // console.log(res)
+      RegionList.value =  res.Detail
+    });
+    }
+   
+
+    function checkcheckRegionTree(id) {
+      
+      for (var i = 0; i < RegionList.value.length; i++) {
+        // console.log('RegionList',id,RegionList.value[i].RegionId)
+        if (RegionList.value[i].RegionId == id) {
+          return RegionList.value[i].RegionName
+        }
+      }
+      return '暂无区域'
+    }
+
+    
 
     // loading
     function openLoading(absolute: boolean) {
@@ -598,6 +827,7 @@ export default defineComponent({
 
     return {
       searchValue,
+      searchSlect,
       filedName,
       facilityTabIndex,
       faTypeName,
@@ -625,10 +855,21 @@ export default defineComponent({
       handleClock,
       handleOk,
       ModalShow,
+      ModalDeviceName,
       showModalClick,
       resetObj,
       SearchStatus,
-      compState
+      compState,
+      computedStatus,
+      searchSlectCut,
+      registerModal,
+      handleEdit,
+      handleSuccess,
+      checkTime,
+      checkcheckTypeTree,
+      RegionList,
+      checkcheckRegionTree,
+      getRegion
     }
   },
 

@@ -32,8 +32,7 @@
   </div>
 </template>
 <script lang="ts">
-import { ref, reactive, nextTick, defineComponent, onMounted,watch } from 'vue';
-import { BasicForm, useForm } from '@/components/Form';
+import { ref, reactive, nextTick, defineComponent, onMounted, watch } from 'vue';
 // import { Button } from '@/components/Button';
 import { BasicTable, useTable, TableAction, BasicColumn, EditRecordRow, ActionItem } from '@/components/Table';
 import { getBasicColumns, getTreeTableData } from './tableData';
@@ -41,8 +40,8 @@ import { getBasicColumns, getTreeTableData } from './tableData';
 import { facilityTypeTreeApi, facilityTypeSaveApi, facilityTypeSameGradeApi, facilityTypeDeleteApi, facilityTypeEditApi } from '@/api/facility/facility'
 
 import addclass from './components/addclass.vue';
-import console from 'console';
 import { useMessage } from '@/hooks/web/useMessage';
+import { message } from 'ant-design-vue';
 const { createMessage: msg } = useMessage();
 
 // const openModal = ref({false,1});
@@ -51,7 +50,7 @@ export default defineComponent({
   name: 'AccountDetail',
   components: { BasicTable, TableAction, addclass },
   setup() {
-    onMounted(()=>{
+    onMounted(() => {
       FengfacilityTypeTree();
     })
     // 获取data
@@ -76,6 +75,8 @@ export default defineComponent({
                 TreeTableData[i].children[y].children = []
                 // console.log('res[i].SonData',TreeTableData)
                 for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
+                  res[i].SonData[y].SonData[x].SelfData.ceng = 3
+                  // TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
                   TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
                 }
               }
@@ -91,7 +92,7 @@ export default defineComponent({
     }
 
     // const TreeTabColumns = ref()
-    const [registertab, { expandAll, deleteTableDataRecord }] = useTable({
+    const [registertab, { expandAll, deleteTableDataRecord,reload }] = useTable({
       // title: '树形表格',
       // api:FengfacilityTypeTreeApi,
       isTreeTable: true,
@@ -117,7 +118,6 @@ export default defineComponent({
       // 编辑
       if (type) {
         addmodel.value.parent = true
-
         if (type == 'edit') {
           // 如果是edit添加数据到弹窗里面
           if (!data.ParentId) {
@@ -137,7 +137,7 @@ export default defineComponent({
         }
 
         if (type == 'add') {
-           // 如果是add添加数据到弹窗里面
+          // 如果是add添加数据到弹窗里面
           addmodel.value.parentSelect[0].selectId = data.TypeId
           addmodel.value.parentSelect[0].selectValue = data.TypeName
           getSelect(data.TypeId)
@@ -150,8 +150,11 @@ export default defineComponent({
     }
 
     // 点击确定后
-    function ClassOK(type, from, parentFrom, deviceid) {
-      console.log(type,from,parentFrom,deviceid)
+    function ClassOK(type, from, parentFrom, deviceid,RadioVal) {
+      console.log(type, from, parentFrom, deviceid,RadioVal)
+
+      if(from[0].value== ''){ message.error('请输入分类名称') ;return }
+      if(from[1].value== ''){ message.error('请输入分类排序') ;return }
 
       if (type == 'edit') {
         let obj = {
@@ -170,9 +173,11 @@ export default defineComponent({
           // TypeId: deviceid,
           TypeName: from[0].value,
           SortPosition: Number(from[1].value),
-          ParentId: Number(parentFrom[0].selectId)
+          ParentId: Number(parentFrom[0].selectId),
+          Status:RadioVal.value
         }
-
+        if(RadioVal.value== ''){ message.error('请选择分类状态') ;return }
+        
         facilityTypeSaveApi(obj).then(res => {
           FengfacilityTypeTree();
           // reload()
@@ -180,9 +185,12 @@ export default defineComponent({
       } else {
         let obj = {
           TypeName: from[0].value,
-          // SortPosition: Number(from[1].value),
-          ParentId: 0
+          SortPosition: Number(from[1].value),
+          ParentId: 0,
+          Status:RadioVal.value
         }
+        if(RadioVal.value== ''){ message.error('请选择分类状态') ;return }
+
         facilityTypeSaveApi(obj).then(res => {
           FengfacilityTypeTree();
           // reload()
@@ -190,7 +198,7 @@ export default defineComponent({
       }
 
       addmodel.value.handleClock()
-        addmodel.value.visible = false
+      addmodel.value.visible = false
 
     }
 
@@ -209,7 +217,7 @@ export default defineComponent({
       return [
         {
           icon: 'ic:baseline-plus',
-          // disabled: editableData.value ? editableData.value !== record.key : false,
+          disabled: record.ceng ? true : false,
           onClick: handleAdd.bind(null, record),
         },
         {

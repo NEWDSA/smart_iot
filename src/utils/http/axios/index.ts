@@ -94,10 +94,24 @@ const transform: AxiosTransform = {
     }
 
     // 如果code==10000
-    const halkblank = Code == 10000 // 后端接口数据
+    const halkblank  = Code == 10000 // 后端接口数据
     if (halkblank) {
       return true
     }
+
+    // 模拟数据
+    // switch (code) {
+    //   case ResultEnum.TIMEOUT:
+    //     timeoutMsg = t('sys.api.timeoutMessage')
+    //     const userStore = useUserStoreWithOut()
+    //     userStore.setToken(undefined)
+    //     userStore.logout(true)
+    //     break
+    //   default:
+    //     if (message) {
+    //       timeoutMsg = message
+    //     }
+    // }
 
     //真实数据
     switch (Code) {

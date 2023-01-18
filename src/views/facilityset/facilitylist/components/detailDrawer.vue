@@ -1,8 +1,8 @@
 <template>
   <BasicDrawer v-bind="$attrs" @register="registerDrawer" :title="getTitle" width="500px" @ok="handleSubmit">
-    <div>日志ID：{{ logDetail.Id }}</div>
-    <div>设备名称：{{ device.gatewayId }}</div>
-    <div>日志状态：{{ logDetail.Status }}</div>
+    <div>日志内容：{{ logDetail.OperationContent }}</div>
+    <!-- <div>设备名称：{{ device.gatewayId }}</div> -->
+    <!-- <div>日志状态：{{ logDetail.Status }}</div> -->
   </BasicDrawer>
 </template>
 <script lang="ts">
@@ -31,7 +31,7 @@ export default defineComponent({
     })
 
     function putDetail(id){
-      facilityLogInfoApi({'Id':'34'}).then(res => {
+      facilityLogInfoApi({'Id':id}).then(res => {
         // console.log(res)
         if(res!= ''){
         device.value = JSON.parse(res) 

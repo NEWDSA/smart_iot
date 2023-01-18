@@ -80,7 +80,7 @@ export function getFormConfig(): Partial<FormProps> {
             { label: '时间排序', value: '1' },
           ],
         },
-        colProps: { span: 8 },
+        colProps: { span: 4 },
       },
       {
         field: 'AlertMode',
@@ -92,8 +92,18 @@ export function getFormConfig(): Partial<FormProps> {
             { label: '短信提醒', value: '2' },
           ],
         },
+        colProps: { span: 4 },
+      },
+      {
+        field: 'AlertContent',
+        label: ' ',
+        component: 'Input',
+        componentProps: {
+          placeholder:'请输入查询关键字'
+        },
         colProps: { span: 8 },
       },
+      
     ],
   };
 }

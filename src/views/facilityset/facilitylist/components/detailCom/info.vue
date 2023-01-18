@@ -2,32 +2,29 @@
     <div class="bg-gray-100 w-full px-5 py-2">
         <div class="text-lg flex items-center">设备信息
             <div class="pl-2" @click="editTypeXiu">
-                <Icon icon="ph:pencil-line-bold" size="20" color="block"></Icon>
+                <!-- <Icon icon="ph:pencil-line-bold" size="20" color="block"></Icon> -->
             </div>
         </div>
 
-        <div class="flex flex-wrap" v-if="!editType">
+        <div class="flex flex-wrap">
             <div class="w-3/12 mt-5">设备ID：{{ infoFacility.DeviceId }}</div>
             <div class="w-3/12 mt-5">设备名称：{{ infoFacility.DeviceName }}</div>
             <div class="w-3/12 mt-5">设备类型：{{ checkType(infoFacility.TypeId) }}</div>
             <div class="w-3/12 mt-5">设备所在区域位置：{{ infoFacility.RegionalLocation }}</div>
             <div class="w-3/12 mt-5">说明：{{ infoFacility.Explain }}</div>
-            <div class="w-3/12 mt-5">创建时间：{{ timeZ(infoFacility.Basic.CreatedAt.seconds) }}</div>
-            <div class="w-3/12 mt-5">设备位置（经纬度）：{{ infoFacility.Latitude ? infoFacility.Latitude + ',' : '' }}
-                {{ infoFacility.Longitude ? infoFacility.Longitude : '' }}</div>
+            <div class="w-3/12 mt-5">创建时间：{{ timeZ(infoFacility.Basic.UpdatedAt.seconds) }}</div>
+            <div class="w-3/12 mt-5">设备位置（经纬度）：{{ infoFacility.Latitude && infoFacility.Longitude ? infoFacility.Latitude + ',' + infoFacility.Longitude : '' }}</div>
         </div>
 
-        <div class="flex flex-wrap" v-else>
+        <!-- <div class="flex flex-wrap" v-else>
             <div class="w-3/12 mt-5">设备ID：{{ infoFacility.DeviceId }}</div>
             <div class="w-3/12 mt-5">设备名称：
                 <input type="text" v-model="DeviceName" />
-                <!-- {{ infoFacility.DeviceName }} -->
             </div>
             <div class="w-3/12 mt-5 flex items-center">设备类型：
                 <TreeSelect :defaultValue="faTypeName" v-model="faTypeName" :tree-data="TreeTableData"
                     @change="changefaType" :field-names="replaceFields" style="width: 50%;" tree-default-expand-all>
                 </TreeSelect>
-                <!-- {{ infoFacility.TypeId }} -->
             </div>
             <div class="w-3/12 mt-5">设备所在区域位置：
                 <TreeSelect :defaultValue="RegionDataName" v-model="RegionDataName" :tree-data="RegionData"
@@ -37,7 +34,7 @@
             <div class="w-3/12 mt-5">说明：
                 <input type="text" v-model="Explain" />
             </div>
-            <div class="w-3/12 mt-5">创建时间：{{ timeZ(infoFacility.Basic.CreatedAt.seconds) }}
+            <div class="w-3/12 mt-5">创建时间：{{ timeZ(infoFacility.Basic.UpdatedAt.seconds) }}
             </div>
             <div class="w-3/12 mt-5">设备位置（经纬度）：
                 <input type="text" v-model="location" />
@@ -48,7 +45,7 @@
             <div class="px-2 py-1 rounded bg-blue-600 text-white mr-3" @click="halkSave">保存</div>
             <div class="px-2 py-1 rounded border-soild border border-blue-600 text-blue-600" @click="halkCancel">取消
             </div>
-        </div>
+        </div>  -->
     </div>
 </template>
 
@@ -64,7 +61,11 @@ const props = defineProps({
     infoFacility: {
         type: Object,
         default: {}
-    }
+    },
+    NetworkStatus:{
+        type: Number,
+        default: 0
+    },
 })
 // const info = ref()
 
@@ -75,17 +76,17 @@ const props = defineProps({
 
 //     })
 // })
-const DeviceName = ref(props.infoFacility.DeviceName)
-const creatTime = ref()
-const Explain = ref(props.infoFacility.Explain)
-const RegionalLocation = ref(props.infoFacility.Explain)
-const RegionId = ref(props.infoFacility.RegionId)
-const location = ref(props.infoFacility.Latitude ? props.infoFacility.Latitude + ',' + props.infoFacility.Longitude : '')
+// const DeviceName = ref(props.infoFacility.DeviceName)
+// const creatTime = ref()
+// const Explain = ref(props.infoFacility.Explain)
+// const RegionalLocation = ref(props.infoFacility.Explain)
+// const RegionId = ref(props.infoFacility.RegionId)
+// const location = ref(props.infoFacility.Latitude ? props.infoFacility.Latitude + ',' + props.infoFacility.Longitude : '')
 
-const faTypeName = ref()
-const faTypeId = ref()
-const RegionDataName = ref()
-const RegionDataId = ref()
+// const faTypeName = ref()
+// const faTypeId = ref()
+// const RegionDataName = ref()
+// const RegionDataId = ref()
 
 onMounted(() => {
     FengfacilityTypeTree()
@@ -94,7 +95,7 @@ onMounted(() => {
 })
 
 
-// 获取data
+// // 获取data
 const TreeTableData = reactive([])
 
 // 获取树状列表，自己封装
@@ -136,7 +137,7 @@ function FengfacilityTypeTree() {
 const RegionData = ref()
 function GetfacilityRegionList() {
     facilityRegionListApi().then(res => {
-        RegionData.value = res
+        RegionData.value = res.Detail
         // console.log(res)
         // console.log(res)
         // 完成后自动展开
@@ -145,86 +146,91 @@ function GetfacilityRegionList() {
     })
 }
 
-// 区域详情
-function GetfacilityRegioninfo(id) {
-    facilityRegionInfoApi({ RegionId: id }).then(res => {
-        // RegionData.value = res.Detail
-        // console.log(res)
-        RegionDataName.value = res.RegionName
-        // console.log(RegionDataName.value)
-    })
-}
+// // 区域详情
+// function GetfacilityRegioninfo(id) {
+//     facilityRegionInfoApi({ RegionId: id }).then(res => {
+//         // RegionData.value = res.Detail
+//         // console.log(res)
+//         RegionDataName.value = res.RegionName
+//         // console.log(RegionDataName.value)
+//     })
+// }
 
 
-const editType = ref(false)
+// const editType = ref(false)
 
-const editTypeXiu = () => {
-    if (editType.value == true) {
-        return
-    }
-    // console.log(props.infoFacility.TypeId)
-    // nextTick(()=>{
-    // console.log(faType.value)
+// const editTypeXiu = () => {
+//     if(props.NetworkStatus==0 || props.NetworkStatus==2 ){
+//         message.error('设备或已禁用，请启用设备再编辑。')
+//         return
+//     }
 
-    faTypeName.value = checkType(props.infoFacility.TypeId)
+//     if (editType.value == true) {
+//         return
+//     }
+//     // console.log(props.infoFacility.TypeId)
+//     // nextTick(()=>{
+//     // console.log(faType.value)
 
-    if (props.infoFacility.RegionId) {
-        GetfacilityRegioninfo(props.infoFacility.RegionId)
-    } else {
-        RegionDataName.value = ''
-    }
+//     faTypeName.value = checkType(props.infoFacility.TypeId)
 
-    faTypeId.value = props.infoFacility.TypeId
-    console.log(RegionDataName)
-    setTimeout(() => {
-        editType.value = true
-    }, 500);
+//     if (props.infoFacility.RegionId) {
+//         GetfacilityRegioninfo(props.infoFacility.RegionId)
+//     } else {
+//         RegionDataName.value = ''
+//     }
+
+//     faTypeId.value = props.infoFacility.TypeId
+//     console.log(RegionDataName)
+//     setTimeout(() => {
+//         editType.value = true
+//     }, 500);
 
 
-}
+// }
 
-const halkSave = () => {
-    let obj = {
-        DeviceId: props.infoFacility.DeviceId,
-        DeviceName: DeviceName.value,
-        TypeId: faTypeId.value,
-        RegionalLocation: RegionDataName.value,
-        RegionId: RegionDataId.value,
-        Explain: Explain.value
-    }
+// const halkSave = () => {
+//     let obj = {
+//         DeviceId: props.infoFacility.DeviceId,
+//         DeviceName: DeviceName.value,
+//         TypeId: faTypeId.value,
+//         RegionalLocation: RegionDataName.value,
+//         RegionId: RegionDataId.value,
+//         Explain: Explain.value
+//     }
 
-    facilityEditApi(obj).then(res => {
-        // console.log(res)
-        if (res == 0) {
-            message.success('修改成功');
-            editType.value = false
-            emit('ingoEdit', props.infoFacility.DeviceId)
-        } else {
-            message.error('修改失败，请确认输入的内容符合格式');
-            return
-        }
+//     facilityEditApi(obj).then(res => {
+//         // console.log(res)
+//         if (res == 0) {
+//             message.success('修改成功');
+//             editType.value = false
+//             emit('ingoEdit', props.infoFacility.DeviceId)
+//         } else {
+//             message.error('修改失败，请确认输入的内容符合格式');
+//             return
+//         }
 
-    })
+//     })
 
-}
+// }
 
-const halkCancel = () => {
-    DeviceName.value = props.infoFacility.DeviceName
-    Explain.value = props.infoFacility.Explain
-    RegionalLocation.value = props.infoFacility.Explain
-    RegionId.value = props.infoFacility.RegionId
-    location.value = props.infoFacility.Latitude ? props.infoFacility.Latitude + ',' + props.infoFacility.Longitude : ''
-    editType.value = false
-}
+// const halkCancel = () => {
+//     DeviceName.value = props.infoFacility.DeviceName
+//     Explain.value = props.infoFacility.Explain
+//     RegionalLocation.value = props.infoFacility.Explain
+//     RegionId.value = props.infoFacility.RegionId
+//     location.value = props.infoFacility.Latitude ? props.infoFacility.Latitude + ',' + props.infoFacility.Longitude : ''
+//     editType.value = false
+// }
 
-const changefaType = (id, data) => {
-    faTypeId.value = id
-    // console.log(id,data,datae)
-}
-const changeRegion = (id, data) => {
-    RegionDataName.value = data[0]
-    RegionDataId.value = id
-}
+// const changefaType = (id, data) => {
+//     faTypeId.value = id
+//     // console.log(id,data,datae)
+// }
+// const changeRegion = (id, data) => {
+//     RegionDataName.value = data[0]
+//     RegionDataId.value = id
+// }
 
 const checkType = (id) => {
     console.log(id)
@@ -239,7 +245,7 @@ const checkType = (id) => {
                 }
 
                 if (TreeTableData[i].children[y].children) {
-                    for (var x = 0; x < TreeTableData[i].children[i].children; x++) {
+                    for (var x = 0; x < TreeTableData[i].children[y].children; x++) {
                         if (TreeTableData[i].children[y].children[x].TypeId == id) {
                             return TreeTableData[i].children[y].children[x].TypeName
                         }
@@ -266,13 +272,13 @@ const timeZ = (time) => {
     //   console.log('输出内容:', strDate)
 
 }
-const replaceFields = ref({
-    children: 'children', label: 'TypeName', key: 'TypeId', value: 'TypeId'
-})
+// const replaceFields = ref({
+//     children: 'children', label: 'TypeName', key: 'TypeId', value: 'TypeId'
+// })
 
-const RegionFields = ref({
-    children: 'child', label: 'RegionName', key: 'RegionId', value: 'RegionId'
-})
+// const RegionFields = ref({
+//     children: 'child', label: 'RegionName', key: 'RegionId', value: 'RegionId'
+// })
 
 </script>
 

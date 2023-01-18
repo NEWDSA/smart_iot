@@ -6,10 +6,9 @@
             {{ Td.title }}
         </div>
     </div>
-    <div class="wrapEl" ref="wrapEl" v-if="model">
+    <div class="wrapEl" ref="wrapEl" v-if="model && (!NetworkStatus || NetworkStatus!= 2)">
         <div v-for="(Th, index) in model" :key="index" class="">
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'switch'">
-                <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value == false ? '关闭' : '打开' }}</div>
                 <div class="w-1/4">
@@ -26,7 +25,6 @@
             </div>
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'select'">
                 <div class="w-1/4">{{ Th.model.name }}</div>
-                <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ returnVlaue(Th.model, Th.value.value) }}</div>
                 <div class="w-1/4">
                     <div class="fasility-set-select">
@@ -42,21 +40,25 @@
 
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'slide'">
                 <div class="w-1/4">{{ Th.model.name }}</div>
-                <div class="w-1/4">{{ Th.model.name }}</div>
-                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }}  {{ Th.model.field == "percentage" ? '%' : '121'}}</div>
                 <div class="w-1/4">
                     <div class="flex items-center">
                         <Icon icon="fluent:subtract-circle-24-regular" size="20" color="blue"
-                            @click="silderKong('jian', Th.value, Th.model, Th.model.field)"></Icon>
-                        <div class="mx-2">{{ Th.value.value }} </div>
+                            @click="silderKong('jian', Th.value, Th.model, Th.model.field)">
+                        </Icon>
+                        
+                        <div class="mx-2">
+                            <Input type="number" v-model:value="Th.value.value" @change="silderKong('input', Th.value.value, Th.model, Th.model.field)" style="width: 5rem;"></Input>
+                            <!-- {{ Th.value.value }}{{ Th.model.field == "percentage" ? '%' : ''}} -->
+                        </div>
                         <Icon icon="fluent:add-circle-24-regular" size="20" color="blue"
-                            @click="silderKong('jia', Th.value, Th.model, Th.model.field)"></Icon>
+                            @click="silderKong('jia', Th.value, Th.model, Th.model.field)">
+                        </Icon>
                     </div>
                 </div>
             </div>
 
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'camera'">
-                <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }}</div>
                 <div class="w-1/4 flex">
@@ -69,21 +71,24 @@
 
         </div>
     </div>
-    <div class="p-3" v-else>
+    <div class="p-3" v-else-if="NetworkStatus== 0 || NetworkStatus== 2">
+        设备处于禁用状态
+    </div>
+    <div class="p-3" v-else-if="!model && NetworkStatus!= 0 || NetworkStatus!= 2">
         暂无设备控制
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, watch } from 'vue';
-import { Select } from 'ant-design-vue';
+import { Select,Input } from 'ant-design-vue';
 import { Icon } from '/@/components/Icon';
 import { useLoading } from '/@/components/Loading';
 import { send_device_command } from '@/utils/iot'
 
 // 请求
 import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef, devices } from '@/utils/iot'
-import console from 'console';
+import { number } from 'vue-types';
 
 const props = defineProps({
     DeviceModel: {
@@ -97,6 +102,10 @@ const props = defineProps({
     ModelId: {
         type: String,
         default: ''
+    },
+    NetworkStatus:{
+        type: Number,
+        default: 0
     },
 })
 // 数组
@@ -120,9 +129,6 @@ const tabTd = reactive([
         title: '功能'
     },
     {
-        title: '内容'
-    },
-    {
         title: '当前状态'
     },
     {
@@ -132,7 +138,6 @@ const tabTd = reactive([
 
 // loading
 const [openWrapLoading, closeWrapLoading] = useLoading({
-    target: wrapEl,
     props: {
         tip: '加载中...',
         absolute: true,
@@ -172,7 +177,7 @@ const SelectCut = (e, data) => {
     openFnWrapLoading();
 }
 
-const silderKong = (type, value, model, field) => {
+const silderKong = (type, value, model, field,event) => {
     if (type == 'jian') {
         var val = value.value - 1
         if (val < model['slide-range'].min) {
@@ -188,7 +193,16 @@ const silderKong = (type, value, model, field) => {
         }
         send_device_command(val, props.DeviceId, props.ModelId, field, 'value')
     }
+    if (type == 'input') {
+        // var val = value.value + 1
+        // if (val > model['slide-range'].max) {
+        //     return;
+        // }
+        console.log(value)
+        send_device_command(value, props.DeviceId, props.ModelId, field, 'value')
+    }
 
+    // console.log('event',event)
     // tabTh[index].status = data
     openFnWrapLoading();
 }

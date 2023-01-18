@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, reactive,onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getRoleListByPage } from '@/api/demo/system';
 import detailDrawer from '../detailDrawer.vue';
@@ -32,20 +32,49 @@ const TreeTabColumns = reactive([
   {
     title: '类型',
     dataIndex: 'OperationType',
-    width: 200
+    width: 200,
+    customRender: ({ record }) => {
+      let msg
+      switch (record.OperationType) {
+        case 1:
+          msg = '设备上线'
+          return msg;
+        case 2:
+          msg = '设备下线'
+          return msg;
+        case 3:
+          msg = '功能调用'
+          return msg;
+        case 4:
+          msg = '设备查询'
+          return msg;
+
+      }
+    },
   },
   {
     title: '内容',
-    dataIndex: 'Status',
+    dataIndex: 'OperationContent',
     width: 400,
   },
   {
-    title: '当前状态',
-    dataIndex: 'Id',
+    title: '时间',
+    dataIndex: ['Basic','CreatedAt','seconds'],
     width: 200,
+    customRender: ({ record }) => {
+        // console.log('record',record)
+        var date = new Date(record.Basic.CreatedAt.seconds *1000);
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+
+        var h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
+        var m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
+        var s = (date.getSeconds() < 10 ? '0' + (date.getSeconds()) : date.getSeconds());
+        var strDate = Y + M + D + h + m + s;
+        return strDate
+      },
   },
-
-
 ])
 // console.log('456456',facilityLogListApi({DeviceSerial:'go-iot-3'}))
 const [registertab] = useTable({
@@ -65,6 +94,16 @@ const [registertab] = useTable({
     // slots: { customRender: 'action' },
     fixed: undefined
   },
+  fetchSetting: {
+    // 传给后台的当前页字段
+    pageField: 'PageNum',
+    // 传给后台的每页显示多少条的字段
+    sizeField: 'PageSize',
+    // 接口返回表格数据的字段
+    listField: 'List',
+    // 接口返回表格总数的字段
+    totalField: 'Total'
+  },
   titleHelpMessage: '树形组件不能和序列号列同时存在',
 })
 
@@ -74,7 +113,11 @@ const props = defineProps({
   DeviceName: {
     type: String,
     default: ''
-  }
+  },
+  NetworkStatus: {
+    type: Number,
+    default: 0
+  },
 })
 
 const handleLook = (record) => {

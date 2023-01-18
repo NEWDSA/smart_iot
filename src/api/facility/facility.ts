@@ -19,6 +19,8 @@ enum Api {
     DeviceSave = '/device/save',
     DeviceEdit = '/device/edit',
     DeviceDelete = '/device/delete',
+    DeviceCheckRule = '/device/check/rule',
+    DeviceRelieve = '/device/relieve',
 
     DeviceTypeTree = '/device/type/tree',
     DeviceTypeSameGrade = '/device/type/same/grade',
@@ -121,6 +123,22 @@ export function facilityDisableApi(params:facilityDetailParams) {
 export function facilityDeleteApi(params) {
     return realHttp.delete({
         url: Api.DeviceDelete,
+        params
+    });
+}
+
+// 设备场景（查看有没有启动的场景）
+export function facilityCheckRuleApi(params) {
+    return realHttp.get({
+        url: Api.DeviceCheckRule,
+        params
+    });
+}
+
+// 移出设备去未分类
+export function facilityRelieveApi(params) {
+    return realHttp.get({
+        url: Api.DeviceRelieve,
         params
     });
 }

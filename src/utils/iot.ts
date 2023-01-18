@@ -3,7 +3,7 @@
 // import Mp4Player from 'xgplayer-mp4';
 import { resultSuccess, resultError, getRequestToken, requestParams } from '../../mock/_util'
 import { getToken } from '@/utils/auth'
-    
+import { webHttp } from './websocket'
 import { message } from 'ant-design-vue';
 
 var ws;
@@ -25,20 +25,20 @@ export {
 }
 
 function connect() {
-    ws = new WebSocket("ws://192.168.8.208:8899/");
+    ws = new WebSocket(webHttp);
     ws.onopen = login;
     ws.onmessage = function (evt) {
         var msg = JSON.parse(evt.data);
         // console.log(msg)
         // debugger;
         if ('request' in msg) {
-            
+
             if (msg.request.command == 'login') {
                 token = msg.response.token;
                 // list_top_area()
                 subscribeDeviceStatus()
             } else if (msg.request.command == 'device') {
-                console.log('msg',msg)
+                console.log('msg', msg)
                 if (msg.code == 0) {
                     message.success('操作成功');
                 } else {
@@ -166,8 +166,8 @@ function registerDevicesRef(ref) {
 
 function login() {
     const token = getToken()
-    console.log('..',token)
-    
+    console.log('..', token)
+
     if (!token) {
         return resultError('Invalid token!')
     }
@@ -224,14 +224,14 @@ function send_device_command(e, device, model, field, vfield) {
     var operation = model + '-set-' + field
     var cmd = {
         command: "device",
-        'session-id':token,
+        'session-id': token,
         parameters: {
             token: token,
             deviceId: device,
             operation: operation,
         }
     }
-    
+
     if (vfield == 'checked') {
         cmd.parameters[field] = e
     } else if (vfield == 'value') {

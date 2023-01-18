@@ -14,10 +14,10 @@
         </div>
       </div>
 
-      <info v-if="facilityDetailTabIndex == '0'" :infoFacility="infoFacility" @ingoEdit="getfacilityId"></info>
-      <log v-if="facilityDetailTabIndex == '1'" :DeviceName="infoFacility.DeviceName"></log>
-      <control v-if="facilityDetailTabIndex == '2'" :DeviceModel="infoFacility.DeviceModel" :DeviceId="infoFacility.DeviceSerial" :ModelId="infoFacility.DeviceModelId"></control>
-      <warn v-if="facilityDetailTabIndex == '3'" :DeviceName="infoFacility.DeviceName"></warn>
+      <info v-if="facilityDetailTabIndex == '0'" :infoFacility="infoFacility" @ingoEdit="getfacilityId" :NetworkStatus="infoFacility.NetworkStatus"></info>
+      <log v-if="facilityDetailTabIndex == '1'" :DeviceName="infoFacility.DeviceName" :NetworkStatus="infoFacility.NetworkStatus"></log>
+      <control v-if="facilityDetailTabIndex == '2'" :DeviceModel="infoFacility.DeviceModel" :DeviceId="infoFacility.DeviceSerial" :ModelId="infoFacility.DeviceModelId" :NetworkStatus="infoFacility.NetworkStatus"></control>
+      <warn v-if="facilityDetailTabIndex == '3'" :DeviceSerial="infoFacility.DeviceSerial" :NetworkStatus="infoFacility.NetworkStatus"></warn>
 
     </div>
   </PageWrapper>
@@ -35,7 +35,7 @@ import { useGo } from '@/hooks/web/usePage';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const go = useGo();
-const infoFacility = ref('')
+const infoFacility = ref()
 
 onMounted(() => {
   // 此处可以得到用户ID
@@ -44,10 +44,11 @@ onMounted(() => {
 })
 
 const getfacilityId = (id) => {
-  // console.log('id')
+  console.log('id',id)
   facilityDetailApi({ 'Id': id }).then(res => {
     console.log('res',res)
     infoFacility.value = res[0]
+    facilityDetailTabIndex.value = '0'
   })
 
 }
