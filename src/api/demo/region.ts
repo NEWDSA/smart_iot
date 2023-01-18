@@ -12,7 +12,9 @@ enum Api {
  devicePermissionList='/device-department/edit',
  deviceTreeList='device/type/tree',
  deviceListApi='/device/list',
- deviceArea='device/edit-region-id'
+ deviceArea='device/edit-region-id',
+ regionAdd='region/save',
+ regiondel='/region/delete'
 }
 
 // 获取区域列表
@@ -50,3 +52,11 @@ realHttp.post({url:Api.deviceArea,params},{isTransformResponse: true})
 // 批量移除设备
 export const bulkDeviceOut=(params?)=>
 realHttp.post({url:Api.deviceArea,params},{isTransformResponse: true})
+
+// 添加区域
+export const addRegion=(params?)=>
+realHttp.post({url:Api.regionAdd,params},{isTransformResponse: true})
+// 删除区域
+export const delRegion=(params?)=>
+realHttp.delete({url:Api.regiondel,params},{isTransformResponse: true})
+

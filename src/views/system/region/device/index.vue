@@ -11,7 +11,7 @@
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
-              label:'移出',
+              label: '移出',
               popConfirm: {
                 title: '是否确认移出',
                 placement: 'left',
@@ -19,11 +19,11 @@
               },
             },
             {
-              label:'权限设置',
+              label: '权限设置',
               onClick: handleEditPwd.bind(null, record)
             },
             {
-              label:'更多',
+              label: '更多',
               onClick: handleEdit.bind(null, record),
             }
           ]" />
@@ -74,7 +74,7 @@ export default defineComponent({
 
 
     }
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination }] = useTable({
+    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination,deleteTableDataRecord }] = useTable({
       title: '区域设备管理',
       onChange,
       rowSelection: {
@@ -181,11 +181,16 @@ export default defineComponent({
         isUpdate: true,
       });
     }
-    // 删除账号
-    function handleDelete(record: Recordable) {
-
+   async function handleDelete(record: Recordable) {
       try {
-        delAccount({ UserId: record.UserId });
+        let param = {
+          DeviceId: [record.DeviceId],
+          RegionId: 0
+        }
+        await deleteTableDataRecord(record.DeviceId);
+        await  bulkDeviceOut(param)
+
+
       } finally {
         reload();
       }
@@ -210,9 +215,6 @@ export default defineComponent({
         item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
         dataSource.value.push(item)
       })
-
-
-      // dataSource.value.push(result)
     }
     function handleSuccess({ isUpdate, values }) {
       if (isUpdate) {
