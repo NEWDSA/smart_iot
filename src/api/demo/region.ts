@@ -14,7 +14,8 @@ enum Api {
  deviceListApi='/device/list',
  deviceArea='device/edit-region-id',
  regionAdd='region/save',
- regiondel='/region/delete'
+ regiondel='/region/delete',
+ regionEdit='/region/edit'
 }
 
 // 获取区域列表
@@ -59,4 +60,9 @@ realHttp.post({url:Api.regionAdd,params},{isTransformResponse: true})
 // 删除区域
 export const delRegion=(params?)=>
 realHttp.delete({url:Api.regiondel,params},{isTransformResponse: true})
+
+// 编辑区域
+export const editRegion=(params?)=>
+realHttp.put({url:Api.regionEdit,params},{isTransformResponse: true})
+
 
