@@ -13,11 +13,7 @@
             },
             {
               icon: 'ion:add-circle-outline',
-              popConfirm: {
-                title: '添加',
-                placement: 'left',
-                confirm: handleAdd.bind(null,record),
-              }
+              onClick:handleAdd.bind(null,record)
             },
             {
               icon: 'ant-design:delete-outlined',
@@ -32,11 +28,11 @@
         </template>
       </template>
     </BasicTable>
-    <DeptModal okText="添加" @register="registerModal" @success="handleSuccess" />
+    <DeptModal :okText="okTitle" @register="registerModal" @success="handleSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent,ref } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import {getReginList,delRegion} from '@/api/demo/region';
 import { PageWrapper } from '@/components/Page';
@@ -50,6 +46,7 @@ export default defineComponent({
 
     const [registerModal, { openModal }] = useModal();
     const ischildren=true;
+    const okTitle=ref('添加');
     let source = 0;
     let target = 0;
     const [registerTable, { reload, deleteTableDataRecord }] = useTable({
@@ -81,6 +78,7 @@ export default defineComponent({
     });
     function handleCreate() {
       openModal(true, {
+        isModifiy:0,
         isUpdate: false,
       });
 
@@ -88,15 +86,17 @@ export default defineComponent({
 
     function handleAdd(record:Recordable){
       openModal(true, {
-        ischildren,
         record,
-        isUpdate: false,
+        isModifiy:1,
+        isUpdate: true,
       });
     }
 
     function handleEdit(record: Recordable) {
+      okTitle.value='确定'
       openModal(true, {
         record,
+        isModifiy:2,
         isUpdate: true,
       });
     }
@@ -120,7 +120,8 @@ export default defineComponent({
       handleAdd,
       source,
       target,
-      ischildren
+      ischildren,
+      okTitle
     };
   },
 });

@@ -63,14 +63,15 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'RegionName',
+    field: 'ParentId',
     label: '上级区域',
+    ifShow:false,
     component: 'TreeSelect',
     componentProps:{
       fieldNames: {
-        label: 'TypeName',
-        key: 'TypeId',
-        value: 'TypeId'
+        label: 'RegionName',
+        key: 'RegionId',
+        value: 'RegionId'
       }
     },
     required: true

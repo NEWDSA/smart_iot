@@ -8,14 +8,15 @@ import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { formSchema } from './dept.data';
-import { addRegion } from '@/api/demo/region';
+import { addRegion, getReginList, editRegion } from '@/api/demo/region';
 export default defineComponent({
   name: 'DeptModal',
   components: { BasicModal, BasicForm },
   emits: ['success', 'register'],
   setup(_, { emit }) {
     const isUpdate = ref(true);
-    const deptId = ref('');
+    const isModifiy = ref(0);
+    const RegionId = ref('');
     const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
       labelWidth: 100,
       baseColProps: { span: 24 },
@@ -23,28 +24,34 @@ export default defineComponent({
       showActionButtonGroup: false,
     });
 
-    const [registerModal, { setModalProps, closeModal }] = useModalInner(async (ischildren,data) => {
-      console.log(ischildren,'...ischildren...123?')
+    const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       resetFields();
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
+      isModifiy.value = data?.isModifiy;
       if (unref(isUpdate)) {
-        console.log('rrrr')
-        deptId.value = data.record.DeptId;
+        RegionId.value = data.record.RegionId;
         setFieldsValue({
           ...data.record,
         });
       }
+      const { Detail } = await getReginList()
+      updateSchema({
+        field: 'ParentId',
+        componentProps: { treeData: Detail },
+        ifShow: unref(isUpdate)
+      });
     });
 
-    const getTitle = computed(() => (!unref(isUpdate) ? '创建区域' : '修改部门'));
+    const getTitle = computed(() => (!unref(isUpdate) ? '创建区域' : '修改区域') && unref(isModifiy)==1?'添加区域':!unref(isUpdate) ? '创建区域' : '修改区域' );
+
 
     async function handleSubmit() {
       try {
         const values = await validate();
         setModalProps({ confirmLoading: true });
         // await createDept(values)
-        !unref(isUpdate) ? await addRegion(values) : await modifiDept({ ...values, deptId: deptId.value })
+        !unref(isUpdate) ? await addRegion(values) : await editRegion({ ...values, RegionId: RegionId.value })
         console.log(values);
         closeModal();
         emit('success');
