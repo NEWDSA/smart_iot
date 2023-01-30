@@ -3,6 +3,7 @@ import { BasicColumn } from '@/components/Table/src/types/table'
 import { FormSchema } from '@/components/Table'
 import { h } from 'vue'
 import { Tag } from 'ant-design-vue'
+
 import dayjs from 'dayjs'
 export function getBasicColumns(): BasicColumn[] {
   return [
@@ -66,7 +67,7 @@ export const formSchema: FormSchema[] = [
     field: 'ParentId',
     label: '上级部门',
     component: 'TreeSelect',
-
+    ifShow:true,
     componentProps: {
       fieldNames: {
         label: 'Name',
@@ -75,6 +76,7 @@ export const formSchema: FormSchema[] = [
       },
       getPopupContainer: () => document.body
     },
+    
     required: true
   },
   {

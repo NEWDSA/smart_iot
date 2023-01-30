@@ -1,6 +1,6 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
-    <BasicForm @register="registerForm" />
+    <BasicForm @register="registerForm"/>
   </BasicModal>
 </template>
 <script lang="ts">
@@ -17,20 +17,21 @@ export default defineComponent({
   setup(_, { emit }) {
     const isUpdate = ref(true);
     const deptId = ref('');
+    const isShow=ref(false);
     const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
       labelWidth: 100,
-
       baseColProps: { span: 24 },
       schemas: formSchema,
       showActionButtonGroup: false,
     });
 
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      console.log(data,'...data....')
       resetFields();
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
       if (unref(isUpdate)) {
-        deptId.value = data.record.DeptId;
+        // deptId.value = data.record.DeptId;
         setFieldsValue({
           ...data.record,
         });
@@ -41,10 +42,11 @@ export default defineComponent({
       updateSchema({
         field: 'ParentId',
         componentProps: { treeData },
+        show:unref(isUpdate)
       });
-    });
 
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增部门' : '修改部门'));
+    });
+    const getTitle = computed(() => (!unref(isUpdate) ? '创建部门' : '添加部门'));
 
     async function handleSubmit() {
       try {
@@ -60,7 +62,7 @@ export default defineComponent({
       }
     }
 
-    return { registerModal, registerForm, getTitle, handleSubmit };
+    return { registerModal, registerForm, getTitle,isShow,isUpdate,handleSubmit };
   },
 });
 </script>

@@ -16,7 +16,7 @@
               popConfirm: {
                 title: '添加',
                 placement: 'left',
-                confirm: handleCreate.bind(null),
+                confirm: handelChildren.bind(null),
               }
             },
             {
@@ -106,7 +106,12 @@ export default defineComponent({
       });
 
     }
-
+    // 添加子部门
+    function handelChildren(){
+      openModal(true, {
+        isUpdate: true,
+      });
+    }
     function handleEdit(record: Recordable) {
       openModal(true, {
         record,
@@ -135,6 +140,7 @@ export default defineComponent({
       handleEdit,
       handleDelete,
       handleSuccess,
+      handelChildren,
       getData,
       source,
       target
