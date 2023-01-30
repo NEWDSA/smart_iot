@@ -15,6 +15,11 @@ enum Api {
     visitorDelete = '/visitor/delete',
     visitorInfo = '/visitor/info',
 
+    ruleVisitorList = '/rule/visitor/list',
+    ruleEnable = '/rule/enable',
+    ruleDisable = '/rule/disable',
+    ruleDelete = '/rule/delete',
+
 
     regionList = '/region/list', //区域列表
     regionInfo = '/region/info'   // 区域详情
@@ -94,3 +99,40 @@ export const visitorTypeDeleteApi = (params) =>
     }, {
         isTransformResponse: true
     });
+
+// 访客场景联动列表
+export const ruleVisitorListApi = (params) =>
+realHttp.get({
+    url: Api.ruleVisitorList,
+    params
+}, {
+    isTransformResponse: true
+});
+
+// 启动访客场景
+export const ruleEnableApi = (params) =>
+realHttp.get({
+    url: Api.ruleEnable,
+    params
+}, {
+    isTransformResponse: true
+});
+
+// 禁用访客场景
+export const ruleDisableApi = (params) =>
+realHttp.get({
+    url: Api.ruleDisable,
+    params
+}, {
+    isTransformResponse: true
+});
+
+// 删除访客场景
+export const ruleDeleteApi = (params) =>
+realHttp.delete({
+    url: Api.ruleDelete,
+    params
+}, {
+    isTransformResponse: true
+});
+
