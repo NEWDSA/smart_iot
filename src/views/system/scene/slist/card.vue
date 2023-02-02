@@ -18,11 +18,11 @@
                     '手动触发' : '全部'
                 }}</span>
               </div>
-              <div :class="`${prefixCls}__card-num`">
-                关联设备：<span>{{ item.DeviceIds }}</span>
+              <div v-if="item?.DeviceName.lenght > 0" :class="`${prefixCls}__card-num`">
+                关联设备：<span>{{ item.DeviceName }}</span>
               </div>
-              <div :class="`${prefixCls}__card-num`">
-                关联区域：<span>{{ item.RegionIds }}</span>
+              <div v-if="item?.RegionName" :class="`${prefixCls}__card-num`">
+                关联区域：<span>{{ item.RegionName }}</span>
               </div>
               <Icon :class="`${prefixCls}__card-download`" v-if="item.download" :icon="item.download" />
             </Card>
@@ -30,21 +30,18 @@
         </a-col>
       </template>
     </a-row>
-
-
   </List>
   <a-row :class="`${prefixCls}`">
-    <Pagination v-model:current="current" :total="50" show-less-items />
+    <Pagination v-model:current="current" :total="toTal" show-less-items />
   </a-row>
-
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { defineComponent, onMounted, reactive, ref, watch } from 'vue';
 import { List, Card, Row, Col, Pagination, Tag } from 'ant-design-vue';
 import Icon from '@/components/Icon/index';
-import { deviceList, scenceList, regionList } from '@/api/demo/scence';
+import { deviceList, scenceList, regionDetail } from '@/api/demo/scence';
 export default defineComponent({
-  props: ['id'],
+  props: ['id', 'set'],
   components: {
     List,
     ListItem: List.Item,
@@ -59,41 +56,95 @@ export default defineComponent({
     // 定义常量
     const current = ref(2);
     const tagColor = ref('#f50');
+    const toTal = ref(0);
     const params = reactive({
       PageNum: 1,
       PageSize: 20,
     })
     const dataList = ref('');
     let param2 = {
-      TriggerMode: props.id
+      TriggerMode: props.id,
     }
     Object.assign(params, param2)
-    // 调用接口获取数据
-    onMounted(async () => {
-      const { List } = await scenceList({
+    watch(
+      () => props.set,
+      (value, oldValue) => {
+        console.log(value,oldValue,'...打印参数...?')
+        if(value!==oldValue){
+          getData(value)
+        }
+        
+      }, { immediate: true }
+    )
+
+    async function getData(value) {
+      // 场景
+      // console.log(value,'..ddd?')
+      
+      Object.assign(params,{
+        Name:value
+      })
+      const { List, Total } = await scenceList({
         ...params
       })
+      toTal.value = Total;
+      const para: any = [];
+      const para3: any = [];
       List.map(async (item) => {
+        item.DeviceName = []
         // 调用接口获取区域列表
-        if (item?.DeviceIds && item.DeviceIds.lenght > 0) {
+        if (item?.DeviceIds && item.DeviceIds.length > 0) {
           item.DeviceIds.forEach(async (item2) => {
+            // 设备接口
             await deviceList({
-              DeviceId: item2
+              Id: item2
+            }).then((res) => {
+              para.push(...res.List);
             })
+
+            // 设备
+            para.map((parm2) => {
+              if (parm2.DeviceId == item2) {
+                item.DeviceName.push(parm2.DeviceName);
+              }
+            })
+
           })
+          //区域
+          if (item?.RegionIds && item.RegionIds.lenght > 0) {
+            item.RegionName = [];
+            item.RegionIds.forEach(async (item3) => {
+              // 调用接口获取区域列表
+              await regionDetail({
+                RegionId: item3
+              }).then((res) => {
+                para3.push(...res.Detail)
+              })
+
+              para3.map((para) => {
+                if (para.RegionId == item3) {
+                  item.RegionName.push(para.RegionName);
+                }
+              })
+            })
+
+          }
+
         }
       })
 
-      // 调用接口获取设备列表
-      await regionList({
-
-      })
       dataList.value = List;
+    }
+    // 调用接口获取数据
+    onMounted(async () => {
+      await getData()
     })
     return {
       props,
       prefixCls: 'account-center-application',
       list: dataList,
+      getData,
+      toTal,
       params,
       current,
       tagColor,

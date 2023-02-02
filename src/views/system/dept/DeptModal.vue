@@ -26,12 +26,10 @@ export default defineComponent({
     });
 
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-      console.log(data,'...data....')
       resetFields();
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
       if (unref(isUpdate)) {
-        // deptId.value = data.record.DeptId;
         setFieldsValue({
           ...data.record,
         });
@@ -42,7 +40,7 @@ export default defineComponent({
       updateSchema({
         field: 'ParentId',
         componentProps: { treeData },
-        show:unref(isUpdate)
+        ifShow:unref(isUpdate)
       });
 
     });

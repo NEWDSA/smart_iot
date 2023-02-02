@@ -1,68 +1,33 @@
 <template>
   <div :class="prefixCls">
-    <!-- <a-row :class="`${prefixCls}-top`">
-      <a-col :span="9" :class="`${prefixCls}-col`">
-        <a-row>
-          <a-col :span="8">
-            <div :class="`${prefixCls}-top__avatar`">
-              <img width="70" :src="avatar" />
-              <span>Vben</span>
-              <div>海纳百川，有容乃大</div>
-            </div>
-          </a-col>
-          <a-col :span="16">
-            <div :class="`${prefixCls}-top__detail`">
-              <template v-for="detail in details" :key="detail.title">
-                <p>
-                  <Icon :icon="detail.icon" />
-                  {{ detail.title }}
-                </p>
-              </template>
-            </div>
-          </a-col>
-        </a-row>
-      </a-col>
-      <a-col :span="7" :class="`${prefixCls}-col`">
-        <CollapseContainer title="标签" :canExpan="false">
-          <template v-for="tag in tags" :key="tag">
-            <Tag class="mb-2">
-              {{ tag }}
-            </Tag>
-          </template>
-        </CollapseContainer>
-      </a-col>
-      <a-col :span="8" :class="`${prefixCls}-col`">
-        <CollapseContainer :class="`${prefixCls}-top__team`" title="团队" :canExpan="false">
-          <div v-for="(team, index) in teams" :key="index" :class="`${prefixCls}-top__team-item`">
-            <Icon :icon="team.icon" :color="team.color" />
-            <span>{{ team.title }}</span>
-          </div>
-        </CollapseContainer>
-      </a-col>
-    </a-row> -->
     <div :class="`${prefixCls}-top`">
+      <a-col class="bg_search" :span="6">
+        <!-- 隔代事件传递 -->
+        <a-input v-model:value="Name1" @pressEnter="searchScence" placeholder="请输入场景名称" />
+        <Button @click="searchScence" type="primary">搜索</Button>
+      </a-col>
       <Tabs>
         <template v-for="item in achieveList" :key="item.key">
           <TabPane :tab="item.name">
-            <component :is="item.component" :id="item.key" />
+            <component :is="item.component" :id="item.key" :set="Name2" />
           </TabPane>
         </template>
       </Tabs>
     </div>
   </div>
 </template>
-
 <script lang="ts">
-import { Tag, Tabs, Row, Col } from 'ant-design-vue';
-import { defineComponent, computed } from 'vue';
+import { Tag, Tabs, Row, Col, Button } from 'ant-design-vue';
+import { defineComponent, computed, ref, unref } from 'vue';
 import { CollapseContainer } from '@/components/Container/index';
 
 import card from './card.vue';
-import {  achieveList } from './data';
+import { achieveList } from './data';
 
 export default defineComponent({
   components: {
     CollapseContainer,
+    Button,
     Tag,
     Tabs,
     TabPane: Tabs.TabPane,
@@ -70,10 +35,23 @@ export default defineComponent({
     [Row.name]: Row,
     [Col.name]: Col,
   },
-  setup() {
+  // emits: ['change'],
+  setup(props, { emit }) {
+    const tabInfo = ref(null); //获取组件的ref
+    const Name1 = ref('');
+    const Name2 = ref('');
+    async function searchScence(value) {
+      Name2.value=Name1.value
+    }
+
+
     return {
       prefixCls: 'account-center',
       achieveList,
+      Name1,
+      Name2,
+      tabInfo,
+      searchScence
     };
   },
 });
@@ -93,6 +71,13 @@ export default defineComponent({
     margin: 16px 16px 12px;
     background-color: @component-background;
     border-radius: 3px;
+
+    .bg_search {
+      position: absolute;
+      display: flex;
+      left: 700px;
+      z-index: 9999;
+    }
 
     &__avatar {
       text-align: center;

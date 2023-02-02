@@ -86,14 +86,14 @@ export const formSchema: FormSchema[] = [
     required: true
   },
   {
-    field: 'orderNo',
+    field: 'OrderNum',
     label: '排序',
     component: 'InputNumber',
     required: true
   },
 
   {
-    field: 'status',
+    field: 'Status',
     label: '状态',
     component: 'RadioButtonGroup',
     defaultValue: '0',

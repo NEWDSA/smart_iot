@@ -2,11 +2,6 @@
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
     <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
-      <!-- <template #bodyCell="{column,record,text}">
-         <template v-if="column">
-               {{ column }}rrr
-         </template>
-      </template> -->
       <template #toolbar>
         <a-button type="primary" @click="handleBulk">批量调动</a-button>
         <a-button type="primary" @click="handleCreate">新增账号</a-button>
@@ -28,22 +23,23 @@
               },
             },
             {
-              icon: 'ri:lock-password-fill',
-              tooltip: '修改密码',
-              onClick: handleEditPwd.bind(null, record)
-            },
-            {
               icon: 'clarity:note-edit-line',
               tooltip: '编辑用户资料',
               onClick: handleEdit.bind(null, record),
+            },
+            {
+              icon: 'ri:lock-password-fill',
+              tooltip: '修改密码',
+              onClick: handleEditPwd.bind(null, record)
             }
           ]" />
         </template>
       </template>
     </BasicTable>
-    <component :is="currentModal" v-model:visible="modalVisible" @success="Dat" :isUpdate="true" />
+    <component :is="currentModal" v-model:visible="modalVisible" :data="myData" @success="Dat" :isUpdate="true" />
     <AccountModal @register="registerModal" @success="handleSuccess" />
     <AccountTable @register="registerMyTable" @success="Dat" />
+    <pwdModal @register="registerpwdModal" @success="pwdSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -56,18 +52,20 @@ import DeptTree from './DeptTree.vue';
 
 import { useModal } from '@/components/Modal';
 import AccountModal from './AccountModal.vue';
-import AccountTable from './AccountTable.vue'
-
+import AccountTable from './AccountTable.vue';
+import pwdModal from './pwdModal.vue';
 import { columns, searchFormSchema } from './account.data';
 import { useGo } from '@/hooks/web/usePage';
 export default defineComponent({
   name: 'AccountManagement',
-  components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction },
+  components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction, pwdModal },
   setup() {
     const go = useGo();
     const dataSource: any = ref([]);
+    const myData: any = ref('');
     const update = getCurrentInstance() as ComponentInternalInstance | null
     const [registerModal, { openModal }] = useModal();
+    const [registerpwdModal, { openModal: openModal3 }] = useModal();
     const [registerMyTable, { openModal: openModal2 }] = useModal();
     const searchInfo = reactive<Recordable>({});
     const checkedKeys = ref<Array<string | number>>([]);
@@ -78,14 +76,14 @@ export default defineComponent({
       createConfirm
     } = useMessage();
     function onChange() {
-      pagination.PageNum=arguments[0].current;
+      pagination.PageNum = arguments[0].current;
       getData()
 
 
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getPaginationRef }] = useTable({
+    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
@@ -113,8 +111,10 @@ export default defineComponent({
       showTableSetting: true,
       bordered: true,
       handleSearchInfoFn(info) {
-        console.log('handleSearchInfoFn', info);
-        // return info;
+        // 接入接口进行数据查询
+        Object.assign(pagination, info)
+        getData();
+        return info;
       },
       actionColumn: {
         width: 120,
@@ -127,8 +127,15 @@ export default defineComponent({
         isUpdate: false,
       });
     }
+    function pwdSuccess() {
+      reload();
+      // currentModal.value = pwdModal;
+      //   nextTick(() => {
+      //     modalVisible.value = true;
+      //   })
+    }
     async function getData() {
- 
+
       dataSource.value = [];
       const { List, Total } = await getAccountList(pagination);
       setPagination({
@@ -170,10 +177,10 @@ export default defineComponent({
       });
     }
     // 删除账号
-    function handleDelete(record: Recordable) {
-
+    async function handleDelete(record: Recordable) {
+      await deleteTableDataRecord(record.UserId);
       try {
-        delAccount({ UserId: record.UserId });
+        await delAccount({ UserId: record.UserId });
       } finally {
         reload();
       }
@@ -183,34 +190,42 @@ export default defineComponent({
       getData()
     })
     function Dat(values) {
-      let Detp = toRaw(values).join();
-      let user = toRaw(checkedKeys.value)
-      try {
-        BulkDept({
-          UserIds: user,
-          DeptId: Number(Detp)
-        })
-      } finally {
+      if (values) {
+        let Detp = toRaw(values).join();
+        let user = toRaw(checkedKeys.value)
+        try {
+          BulkDept({
+            UserIds: user,
+            DeptId: Number(Detp)
+          })
+        } finally {
+          reload();
+        }
+      }else{
         reload();
       }
 
 
 
+
     }
 
-    function handleSuccess({ isUpdate, values }) {
+    async function handleSuccess({ isUpdate, values }) {
       if (isUpdate) {
         // 演示不刷新表格直接更新内部数据。
         // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-        const result = updateTableDataRecord(values.id, values);
-        console.log(result);
+        await updateTableDataRecord(values.RoleId, values);
       } else {
-        reload();
+        await reload();
       }
     }
     function handleEditPwd(record: Recordable) {
-
-      console.log(record, '...record...')
+      // 弹出修改用户密码框
+      currentModal.value = pwdModal;
+      myData.value = record;
+      nextTick(() => {
+        modalVisible.value = true;
+      })
     }
     function handleSelect(DeptId = '') {
       searchInfo.DeptId = DeptId;
@@ -222,6 +237,7 @@ export default defineComponent({
       registerTable,
       registerMyTable,
       registerModal,
+      registerpwdModal,
       handleCreate,
       handleEdit,
       handleDelete,
@@ -232,7 +248,9 @@ export default defineComponent({
       onSelectChange,
       onChange,
       openModal2,
+      openModal3,
       Dat,
+      pwdSuccess,
       getData,
       pagination,
       internalInstance,
@@ -242,6 +260,7 @@ export default defineComponent({
       searchInfo,
       basicData,
       dataSource,
+      myData,
       update
     };
   },

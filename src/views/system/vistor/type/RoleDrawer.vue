@@ -60,7 +60,6 @@ export default defineComponent({
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
         !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({...values,MenuIds:values.menu})
-        console.log('测试123')
         emit('success');
 
       } finally {

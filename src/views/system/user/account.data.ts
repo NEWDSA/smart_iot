@@ -1,10 +1,23 @@
-import { getAllRoleList, isAccountExist, getDeptList } from '@/api/demo/system'
-import { toRaw } from 'vue'
 import { BasicColumn } from '@/components/Table'
 import { FormSchema } from '@/components/Table'
 import { Tag } from 'ant-design-vue'
 import { h } from 'vue'
 import dayjs from 'dayjs'
+import { RuleObject } from 'ant-design-vue/lib/form'
+// 邮箱验证
+const validateEmail = () => {
+  return async (_: RuleObject, value: string) => {
+    if (!value) {
+      return Promise.reject('请输入邮箱')
+    }
+    var regu =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    var re = new RegExp(regu)
+    if (!re.test(value)) {
+      return Promise.reject('请检查输入的邮箱格式是否正确');
+    }
+  }
+}
 export const columns: BasicColumn[] = [
   {
     title: '用户名',
@@ -23,7 +36,6 @@ export const columns: BasicColumn[] = [
   },
   // 需对部门信息进行处理
   {
-
     title: '部门',
     dataIndex: 'DeptName'
   },
@@ -51,7 +63,7 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'UserName',
+    field: 'NickName',
     label: '用户名',
     component: 'Input',
     colProps: { span: 8 },
@@ -82,7 +94,7 @@ export const searchFormSchema: FormSchema[] = [
 
 export const accountFormSchema: FormSchema[] = [
   {
-    field: 'UserName',
+    field: 'NickName',
     label: '昵称',
     component: 'Input',
     rules: [
@@ -91,17 +103,6 @@ export const accountFormSchema: FormSchema[] = [
         message: '请输入用户名'
       }
     ]
-  },
-  {
-    label: '角色',
-    field: 'RoleId',
-    component: 'ApiSelect',
-    componentProps: {
-      api: getAllRoleList,
-      labelField: 'RoleName',
-      valueField: 'RoleId'
-    },
-    required: true
   },
   {
     field: 'DeptId',
@@ -119,22 +120,56 @@ export const accountFormSchema: FormSchema[] = [
     required: true
   },
   {
-    field: 'nickname',
-    label: '昵称',
+    field: 'UserName',
+    label: '用户名称',
     component: 'Input',
     required: true
   },
-
+  {
+    field: 'PhoneNumber',
+    label: '手机号',
+    component: 'Input',
+    required: true
+  },
+  {
+    label: '角色类型',
+    field: 'RoleId',
+    component: 'TreeSelect',
+    componentProps: {
+      fieldNames: {
+        label: 'RoleName',
+        key: 'RoleId',
+        value: 'RoleId'
+      }
+    },
+    required: true
+  },
   {
     label: '邮箱',
-    field: 'email',
+    field: 'Email',
     component: 'Input',
-    required: true
+    // 使用正则
+    rules: [
+      {
+        required: true,
+        validator: validateEmail(),
+        trigger: 'blur'
+      }
+    ]
+    // rules:[],
+    // required: true
   },
-
+  // 状态设置
   {
-    label: '备注',
-    field: 'remark',
-    component: 'InputTextArea'
+    field: 'Status',
+    label: '状态',
+    component: 'RadioButtonGroup',
+    defaultValue: '0',
+    componentProps: {
+      options: [
+        { label: '启用', value: '0' },
+        { label: '禁用', value: '1' }
+      ]
+    }
   }
 ]

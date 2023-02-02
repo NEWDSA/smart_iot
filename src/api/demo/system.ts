@@ -140,7 +140,7 @@ export const getRoleListByPage = (params?: RolePageParams) =>
 
 // 获取角色列表
 export const getAllRoleList = (params?: RoleParams) =>
-  realHttp.get<RoleListGetResultModel>({ url: Api.GetAllRoleList, params })
+  realHttp.get({ url: Api.GetAllRoleList, params })
 
 
 // 创建角色

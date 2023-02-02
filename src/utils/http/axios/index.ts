@@ -54,7 +54,6 @@ const transform: AxiosTransform = {
     // const { code, result, message } = data   //模拟数据接口
     const { Code, Data, Msg } = data
 
-
     // 这里逻辑可以根据项目进行修改
     // TODO:根据后端真实接口进行更改 code
     // const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS //模拟数据
@@ -73,13 +72,6 @@ const transform: AxiosTransform = {
       } else if (options.successMessageMode === 'message') {
         createMessage.success(successMsg)
       }
-      // return result  // 模拟数据
-      // 对数据结构进行判断
-      //真实数据
-      // if(Data.hasOwnProperty('List')|| )
-
-      // return Data.hasOwnProperty('List') ? Data.List : Data
-      // return Data.hasOwnProperty('Detail') ? Data.Detail : Data
       return Data
     }
 
@@ -99,20 +91,7 @@ const transform: AxiosTransform = {
       return true
     }
 
-    // 模拟数据
-    // switch (code) {
-    //   case ResultEnum.TIMEOUT:
-    //     timeoutMsg = t('sys.api.timeoutMessage')
-    //     const userStore = useUserStoreWithOut()
-    //     userStore.setToken(undefined)
-    //     userStore.logout(true)
-    //     break
-    //   default:
-    //     if (message) {
-    //       timeoutMsg = message
-    //     }
-    // }
-
+   
     //真实数据
     switch (Code) {
       case ResultEnum.TIMEOUT:
@@ -199,7 +178,7 @@ const transform: AxiosTransform = {
     const token = getToken()
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
-      ; (config as Recordable).headers.Authorization = options.authenticationScheme
+      ;(config as Recordable).headers.Authorization = options.authenticationScheme
         ? `${options.authenticationScheme} ${token}`
         : token
     }
@@ -222,7 +201,12 @@ const transform: AxiosTransform = {
     errorLogStore.addAjaxErrorInfo(error)
     const { response, code, message, config } = error || {}
     const errorMessageMode = config?.requestOptions?.errorMessageMode || 'none'
-    const msg: string = response?.data?.error?.message ?? ''
+    // const msg: string = response?.data?.error?.message ?? ''
+
+    let msg: string = response?.data?.Error ?? ''
+    msg=msg.replace("rpc error: code = Unknown desc =","");
+    // 去掉字符串中的多余参数
+
     const err: string = error?.toString?.() ?? ''
     let errMessage = ''
 
