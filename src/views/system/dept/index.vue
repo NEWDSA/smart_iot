@@ -13,11 +13,7 @@
             },
             {
               icon: 'ion:add-circle-outline',
-              popConfirm: {
-                title: '添加',
-                placement: 'left',
-                confirm: handelChildren.bind(null),
-              }
+              onClick:handelChildren.bind(null)
             },
             {
               icon: 'ant-design:delete-outlined',

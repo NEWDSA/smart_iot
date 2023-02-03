@@ -50,8 +50,7 @@ export default defineComponent({
       try {
         const values = await validate();
         setModalProps({ confirmLoading: true });
-        // await createDept(values)
-        !unref(isUpdate) ? await createDept(values) : await modifiDept({ ...values, deptId:deptId.value })
+        !unref(isUpdate) ? await createDept({...values,ParentId:0}) : await modifiDept({ ...values, deptId:deptId.value })
         console.log(values);
         closeModal();
         emit('success');
