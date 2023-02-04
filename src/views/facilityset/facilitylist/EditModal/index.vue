@@ -40,25 +40,7 @@ export default defineComponent({
             const TypeTree = await facilityTypeTreeApi().then((res) => {
                 const TreeTableData: any = []
                 for (let i = 0; i < res.length; i++) {
-                    TreeTableData.push(res[i].SelfData)
-
-                    if (res[i].SonData) {
-                        TreeTableData[i].children = []
-                        // console.log('res[i].SonData',res[i].SonData)
-                        for (let y = 0; y < res[i].SonData.length; y++) {
-                            TreeTableData[i].children.push(res[i].SonData[y].SelfData)
-
-                            if (res[i].SonData[y].SonData) {
-                                // console.log(res[i].SonData[y].SonData)
-                                TreeTableData[i].children[y].children = []
-                                // console.log('res[i].SonData',TreeTableData)
-                                for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
-                                    TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
-                                }
-                            }
-                        }
-                    }
-
+                    TreeTableData.push(tree([res[i]])[0])
                 }
                 return TreeTableData
 
@@ -93,7 +75,7 @@ export default defineComponent({
 
                 var m = values.LongitudeLatitude.split(",");
 
-                if(m.length!=2){
+                if (m.length != 2) {
                     message.warn('经纬度输入格式有误,例：39.908349,116.404412')
                     return;
                 }
@@ -101,13 +83,13 @@ export default defineComponent({
                 const Latitude = Number(m[0]);
                 const Longitude = Number(m[1]);
 
-                console.log(Latitude,Longitude,'tyodf')
+                console.log(Latitude, Longitude, 'tyodf')
 
-                if (typeof Latitude != "number" || isNaN(Latitude)){
+                if (typeof Latitude != "number" || isNaN(Latitude)) {
                     message.warn('纬度输入格式有误')
                     return;
                 }
-                if (typeof Longitude != "number" || isNaN(Longitude)){
+                if (typeof Longitude != "number" || isNaN(Longitude)) {
                     message.warn('经度输入格式有误')
                     return;
                 }
@@ -124,7 +106,28 @@ export default defineComponent({
             }
         }
 
-        return { registerModal, registerForm, getTitle, handleSubmit };
+        function tree(data) {
+            // debugger;
+            console.log('data', data)
+            let Array = [];
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].SonData) {
+
+                    let obj = data[i].SelfData
+                    obj.children = tree(data[i].SonData)
+
+                    Array.push(obj)
+                } else {
+                    let obj = data[i].SelfData
+                    Array.push(obj)
+                }
+                // Array.push(obj)
+            }
+            return Array;
+
+        }
+
+        return { registerModal, registerForm, getTitle, handleSubmit, tree };
     },
 });
 </script>

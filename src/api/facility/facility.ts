@@ -20,8 +20,11 @@ enum Api {
     DeviceEdit = '/device/edit',
     DeviceDelete = '/device/delete',
     DeviceCheckRule = '/device/check/rule',
+    DeviceDisableRule = 'device/disable/rule',
     DeviceRelieve = '/device/relieve',
+    
 
+    
     DeviceTypeTree = '/device/type/tree',
     DeviceTypeSameGrade = '/device/type/same/grade',
     DeviceTypeInfo = '/device/type/info',
@@ -35,7 +38,7 @@ enum Api {
     DeviceAlertList = '/device/alert/list',
     DeviceAlertIgnore = '/device/alert/ignore',
     DeviceAlertNotice = '/device/alert/notice',
-
+    
 
     regionList = '/region/list', //区域列表
     regionInfo = '/region/info'   // 区域详情
@@ -81,6 +84,14 @@ export function facilityTypeDeleteApi(params) {
 export function facilityTypeEditApi(params:facilityEditClassParams) {
     return realHttp.put({
         url: Api.DeviceTypeEdit,
+        params
+    });
+}
+
+// 设备类型详情
+export function facilityTypeInfoApi(params) {
+    return realHttp.get({
+        url: Api.DeviceTypeInfo,
         params
     });
 }
@@ -134,6 +145,15 @@ export function facilityCheckRuleApi(params) {
         params
     });
 }
+
+// 设备场景（停用设备关联的所有场景）
+export function facilityDisableRuleApi(params) {
+    return realHttp.get({
+        url: Api.DeviceDisableRule,
+        params
+    });
+}
+
 
 // 移出设备去未分类
 export function facilityRelieveApi(params) {

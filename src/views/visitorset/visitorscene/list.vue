@@ -88,13 +88,15 @@
 
                 </div>
 
-                <div class="flex text-right" style="text-align: center;">
+                <Pagination v-model:current="seachObj.PageNum" v-model:pageSize="seachObj.PageSize" :total="total" show-size-changer @change="cutPage()"></Pagination>
+
+                <!-- <div class="flex text-right" style="text-align: center;">
                     <div class="mr-2" v-for="count in visitorSceneListlock">
                         <div class="px-3 py-1 rounded" @click="cutPage(count)"
                             :class="seachObj.PageNum == count ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'">
                             {{ count }} </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -107,9 +109,9 @@
 <script lang="ts">
 import { ref, defineComponent, reactive, onMounted, } from 'vue';
 import { visitorTypeListApi, ruleVisitorListApi, ruleEnableApi, ruleDisableApi, ruleDeleteApi } from '@/api/visitor/visitor'
-import { message, Modal } from 'ant-design-vue';
+import { message, Modal,Pagination } from 'ant-design-vue';
 export default defineComponent({
-    components: { Modal },
+    components: { Modal,Pagination },
     setup() {
         onMounted(() => {
             getTypeList();
@@ -125,6 +127,7 @@ export default defineComponent({
             PageSize: 12,
             PageNum: 1
         })
+        const total = ref()
 
         const searchValue = ref()
         const ModalShow = ref<boolean>(false);
@@ -148,6 +151,7 @@ export default defineComponent({
         }
 
         function getSceneList(type: boolean, Name: any) {
+            console.log(seachObj,'seachObj')
             if (type) {
                 seachObj.PageNum = 1
             }
@@ -165,7 +169,8 @@ export default defineComponent({
 
                     console.log(visitorSceneList.value)
                     // 计算分页
-                    visitorSceneListlock.value = Math.ceil(res.Page.Total / 12)
+                    // visitorSceneListlock.value = Math.ceil(res.Page.Total / 12)
+                    total.value = res.Page.Total
                 } else {
                     visitorSceneList.value = []
                 }
@@ -238,8 +243,9 @@ export default defineComponent({
             getSceneList(true, null)
         }
 
-        function cutPage(count: number) {
-            seachObj.PageNum = count
+        function cutPage() {
+            console.log(seachObj)
+            // seachObj.PageNum = count
             getSceneList(false, null)
         }
 
@@ -301,7 +307,8 @@ export default defineComponent({
             handleClock,
             ModalObj,
             enableDevice,
-            disableDevice
+            disableDevice,
+            total
         };
     },
 });

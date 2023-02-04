@@ -5,15 +5,15 @@ import {
   deviceParam
 } from './model/systemModel'
 enum Api {
- regionList='region/list',
+ regionList='/region/list',
  regionUnionDevice='/device/list-region-id',
  regionTreeList='/system/dept',
  DeviceType='/device/type/info',
  devicePermissionList='/device-department/edit',
- deviceTreeList='device/type/tree',
+ deviceTreeList='/device/type/tree',
  deviceListApi='/device/list',
- deviceArea='device/edit-region-id',
- regionAdd='region/save',
+ deviceArea='/device/edit-region-id',
+ regionAdd='/region/save',
  regiondel='/region/delete',
  regionEdit='/region/edit'
 }

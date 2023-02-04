@@ -20,6 +20,7 @@ enum Api {
     ruleDisable = '/rule/disable',
     ruleDelete = '/rule/delete',
 
+    fileUpload = '/file/upload',
 
     regionList = '/region/list', //区域列表
     regionInfo = '/region/info'   // 区域详情
@@ -136,3 +137,10 @@ realHttp.delete({
     isTransformResponse: true
 });
 
+// 上传文件
+export const seeFileApi = (params) =>
+realHttp.get({
+    url:params,
+}, {
+    isTransformResponse: true
+});

@@ -88,7 +88,8 @@ const transform: AxiosTransform = {
     // 如果code==10000
     const halkblank  = Code == 10000 // 后端接口数据
     if (halkblank) {
-      return true
+
+      return Msg
     }
 
    
@@ -308,6 +309,14 @@ export const realHttp = createAxios({
     apiUrl: '/admin-api'
   }
 })
+
+// TODO:创建自定义axios实例，专用于调取线上api 上传文件
+export const uploadHttp = createAxios({
+  requestOptions: {
+    apiUrl: '/upload'
+  }
+})
+
 
 // other api url
 // export const otherHttp = createAxios({

@@ -3,7 +3,7 @@ import { defHttp } from '@/utils/http/axios'
 import { UploadFileParams } from '/#/axios'
 import { useGlobSetting } from '@/hooks/setting'
 
-const { uploadUrl = '' } = useGlobSetting()
+const { uploadUrl = 'htttp://192.168.8.180:4000/api/v1/file/upload' } = useGlobSetting()
 
 /**
  * @description: Upload interface

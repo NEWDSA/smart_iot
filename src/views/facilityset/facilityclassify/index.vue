@@ -6,7 +6,7 @@
         <!-- <BasicForm @register="register"></BasicForm> -->
       </div>
       <div>
-        <a-button type="primary" preIcon="ic:baseline-plus" @click="openModal()">
+        <a-button type="primary" preIcon="ic:baseline-plus" @click="openModal(null, null)">
           创建新的分类
         </a-button>
       </div>
@@ -32,17 +32,15 @@
   </div>
 </template>
 <script lang="ts">
-import { ref, reactive, nextTick, defineComponent, onMounted, watch } from 'vue';
+import { ref, reactive, nextTick, defineComponent, onMounted, } from 'vue';
 // import { Button } from '@/components/Button';
 import { BasicTable, useTable, TableAction, BasicColumn, EditRecordRow, ActionItem } from '@/components/Table';
-import { getBasicColumns, getTreeTableData } from './tableData';
+import { getBasicColumns, } from './tableData';
 
 import { facilityTypeTreeApi, facilityTypeSaveApi, facilityTypeSameGradeApi, facilityTypeDeleteApi, facilityTypeEditApi } from '@/api/facility/facility'
 
 import addclass from './components/addclass.vue';
-import { useMessage } from '@/hooks/web/useMessage';
 import { message } from 'ant-design-vue';
-const { createMessage: msg } = useMessage();
 
 // const openModal = ref({false,1});
 
@@ -54,7 +52,7 @@ export default defineComponent({
       FengfacilityTypeTree();
     })
     // 获取data
-    const TreeTableData = reactive([])
+    const TreeTableData: any = reactive([])
     // 获取树状列表，自己封装
     function FengfacilityTypeTree() {
       TreeTableData.length = 0
@@ -62,26 +60,28 @@ export default defineComponent({
       facilityTypeTreeApi().then(res => {
         console.log(res)
         for (let i = 0; i < res.length; i++) {
-          TreeTableData.push(res[i].SelfData)
+          // console.log(tree(res[i])[0])
+          TreeTableData.push(tree([res[i]])[0])
+          // TreeTableData.push(res[i].SelfData)
 
-          if (res[i].SonData) {
-            TreeTableData[i].children = []
-            // console.log('res[i].SonData',res[i].SonData)
-            for (let y = 0; y < res[i].SonData.length; y++) {
-              TreeTableData[i].children.push(res[i].SonData[y].SelfData)
+          // if (res[i].SonData) {
+          //   TreeTableData[i].children = []
+          //   // console.log('res[i].SonData',res[i].SonData)
+          //   for (let y = 0; y < res[i].SonData.length; y++) {
+          //     TreeTableData[i].children.push(res[i].SonData[y].SelfData)
 
-              if (res[i].SonData[y].SonData) {
-                // console.log(res[i].SonData[y].SonData)
-                TreeTableData[i].children[y].children = []
-                // console.log('res[i].SonData',TreeTableData)
-                for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
-                  res[i].SonData[y].SonData[x].SelfData.ceng = 3
-                  // TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
-                  TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
-                }
-              }
-            }
-          }
+          //     if (res[i].SonData[y].SonData) {
+          //       // console.log(res[i].SonData[y].SonData)
+          //       TreeTableData[i].children[y].children = []
+          //       // console.log('res[i].SonData',TreeTableData)
+          //       for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
+          //         res[i].SonData[y].SonData[x].SelfData.ceng = 3
+          //         // TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
+          //         TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
+          //       }
+          //     }
+          //   }
+          // }
 
         }
         // 完成后自动展开
@@ -91,8 +91,30 @@ export default defineComponent({
 
     }
 
+    function tree(data) {
+      // debugger;
+      console.log('data', data)
+      let Array = [];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].SonData) {
+
+          let obj = data[i].SelfData
+          obj.children = tree(data[i].SonData)
+
+          Array.push(obj)
+        } else {
+          let obj = data[i].SelfData
+          Array.push(obj)
+        }
+        // Array.push(obj)
+      }
+      return Array;
+
+    }
+
+
     // const TreeTabColumns = ref()
-    const [registertab, { expandAll, deleteTableDataRecord,reload }] = useTable({
+    const [registertab, { expandAll, deleteTableDataRecord, reload }] = useTable({
       // title: '树形表格',
       // api:FengfacilityTypeTreeApi,
       isTreeTable: true,
@@ -150,11 +172,11 @@ export default defineComponent({
     }
 
     // 点击确定后
-    function ClassOK(type, from, parentFrom, deviceid,RadioVal) {
-      console.log(type, from, parentFrom, deviceid,RadioVal)
+    function ClassOK(type, from, parentFrom, deviceid, RadioVal) {
+      console.log(type, from, parentFrom, deviceid, RadioVal)
 
-      if(from[0].value== ''){ message.error('请输入分类名称') ;return }
-      if(from[1].value== ''){ message.error('请输入分类排序') ;return }
+      if (from[0].value == '') { message.error('请输入分类名称'); return }
+      if (from[1].value == '') { message.error('请输入分类排序'); return }
 
       if (type == 'edit') {
         let obj = {
@@ -174,10 +196,10 @@ export default defineComponent({
           TypeName: from[0].value,
           SortPosition: Number(from[1].value),
           ParentId: Number(parentFrom[0].selectId),
-          Status:RadioVal.value
+          Status: RadioVal.value
         }
-        if(RadioVal.value== ''){ message.error('请选择分类状态') ;return }
-        
+        if (RadioVal.value == '') { message.error('请选择分类状态'); return }
+
         facilityTypeSaveApi(obj).then(res => {
           FengfacilityTypeTree();
           // reload()
@@ -187,9 +209,9 @@ export default defineComponent({
           TypeName: from[0].value,
           SortPosition: Number(from[1].value),
           ParentId: 0,
-          Status:RadioVal.value
+          Status: RadioVal.value
         }
-        if(RadioVal.value== ''){ message.error('请选择分类状态') ;return }
+        if (RadioVal.value == '') { message.error('请选择分类状态'); return }
 
         facilityTypeSaveApi(obj).then(res => {
           FengfacilityTypeTree();
@@ -217,7 +239,7 @@ export default defineComponent({
       return [
         {
           icon: 'ic:baseline-plus',
-          disabled: record.ceng ? true : false,
+          // disabled: record.ceng ? true : false,
           onClick: handleAdd.bind(null, record),
         },
         {
@@ -249,8 +271,16 @@ export default defineComponent({
 
     async function handleDelete(record: Recordable) {
       await deleteTableDataRecord(record.TypeId)
-      await facilityTypeDeleteApi({ 'Ids': [record.TypeId] })
-      FengfacilityTypeTree();
+      await facilityTypeDeleteApi({ 'Ids': [record.TypeId] }).then(res => {
+        if (res != 0) {
+          var a = res.split('=')
+          // console.log(a)
+          message.error(a[2])
+          return;
+        } else {
+          FengfacilityTypeTree();
+        }
+      })
 
       console.log(TreeTableData);
     }
@@ -314,6 +344,7 @@ export default defineComponent({
       handleAdd,
       checkSlectVlaue,
       getSelect,
+      tree
     };
   },
 });

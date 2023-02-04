@@ -36,7 +36,7 @@ function connect() {
             if (msg.request.command == 'login') {
                 token = msg.response.token;
                 // list_top_area()
-                subscribeDeviceStatus()
+                // subscribeDeviceStatus()
             } else if (msg.request.command == 'device') {
                 console.log('msg', msg)
                 if (msg.code == 0) {
@@ -187,6 +187,21 @@ function subscribeDeviceStatus() {
             token: token,
             operation: "set",
             topic: "device/status"
+        }
+    }
+    ws.send(JSON.stringify(cmd))
+}
+
+function subscribeDeviceStatusNew(device) {
+    var cmd = {
+        command: "subscribe",
+        "session-id": token,
+        parameters: {
+            token: token,
+            operation: "device",
+            topic: "device.status",
+            deviceId: device,
+            extend: 100
         }
     }
     ws.send(JSON.stringify(cmd))

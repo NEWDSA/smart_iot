@@ -9,11 +9,14 @@
         <div class="flex flex-wrap">
             <div class="w-3/12 mt-5">设备ID：{{ infoFacility.DeviceId }}</div>
             <div class="w-3/12 mt-5">设备名称：{{ infoFacility.DeviceName }}</div>
-            <div class="w-3/12 mt-5">设备类型：{{ checkType(infoFacility.TypeId) }}</div>
+            <div class="w-3/12 mt-5">设备类型：{{ facilityType }}</div>
             <div class="w-3/12 mt-5">设备所在区域位置：{{ infoFacility.RegionalLocation }}</div>
             <div class="w-3/12 mt-5">说明：{{ infoFacility.Explain }}</div>
             <div class="w-3/12 mt-5">创建时间：{{ timeZ(infoFacility.Basic.UpdatedAt.seconds) }}</div>
-            <div class="w-3/12 mt-5">设备位置（经纬度）：{{ infoFacility.Latitude && infoFacility.Longitude ? infoFacility.Latitude + ',' + infoFacility.Longitude : '' }}</div>
+            <div class="w-3/12 mt-5">设备位置（经纬度）：{{
+                infoFacility.Latitude && infoFacility.Longitude ?
+                    infoFacility.Latitude + ',' + infoFacility.Longitude : ''
+            }}</div>
         </div>
 
         <!-- <div class="flex flex-wrap" v-else>
@@ -53,7 +56,7 @@
 import { ref, reactive, onMounted, nextTick, watch } from 'vue';
 import { Icon } from '/@/components/Icon';
 import { TreeSelect, DatePicker } from 'ant-design-vue';
-import { facilityTypeTreeApi, facilityRegionListApi, facilityRegionInfoApi, facilityEditApi } from '@/api/facility/facility'
+import { facilityTypeTreeApi, facilityRegionListApi, facilityRegionInfoApi, facilityEditApi,facilityTypeInfoApi } from '@/api/facility/facility'
 import { message } from 'ant-design-vue';
 
 let emit = defineEmits(['ingoEdit'])
@@ -62,11 +65,12 @@ const props = defineProps({
         type: Object,
         default: {}
     },
-    NetworkStatus:{
+    NetworkStatus: {
         type: Number,
         default: 0
     },
 })
+const facilityType = ref()
 // const info = ref()
 
 // const { infoFacility } = props
@@ -89,49 +93,53 @@ const props = defineProps({
 // const RegionDataId = ref()
 
 onMounted(() => {
-    FengfacilityTypeTree()
+    // FengfacilityTypeTree()
+    checkType()
     GetfacilityRegionList()
     // GetfacilityRegioninfo()
 })
 
 
 // // 获取data
-const TreeTableData = reactive([])
+// const TreeTableData = reactive([])
 
-// 获取树状列表，自己封装
-function FengfacilityTypeTree() {
-    TreeTableData.length = 0
+// // 获取树状列表，自己封装
+// function FengfacilityTypeTree() {
+//     TreeTableData.length = 0
 
-    facilityTypeTreeApi().then(res => {
+//     facilityTypeTreeApi().then(res => {
 
-        for (let i = 0; i < res.length; i++) {
-            TreeTableData.push(res[i].SelfData)
+//         for (let i = 0; i < res.length; i++) {
+//             TreeTableData.push(tree([res[i]])[0])
+//         }
+//         // console.log(res)
+//         // 完成后自动展开
+//         // nextTick(expandAll);
+//         console.log('TreeTableData', TreeTableData)
+//     })
 
-            if (res[i].SonData) {
-                TreeTableData[i].children = []
-                // console.log('res[i].SonData',res[i].SonData)
-                for (let y = 0; y < res[i].SonData.length; y++) {
-                    TreeTableData[i].children.push(res[i].SonData[y].SelfData)
+// }
 
-                    if (res[i].SonData[y].SonData) {
-                        // console.log(res[i].SonData[y].SonData)
-                        TreeTableData[i].children[y].children = []
-                        // console.log('res[i].SonData',TreeTableData)
-                        for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
-                            TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
-                        }
-                    }
-                }
-            }
+// function tree(data) {
+//     // debugger;
+//     console.log('data', data)
+//     let Array = [];
+//     for (let i = 0; i < data.length; i++) {
+//         if (data[i].SonData) {
 
-        }
-        // console.log(res)
-        // 完成后自动展开
-        // nextTick(expandAll);
-        console.log('TreeTableData', TreeTableData)
-    })
+//             let obj = data[i].SelfData
+//             obj.children = tree(data[i].SonData)
 
-}
+//             Array.push(obj)
+//         } else {
+//             let obj = data[i].SelfData
+//             Array.push(obj)
+//         }
+//         // Array.push(obj)
+//     }
+//     return Array;
+
+// }
 
 // 区域列表
 const RegionData = ref()
@@ -232,28 +240,11 @@ function GetfacilityRegionList() {
 //     RegionDataId.value = id
 // }
 
-const checkType = (id) => {
-    console.log(id)
-    for (var i = 0; i < TreeTableData.length; i++) {
-        if (TreeTableData[i].TypeId == id) {
-            return TreeTableData[i].TypeName
-        }
-        if (TreeTableData[i].children) {
-            for (var y = 0; y < TreeTableData[i].children.length; y++) {
-                if (TreeTableData[i].children[y].TypeId == id) {
-                    return TreeTableData[i].children[y].TypeName
-                }
-
-                if (TreeTableData[i].children[y].children) {
-                    for (var x = 0; x < TreeTableData[i].children[y].children; x++) {
-                        if (TreeTableData[i].children[y].children[x].TypeId == id) {
-                            return TreeTableData[i].children[y].children[x].TypeName
-                        }
-                    }
-                }
-            }
-        }
-    }
+const checkType = () => {
+    facilityTypeInfoApi({Id:props.infoFacility.TypeId}).then(res=>{
+        facilityType.value = res[0].TypeName
+    })
+    // console.log(id)
 
 }
 

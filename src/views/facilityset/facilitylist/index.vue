@@ -34,7 +34,7 @@
                 <!-- //v-for="(Sonvalue, index) in item.facilitySonTab" -->
                 <TreeSelect :defaultValue="faTypeName[facilityTabIndex == '0' ? index : 0]"
                   v-if="facilityTabIndex == '0' ? facilityTab[index + 1].children : facilityTab[facilityTabIndex].children"
-                  v-model:value="faTypeName[facilityTabIndex == '0' ? index : faTypeName.length - 1]"
+                  v-model:value="faTypeName[facilityTabIndex == '0' ? index : faTypeName?.length - 1]"
                   :tree-data="facilityTabIndex == '0' ? facilityTab[index + 1].children : facilityTab[facilityTabIndex].children"
                   @change="SelectCut($event, index, item.facilityTab.TypeId)" :field-names="filedName"
                   style="width: 200px;" tree-default-expand-all>
@@ -45,7 +45,7 @@
             </div>
 
           </div>
-          <div class="flex items-center flex-wrap" v-if="item.facility.length > 0">
+          <div class="flex items-center flex-wrap" v-if="item.facility?.length > 0">
 
             <div v-for="(facility, index2) in item.facility" :key="facility.DeviceId" class="w-100 mb-5"
               @click="pathDetail(facility.DeviceId)">
@@ -63,8 +63,12 @@
                   </div>
                 </div>
                 <div class="text-gray-500 mb-5">ID:{{ facility.DeviceId }}</div>
-                <div class="text-gray-500">设备类型 <span class="text-black">{{ checkcheckTypeTree(facility.TypeId )}}</span></div>
-                <div class="text-gray-500">设备区域 <span class="text-black">{{ checkcheckRegionTree(facility.RegionId) }}</span></div>
+                <div class="text-gray-500">设备类型 <span class="text-black">{{
+                  checkcheckTypeTree(facility.TypeId)
+                }}</span></div>
+                <div class="text-gray-500">设备区域 <span class="text-black">{{
+                  checkcheckRegionTree(facility.RegionId)
+                }}</span></div>
 
                 <div class="bottom-but flex items-center mt-2 justify-end">
                   <Modal v-model:visible="ModalShow[facilityTabIndex == '0' && !SearchStatus ? index : 0].model[index2]"
@@ -119,13 +123,27 @@
       :background="compState.background" />
 
     <EditModel @register="registerModal" @success="handleSuccess"></EditModel>
+
+    <Modal v-model:visible="sceneStopModal" title="系统提示" :footer="null">
+      <div class="p-5">
+        <div class="text-base">当前设备包含关联场景，是否停用关联场景？</div>
+        <div class="flex mt-3" style="justify-content: end;">
+          <div class="bg-blue-600 text-white rounded px-4 py-1 mr-2" @click="stopClick">停用</div>
+          <div class="text-blue-600 rounded px-4 py-1 mr-2" style="border:1px solid rgba(37, 99, 234)"
+            @click="stopCheck">查看</div>
+          <div class="text-blue-600 rounded px-4 py-1" style="border:1px solid rgba(37, 99, 235,1)" @click="stopClock">
+            取消</div>
+        </div>
+      </div>
+
+    </Modal>
   </div>
 </template>
 <script lang="ts" >
-import { ref, reactive, defineComponent, nextTick, watch } from 'vue';
+import { ref, reactive, defineComponent } from 'vue';
 import { Select, Modal, TreeSelect } from 'ant-design-vue';
 import { useGo } from '@/hooks/web/usePage';
-import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityCheckRuleApi, facilityRegionListApi } from '@/api/facility/facility'
+import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityCheckRuleApi, facilityRegionListApi, facilityDisableRuleApi,facilityRelieveApi } from '@/api/facility/facility'
 import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
 import { message } from 'ant-design-vue';
 import { Loading } from '@/components/Loading';
@@ -167,7 +185,7 @@ export default defineComponent({
     const ModalDeviceName = ref()
     // const showFacilityTab = ref()
 
-    const facilityTab = reactive([
+    const facilityTab: any = reactive([
       {
         TypeId: 0,
         TypeName: '全部'
@@ -181,6 +199,10 @@ export default defineComponent({
       tip: '加载中...',
       background: 'rgba(0,0,0,.5)'
     });
+
+    // 禁用启用
+    const sceneStopModal = ref(false)
+    const sceneStopId = ref()
 
     // 编辑
     function handleEdit(index, index2) {
@@ -251,7 +273,6 @@ export default defineComponent({
           // facilityList[y].facility.push(valt)
           ModalShow.value[o].model.push(false) //弹窗
           // console.log('facilityList', res)
-          // debugger;
         }
       }
 
@@ -260,12 +281,10 @@ export default defineComponent({
         SelectFacilityListObj.DeviceName = ''
       }
 
-      // nextTick(() => {
       //   for (let o = 0; o < faTypeName.value.length; o++) {
 
       faTypeName.value[faTypeName.value.length - 1] = '全部' //重置分类列表页的子分类select
       //   }
-      // })
       console.log(faTypeName)
 
       if (index != 0) {
@@ -307,7 +326,7 @@ export default defineComponent({
       }
 
       facilityListApi(SelectFacilityListObj).then(res => {
-        if (res == true) {
+        if (!res.List) {
           return;
         }
 
@@ -330,7 +349,7 @@ export default defineComponent({
 
     const facilityList: any = reactive([
       // {
-      //   facilityTab: '网关设备',
+      //   facilityTab: '网关设备',    //tab栏
       //   facilityClass: [
       //     {
       //       label: '全部'
@@ -340,7 +359,7 @@ export default defineComponent({
       //     }
       //   ],
       //   facilityClassIndex: '全部',
-      //   facility: [
+      //   facility: [                 // 设备
       //     {
       //       id: '246531543123265',
       //       name: '网关',
@@ -371,8 +390,6 @@ export default defineComponent({
       facilityTypeTreeApi().then(res => {
         console.log('res', res)
         for (let i = 0; i < res.length; i++) {
-          // 暂存
-          facilityTab.push(res[i].SelfData) //push设备类别的tab栏
 
           // 加在select菜单的默认值
           faTypeName.value.push('全部')
@@ -394,31 +411,42 @@ export default defineComponent({
           facilityListLock.push(false) //分页锁
 
           facilityList[i].facilityTab = res[i].SelfData //顶级分类
-          // console.log('res[i]',res[i])
-          // console.log('facilityList[i].facilityTab[i]',facilityList[i].facilityTab)
+
+          // 暂存 
+          facilityTab.push(res[i].SelfData) //push设备类别的tab栏
 
           if (res[i].SonData) {
-            // console.log('facilityList[i].facilityTab[i]',facilityList[i].facilityTab[i])
-            facilityList[i].facilityTab.children = [{ //添加一个全部的选项
+            facilityList[i].facilityTab.children = [{ //添加一个全部的选项 //用了tree()之后这个没什么用 相当与 facilityList[i].facilityTab.children = []
               TypeId: '0',
               TypeName: "全部"
             }]
-            console.log('res[i].SonData', res[i].SonData)
-            for (let y = 0; y < res[i].SonData.length; y++) {    //封装成自己的数据 打印就知道了
 
-              facilityList[i].facilityTab.children.push(res[i].SonData[y].SelfData)
+            // for (let y = 0; y < res[i].SonData.length; y++) {    //封装成自己的数据 打印就知道了
+            //   debugger;
+            // console.log('facilityList[i].facilityTab.children',facilityList[i].facilityTab.children)
+            //   facilityList[i].facilityTab.children.push(res[i].SonData[y].SelfData)
 
-              if (res[i].SonData[y].SonData) {
-                // console.log(res[i].SonData[y].SonData)
-                facilityList[i].facilityTab.children[y + 1].children = []
-                // console.log('res[i].SonData',facilityList[i].facilityTab)
-                for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
-                  facilityList[i].facilityTab.children[y + 1].children.push(res[i].SonData[y].SonData[x].SelfData)
+            //   if (res[i].SonData[y].SonData) {
+            //     // console.log(res[i].SonData[y].SonData)
+            //     facilityList[i].facilityTab.children[y + 1].children = []
+            //     // console.log('res[i].SonData',facilityList[i].facilityTab)
+            //     for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
+            //       facilityList[i].facilityTab.children[y + 1].children.push(res[i].SonData[y].SonData[x].SelfData)
 
-                }
-              }
-            }
+            //     }
+            //   }
+            // }
+            // facilityList[i].facilityTab.children = []
+
+            facilityList[i].facilityTab.children.push(tree([res[i]])[0])
+
+            facilityList[i].facilityTab.children.unshift({ //添加一个全部的选项  //用了tree()之后看这个 第一个添加全部
+              TypeId: '0',
+              TypeName: "全部"
+            })
+
           }
+
         }
 
         // 固定添加
@@ -459,7 +487,7 @@ export default defineComponent({
       // console.log('facilityListObj',facilityListObj)
       // console.log(facilityListObj)
       // console.log('y', y)
-      new Promise((resove, reject) => {
+      new Promise(() => {
         //自定义请求参数
         console.log('facilityListObj[y].TypeId', facilityListObj[y].TypeId, y)
         let obj = {
@@ -480,7 +508,7 @@ export default defineComponent({
           console.log('obj', obj)
           console.log(res, 'dddd')
 
-          if (res == true) { //如果没数据
+          if (!res.List) { //如果没数据
             return;
           }
           // debugger;
@@ -660,7 +688,11 @@ export default defineComponent({
           })
           message.success('操作成功')
 
-        } else {
+        } else if(res == 1){
+        sceneStopId.value = id
+        sceneStopModal.value = true
+        
+        }else{
           message.error('操作失败')
         }
 
@@ -786,16 +818,16 @@ export default defineComponent({
 
     const RegionList = ref()
     getRegion()
-    function getRegion(){
+    function getRegion() {
       facilityRegionListApi().then((res) => {
-      // console.log(res)
-      RegionList.value =  res.Detail
-    });
+        // console.log(res)
+        RegionList.value = res.Detail
+      });
     }
-   
+
 
     function checkcheckRegionTree(id) {
-      
+
       for (var i = 0; i < RegionList.value.length; i++) {
         // console.log('RegionList',id,RegionList.value[i].RegionId)
         if (RegionList.value[i].RegionId == id) {
@@ -805,7 +837,27 @@ export default defineComponent({
       return '暂无区域'
     }
 
-    
+    // sondata树
+    function tree(data) {
+      // debugger;
+      console.log('data', data)
+      let Array = [];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].SonData) {
+
+          let obj = data[i].SelfData
+          obj.children = tree(data[i].SonData)
+
+          Array.push(obj)
+        } else {
+          let obj = data[i].SelfData
+          Array.push(obj)
+        }
+        // Array.push(obj)
+      }
+      return Array;
+
+    }
 
     // loading
     function openLoading(absolute: boolean) {
@@ -815,6 +867,25 @@ export default defineComponent({
         compState.loading = false;
       }, 2000);
     }
+
+    function stopClick() {
+      facilityDisableRuleApi({ 'Id': sceneStopId.value }).then(res => {
+        if (res == 0) {
+          message.success('操作成功')
+        } else {
+          message.success('操作失败')
+        }
+
+        sceneStopModal.value = false
+      })
+    }
+    function stopCheck() {
+      message.success('开发中。。。')
+    }
+    function stopClock() {
+      sceneStopModal.value = false
+    }
+
 
     // 设备登录
     const titles = ref([])
@@ -869,7 +940,13 @@ export default defineComponent({
       checkcheckTypeTree,
       RegionList,
       checkcheckRegionTree,
-      getRegion
+      getRegion,
+      tree,
+      sceneStopModal,
+      sceneStopId,
+      stopClick,
+      stopCheck,
+      stopClock
     }
   },
 

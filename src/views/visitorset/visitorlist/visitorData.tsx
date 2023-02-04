@@ -111,7 +111,7 @@ export const formSchema: FormSchema[] = [
     label: '用户',
     field: 'VisitorName',
     component: 'Input',
-    required: true
+    required: true,
   },
   {
     label: '联系电话',

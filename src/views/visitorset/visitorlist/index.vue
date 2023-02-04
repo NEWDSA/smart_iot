@@ -14,14 +14,14 @@
       <div class="flex p-3">
         <div class="mr-3">
           <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut">
-          <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
-            {{ item.label }}
-          </div>
-        </Select>
+            <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
+              {{ item.label }}
+            </div>
+          </Select>
         </div>
-        
 
-        <div class="w-50 mr-3" v-if="souSelect.key!= ''">
+
+        <div class="w-50 mr-3" v-if="souSelect.key != ''">
           <Select class="w-45" @change="TypeChange" v-if="souSelect.key == 'VisitorTypeId'">
             <div :value="item.VisitorTypeName" v-for="(item, index) in VisitorTypeList" :key="item.VisitorTypeId">
               {{ item.VisitorTypeName }}
@@ -39,14 +39,21 @@
       </div>
     </div>
     <BasicTable @register="registertab">
-      <!-- <template #toolbar>
-        <a-button type="primary" @click="expandAll">展开全部</a-button>
-        <a-button type="primary" @click="collapseAll">折叠全部</a-button>
-      </template> -->
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction :actions="createActions(record, column)" />
         </template>
+
+        <template v-if="column.key === 'VisitorName'">
+          <div class="flex items-center justify-center">
+            <div class="w-10 h-10 rounded-3xl overflow-hidden mr-3" v-if="record.Photo">
+              <img :src="url + record.Photo" alt="">
+            </div>
+            <div>{{ record.VisitorName }}</div>
+          </div>
+
+        </template>
+
       </template>
     </BasicTable>
 
@@ -73,6 +80,9 @@ export default defineComponent({
         VisitorTypeList.value = res.Detail
       })
     })
+
+    const url = ref('http://192.168.8.180:4000/api/v1/')
+
     const [registerModal, { openModal }] = useModal();
     // 表格数据
     const searchInfo = ref()
@@ -169,14 +179,14 @@ export default defineComponent({
         var obj = res.Detail
 
         openModal(true, {
-        isUpdate: true,
-        obj,
-        disabled:true
-      });
+          isUpdate: true,
+          obj,
+          disabled: true
+        });
         // }
       })
 
-      
+
     }
 
     function handleSuccess() {
@@ -281,7 +291,8 @@ export default defineComponent({
       SelectCut,
       getFormValues,
       resetFormValues,
-      TypeChange
+      TypeChange,
+      url
     };
   },
 });

@@ -6,26 +6,36 @@
             {{ Td.title }}
         </div>
     </div>
-    <div class="wrapEl" ref="wrapEl" v-if="model && (!NetworkStatus || NetworkStatus!= 2)">
+    <div class="wrapEl" ref="wrapEl" v-if="model && (!NetworkStatus || NetworkStatus != 2)">
         <div v-for="(Th, index) in model" :key="index" class="">
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'switch'">
                 <div class="w-1/4">{{ Th.model.name }}</div>
-                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value == false ? '关闭' : '打开' }}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
+                    Th.value.value == false ? '关闭'
+                        : '打开'
+                }}</div>
                 <div class="w-1/4">
                     <div class="flex">
-                        <div class="px-2 rounded mr-3" @click="buttomCut(true, Th)"
-                            :class="Th.value.value == true ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                        <div class="px-2 rounded mr-3" @click="buttomCut(1, Th)"
+                            :class="Th.value.value == 1 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
                             打开</div>
 
-                        <div class="px-2 rounded mr-3" @click="buttomCut(false, Th)"
-                            :class="Th.value.value == false ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                        <div class="px-2 rounded mr-3" @click="buttomCut(2, Th)" v-if="ModelId == 'curtain'"
+                            :class="Th.value.value == 2 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                            停止</div>
+
+                        <div class="px-2 rounded mr-3" @click="buttomCut(0, Th)"
+                            :class="Th.value.value == 0 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
                             关闭</div>
                     </div>
                 </div>
             </div>
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'select'">
                 <div class="w-1/4">{{ Th.model.name }}</div>
-                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ returnVlaue(Th.model, Th.value.value) }}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
+                    returnVlaue(Th.model,
+                    Th.value.value)
+                }}</div>
                 <div class="w-1/4">
                     <div class="fasility-set-select">
                         <Select :value="returnVlaue(Th.model, Th.value.value)" class="w-25" @change="SelectCut">
@@ -40,15 +50,19 @@
 
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'slide'">
                 <div class="w-1/4">{{ Th.model.name }}</div>
-                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }}  {{ Th.model.field == "percentage" ? '%' : '121'}}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }} {{
+                    Th.model.field == "percentage" ? '%' : '121'
+                }}</div>
                 <div class="w-1/4">
                     <div class="flex items-center">
                         <Icon icon="fluent:subtract-circle-24-regular" size="20" color="blue"
                             @click="silderKong('jian', Th.value, Th.model, Th.model.field)">
                         </Icon>
-                        
+
                         <div class="mx-2">
-                            <Input type="number" v-model:value="Th.value.value" @change="silderKong('input', Th.value.value, Th.model, Th.model.field)" style="width: 5rem;"></Input>
+                            <Input type="number" v-model:value="Th.value.value"
+                                @change="silderKong('input', Th.value.value, Th.model, Th.model.field)"
+                                style="width: 5rem;"></Input>
                             <!-- {{ Th.value.value }}{{ Th.model.field == "percentage" ? '%' : ''}} -->
                         </div>
                         <Icon icon="fluent:add-circle-24-regular" size="20" color="blue"
@@ -71,17 +85,17 @@
 
         </div>
     </div>
-    <div class="p-3" v-else-if="NetworkStatus== 0 || NetworkStatus== 2">
+    <div class="p-3" v-else-if="NetworkStatus == 0 || NetworkStatus == 2">
         设备处于禁用状态
     </div>
-    <div class="p-3" v-else-if="!model && NetworkStatus!= 0 || NetworkStatus!= 2">
+    <div class="p-3" v-else-if="!model && NetworkStatus != 0 || NetworkStatus != 2">
         暂无设备控制
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, watch } from 'vue';
-import { Select,Input } from 'ant-design-vue';
+import { Select, Input } from 'ant-design-vue';
 import { Icon } from '/@/components/Icon';
 import { useLoading } from '/@/components/Loading';
 import { send_device_command } from '@/utils/iot'
@@ -103,7 +117,7 @@ const props = defineProps({
         type: String,
         default: ''
     },
-    NetworkStatus:{
+    NetworkStatus: {
         type: Number,
         default: 0
     },
@@ -159,6 +173,10 @@ watch(() => devices.value, (newVal, oldVal) => {
     deep: true
 })
 
+// 个别设备登录 subscribeDeviceStatusNew
+
+
+
 const buttomCut = (e, data) => {
 
     send_device_command(e, props.DeviceId, props.ModelId, data.model.field, 'checked')
@@ -177,7 +195,7 @@ const SelectCut = (e, data) => {
     openFnWrapLoading();
 }
 
-const silderKong = (type, value, model, field,event) => {
+const silderKong = (type, value, model, field, event) => {
     if (type == 'jian') {
         var val = value.value - 1
         if (val < model['slide-range'].min) {
