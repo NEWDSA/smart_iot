@@ -1,7 +1,7 @@
 <template>
+    <PageWrapper contentFullHeight title="场景联动详情">
     <div>
-        <div class="p-5 bg-white">
-            <div class="text-lg font-bold">场景联动详情</div>
+        <div class="p-2 bg-white">
 
             <div class="my-4 md:flex items-center">
                 <div class="flex">
@@ -104,14 +104,16 @@
             <div class="p-3">确认删除 <span class="text-red-500">{{ ModalObj.Name }}</span> 此场景？</div>
         </Modal>
     </div>
+</PageWrapper>
 </template>
 
 <script lang="ts">
 import { ref, defineComponent, reactive, onMounted, } from 'vue';
 import { visitorTypeListApi, ruleVisitorListApi, ruleEnableApi, ruleDisableApi, ruleDeleteApi } from '@/api/visitor/visitor'
 import { message, Modal,Pagination } from 'ant-design-vue';
+import { PageWrapper } from '@/components/Page';
 export default defineComponent({
-    components: { Modal,Pagination },
+    components: { Modal,Pagination,PageWrapper },
     setup() {
         onMounted(() => {
             getTypeList();

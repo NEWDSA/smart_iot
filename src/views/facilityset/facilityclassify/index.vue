@@ -1,7 +1,7 @@
 <template>
-  <div class="p-5">
-    <div class="p-5 bg-white">
-      <div class="text-lg font-bold">设备分类</div>
+  <PageWrapper contentFullHeight title="设备分类">
+  <div class="">
+    <div class="p-2 bg-white">
       <div>
         <!-- <BasicForm @register="register"></BasicForm> -->
       </div>
@@ -30,13 +30,14 @@
     <addclass ref="addmodel" @ok="ClassOK" @close="ClassClose"></addclass>
 
   </div>
+</PageWrapper>
 </template>
 <script lang="ts">
 import { ref, reactive, nextTick, defineComponent, onMounted, } from 'vue';
 // import { Button } from '@/components/Button';
 import { BasicTable, useTable, TableAction, BasicColumn, EditRecordRow, ActionItem } from '@/components/Table';
 import { getBasicColumns, } from './tableData';
-
+import { PageWrapper } from '@/components/Page';
 import { facilityTypeTreeApi, facilityTypeSaveApi, facilityTypeSameGradeApi, facilityTypeDeleteApi, facilityTypeEditApi } from '@/api/facility/facility'
 
 import addclass from './components/addclass.vue';
@@ -46,7 +47,7 @@ import { message } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'AccountDetail',
-  components: { BasicTable, TableAction, addclass },
+  components: { BasicTable, TableAction, addclass,PageWrapper },
   setup() {
     onMounted(() => {
       FengfacilityTypeTree();

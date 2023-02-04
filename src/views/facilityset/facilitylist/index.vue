@@ -1,7 +1,8 @@
 <template>
+  <PageWrapper contentFullHeight title="设备列表">
+    
   <div>
-    <div class="p-5 bg-white">
-      <div class="text-lg font-bold">设备列表</div>
+    <div class="p-2 bg-white">
 
       <div class="my-4 md:flex items-center">
         <div class="flex">
@@ -138,6 +139,7 @@
 
     </Modal>
   </div>
+</PageWrapper>
 </template>
 <script lang="ts" >
 import { ref, reactive, defineComponent } from 'vue';
@@ -149,10 +151,11 @@ import { message } from 'ant-design-vue';
 import { Loading } from '@/components/Loading';
 import { useModal } from '@/components/Modal';
 import EditModel from './EditModal/index.vue'
+import { PageWrapper } from '@/components/Page';
 
 export default defineComponent({
   name: 'Facilitylist',
-  components: { Select, Modal, TreeSelect, Loading, EditModel },
+  components: { Select, Modal, TreeSelect, Loading, EditModel,PageWrapper },
   setup() {
     const go = useGo();
     const [registerModal, { openModal }] = useModal();

@@ -1,65 +1,65 @@
 <template>
-  <div class="p-5">
-    <div class="p-5 bg-white">
-      <div class="text-xl">访客列表</div>
-      <div>
-        <!-- <BasicForm @register="register"></BasicForm> -->
-      </div>
-      <div>
-        <a-button type="primary" preIcon="ic:baseline-plus" @click="addVisitor()">
-          创建新的访客
-        </a-button>
-      </div>
+  <PageWrapper contentFullHeight title="访客列表">
+    <div class="">
+      <div class="p-2 bg-white flex justify-between items-center">
 
-      <div class="flex p-3">
-        <div class="mr-3">
-          <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut">
-            <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
-              {{ item.label }}
-            </div>
-          </Select>
-        </div>
-
-
-        <div class="w-50 mr-3" v-if="souSelect.key != ''">
-          <Select class="w-45" @change="TypeChange" v-if="souSelect.key == 'VisitorTypeId'">
-            <div :value="item.VisitorTypeName" v-for="(item, index) in VisitorTypeList" :key="item.VisitorTypeId">
-              {{ item.VisitorTypeName }}
-            </div>
-          </Select>
-
-          <Input v-if="souSelect.key == 'VisitorPhone'" v-model:value="souOrder.VisitorPhone"></Input>
-          <Input v-if="souSelect.key == 'VisitorName'" v-model:value="souOrder.VisitorName"></Input>
-          <Input v-if="souSelect.key == 'LicensePlate'" v-model:value="souOrder.LicensePlate"></Input>
-        </div>
-
-        <a-button type="primary" @click="getFormValues" class="mr-3">查询</a-button>
-        <a-button @click="resetFormValues" class="mr-3">重置</a-button>
-
-      </div>
-    </div>
-    <BasicTable @register="registertab">
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'action'">
-          <TableAction :actions="createActions(record, column)" />
-        </template>
-
-        <template v-if="column.key === 'VisitorName'">
-          <div class="flex items-center justify-center">
-            <div class="w-10 h-10 rounded-3xl overflow-hidden mr-3" v-if="record.Photo">
-              <img :src="url + record.Photo" alt="">
-            </div>
-            <div>{{ record.VisitorName }}</div>
+        <div class="flex p-3">
+          <div class="mr-3">
+            <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut">
+              <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
+                {{ item.label }}
+              </div>
+            </Select>
           </div>
 
+
+          <div class="w-50 mr-3" v-if="souSelect.key != ''">
+            <Select class="w-45" @change="TypeChange" v-if="souSelect.key == 'VisitorTypeId'">
+              <div :value="item.VisitorTypeName" v-for="(item, index) in VisitorTypeList" :key="item.VisitorTypeId">
+                {{ item.VisitorTypeName }}
+              </div>
+            </Select>
+
+            <Input v-if="souSelect.key == 'VisitorPhone'" v-model:value="souOrder.VisitorPhone"></Input>
+            <Input v-if="souSelect.key == 'VisitorName'" v-model:value="souOrder.VisitorName"></Input>
+            <Input v-if="souSelect.key == 'LicensePlate'" v-model:value="souOrder.LicensePlate"></Input>
+          </div>
+
+          <a-button type="primary" @click="getFormValues" class="mr-3">查询</a-button>
+          <a-button @click="resetFormValues" class="mr-3">重置</a-button>
+
+        </div>
+
+
+        <div>
+          <a-button type="primary" preIcon="ic:baseline-plus" @click="addVisitor()">
+            创建新的访客
+          </a-button>
+        </div>
+      </div>
+      <BasicTable @register="registertab">
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'action'">
+            <TableAction :actions="createActions(record, column)" />
+          </template>
+
+          <template v-if="column.key === 'VisitorName'">
+            <div class="flex items-center justify-center">
+              <div class="w-10 h-10 rounded-3xl overflow-hidden mr-3" v-if="record.Photo">
+                <img :src="url + record.Photo" alt="">
+              </div>
+              <div>{{ record.VisitorName }}</div>
+            </div>
+
+          </template>
+
         </template>
-
-      </template>
-    </BasicTable>
+      </BasicTable>
 
 
-    <visitorModel @register="registerModal" @success="handleSuccess"></visitorModel>
-  </div>
+      <visitorModel @register="registerModal" @success="handleSuccess"></visitorModel>
+    </div>
+  </PageWrapper>
 </template>
 
 <script>
@@ -71,9 +71,10 @@ import { useModal } from '@/components/Modal';
 import visitorModel from './visitorModal.vue';
 import { message, Select, Input } from 'ant-design-vue';
 import { useLoading } from '@/components/Loading';
+import { PageWrapper } from '@/components/Page';
 
 export default defineComponent({
-  components: { BasicTable, TableAction, visitorModel, Select, Input },
+  components: { BasicTable, TableAction, visitorModel, Select, Input, PageWrapper },
   setup() {
     onMounted(() => {
       visitorTypeListApi().then(res => {
