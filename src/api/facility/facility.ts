@@ -19,11 +19,14 @@ enum Api {
     DeviceSave = '/device/save',
     DeviceEdit = '/device/edit',
     DeviceDelete = '/device/delete',
+
+
     DeviceCheckRule = '/device/check/rule',
     DeviceDisableRule = 'device/disable/rule',
     DeviceRelieve = '/device/relieve',
-    
-
+    DeviceRuleList = '/device/rule/list',
+    ruleEnable = '/rule/enable',
+    ruleDisable = '/rule/disable',
     
     DeviceTypeTree = '/device/type/tree',
     DeviceTypeSameGrade = '/device/type/same/grade',
@@ -159,6 +162,30 @@ export function facilityDisableRuleApi(params) {
 export function facilityRelieveApi(params) {
     return realHttp.get({
         url: Api.DeviceRelieve,
+        params
+    });
+}
+
+// 设备关联的场景
+export function facilityRuleListApi(params) {
+    return realHttp.get({
+        url: Api.DeviceRuleList,
+        params
+    });
+}
+
+// 场景启用
+export function ruleEnableApi(params) {
+    return realHttp.get({
+        url: Api.ruleEnable,
+        params
+    });
+}
+
+// 场景禁用
+export function ruleDisableApi(params) {
+    return realHttp.get({
+        url: Api.ruleDisable,
         params
     });
 }

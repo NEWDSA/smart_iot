@@ -18,7 +18,7 @@
       <log v-if="facilityDetailTabIndex == '1'" :DeviceName="infoFacility.DeviceName" :NetworkStatus="infoFacility.NetworkStatus"></log>
       <control v-if="facilityDetailTabIndex == '2'" :DeviceModel="infoFacility.DeviceModel" :DeviceId="infoFacility.DeviceSerial" :ModelId="infoFacility.DeviceModelId" :NetworkStatus="infoFacility.NetworkStatus"></control>
       <warn v-if="facilityDetailTabIndex == '3'" :DeviceSerial="infoFacility.DeviceSerial" :NetworkStatus="infoFacility.NetworkStatus"></warn>
-
+      <scene v-if="facilityDetailTabIndex == '4'" :DeviceId="infoFacility.DeviceSerial"></scene>
     </div>
   </PageWrapper>
 </template>
@@ -30,6 +30,7 @@ import info from './components/detailCom/info.vue'
 import control from './components/detailCom/control.vue'
 import warn from './components/detailCom/warn.vue'
 import log from './components/detailCom/log.vue'
+import scene from './components/detailCom/scene.vue'
 import { facilityDetailApi } from '@/api/facility/facility'
 import { useGo } from '@/hooks/web/usePage';
 import { useRoute } from 'vue-router';
@@ -48,7 +49,9 @@ const getfacilityId = (id) => {
   facilityDetailApi({ 'Id': id }).then(res => {
     console.log('res',res)
     infoFacility.value = res[0]
-    facilityDetailTabIndex.value = '0'
+
+    const tab = route.params?.tab
+    tab ? facilityDetailTabIndex.value = '4' : '0'
   })
 
 }
@@ -71,6 +74,10 @@ const facilityDetailTab = reactive([
   {
     id: 4,
     title: '告警状态'
+  },
+  {
+    id: 5,
+    title: '关联场景'
   }
 ])
 const cutTab = (index) => {

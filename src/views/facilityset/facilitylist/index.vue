@@ -883,7 +883,8 @@ export default defineComponent({
       })
     }
     function stopCheck() {
-      message.success('开发中。。。')
+      go('/facilityset/facility_detail/' + sceneStopId.value +'/scene')
+      
     }
     function stopClock() {
       sceneStopModal.value = false
