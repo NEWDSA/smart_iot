@@ -74,7 +74,7 @@ export default defineComponent({
 
 
     }
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination,deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
       title: '区域设备管理',
       onChange,
       rowSelection: {
@@ -107,7 +107,7 @@ export default defineComponent({
     onMounted(() => {
       getData()
     })
-    function handleCreate() {
+    async function handleCreate() {
       if (searchInfo.RegionId) {
         let params = searchInfo.RegionId
         openModal(true, {
@@ -127,17 +127,20 @@ export default defineComponent({
       checkedKeys.value = selectedRowKeys;
       PermisionList.DeviceId = Object.values(selectedRowKeys);
     }
-    function handleout() {
-      // 请选择需要移出的设备
-      if (toRaw(checkedKeys.value)) {
+    async function handleout() {
+      // 请选择需要移出的设备、
+      console.log(toRaw(checkedKeys.value).length, '!!!!批量选择设备!!!')
+      // await deleteTableDataRecord(record.RegionId);
+      if (toRaw(checkedKeys.value).length > 0) {
         let param = {
           DeviceId: toRaw(checkedKeys.value),
           RegionId: 0
         }
         try {
-          bulkDeviceOut(param)
+         await bulkDeviceOut(param)
         } finally {
-          reload()
+          // reload()
+          getData()
         }
 
 
@@ -151,6 +154,7 @@ export default defineComponent({
     }
     // 
     function bulkPermission(params) {
+      
       PermisionList.DepartmentId = Object.values(params);
       // 调用接口进行处理
       devicePermission({ DeviceId: PermisionList.DeviceId, DepartmentId: PermisionList.DepartmentId })
@@ -181,14 +185,14 @@ export default defineComponent({
         isUpdate: true,
       });
     }
-   async function handleDelete(record: Recordable) {
+    async function handleDelete(record: Recordable) {
       try {
         let param = {
           DeviceId: [record.DeviceId],
           RegionId: 0
         }
         await deleteTableDataRecord(record.DeviceId);
-        await  bulkDeviceOut(param)
+        await bulkDeviceOut(param)
 
 
       } finally {
@@ -216,19 +220,26 @@ export default defineComponent({
         dataSource.value.push(item)
       })
     }
-    function handleSuccess({ isUpdate, values }) {
-      if (isUpdate) {
-        // 演示不刷新表格直接更新内部数据。
-        // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-        const result = updateTableDataRecord(values.id, values);
-        console.log(result);
-      } else {
-        reload();
-      }
+    function handleSuccess() {
+      // reload()
+      getData();
     }
     function handleEditPwd(record: Recordable) {
 
-      console.log(record, '...record...')
+      if (getSelectRowKeys().length > 0) {
+
+        currentModal.value = AccountTable;
+        nextTick(() => {
+          modalVisible.value = true;
+        })
+      } else {
+        createConfirm({
+          iconType: 'info',
+          title: '提示',
+          content: '至少选择一项',
+        });
+
+      }
     }
     function handleSelect(RegionId = '') {
 

@@ -42,6 +42,19 @@ export const columns: BasicColumn[] = [
 ]
 export const searchFormSchema: FormSchema[] = [
   {
+    field: 'Sort',
+    label: '选择排序',
+    component: 'Select',
+    colProps: { span: 8 },
+    componentProps:{
+      options:[{
+        label:'按名称排序',value:'1'
+      },{
+        label:'按创建时间排序',value:'2'
+      }]
+    }
+  },
+  {
     field: 'TypeId',
     label: '设备分类',
     component: 'TreeSelect',

@@ -3,18 +3,19 @@ import { BasicColumn } from '@/components/Table/src/types/table'
 import { FormSchema } from '@/components/Table'
 import { h } from 'vue'
 import { Tag } from 'ant-design-vue'
+
 import dayjs from 'dayjs'
 export function getBasicColumns(): BasicColumn[] {
   return [
     {
-      title: '区域列表',
-      dataIndex: 'RegionName',
+      title: '部门名称',
+      dataIndex: 'DeptName',
       width: 160,
       align: 'left'
     },
     {
       title: '排序',
-      dataIndex: 'Sort',
+      dataIndex: 'OrderNum',
       width: 50
     },
     {
@@ -64,42 +65,45 @@ export const searchFormSchema: FormSchema[] = [
 export const formSchema: FormSchema[] = [
   {
     field: 'ParentId',
-    label: '上级区域',
+    label: '上级部门',
     component: 'TreeSelect',
-    show: ({ values }) => {
-      return values.ParentId=='0'?false:true
-    },
-    componentProps:{
+    ifShow:true,
+    componentProps: {
       fieldNames: {
-        label: 'RegionName',
-        key: 'RegionId',
-        value: 'RegionId'
-      }
+        label: 'Name',
+        key: 'Id',
+        value: 'Id'
+      },
+      getPopupContainer: () => document.body
     },
+    
     required: true
   },
   {
-    field: 'RegionName',
-    label: '区域名称',
+    field: 'DeptName',
+    label: '部门名称',
     component: 'Input',
     required: true
   },
   {
+    field: 'OrderNum',
+    label: '排序',
+    component: 'InputNumber',
+    required: true
+  },
+
+  {
     field: 'Status',
     label: '状态',
     component: 'RadioButtonGroup',
-    defaultValue: 0,
+    defaultValue: '0',
     componentProps: {
       options: [
-        { label: '启用', value: 0 },
-        { label: '停用', value: 1 }
+        { label: '启用', value: '0' },
+        { label: '停用', value: '1' }
       ]
     },
     required: true
-  },{
-    field: 'Sort',
-    label: '排序',
-    component: 'InputNumber'
   }
 ]
 

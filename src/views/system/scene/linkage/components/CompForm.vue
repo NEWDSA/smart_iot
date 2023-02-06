@@ -13,21 +13,44 @@
           </a-input>
         </template>
       </BasicForm>
+      <!-- <BasicForm v-if="showForm"  :showActionButtonGroup="false" :labelWidth="0" :schemas="schemas2"
+        :actionColOptions="{ span: 24 }" @submit="handleSubmit">
+        <template #switchSlot="{ model, field }">
+          <Switch checked-children="OR" un-checked-children="AND" v-model:checked="model[field]" />
+        </template>
+      </BasicForm> -->
+      <Form :model="FormAdd" ref="formRef">
+        <template v-for="item in FormAdd" :key="item.account">
+          <FormItem :name="item.account" class="enter-x">
+            <Input class="fix-auto-fill" size="large" v-model:value="item.account" :placeholder="222" />
+          </FormItem>
+          <FormItem>
+            <a-select v-model:value="item.account">
+              <a-select-option value="jack">Jack</a-select-option>
+              <a-select-option value="jack">Jack</a-select-option>
+              <a-select-option value="jack">Jack</a-select-option>
+              <a-select-option value="jack">Jack</a-select-option>
+              <a-select-option value="jack">Jack</a-select-option>
+            </a-select>
+          </FormItem>
+        </template>
+      </Form>
       <!-- 添加过滤条件 -->
       <span @click="addRule">
         <Icon icon="bi:plus" size="14" />
         添加过滤条件
       </span>
-
     </div>
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
+import { Switch, Form } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
 import { PageWrapper } from '@/components/Page';
 import { Icon } from '@/components/Icon';
+import SelectItem from '@/layouts/default/setting/components/SelectItem.vue';
 const schemas: FormSchema[] = [
   {
     field: 'field1',
@@ -200,10 +223,35 @@ const schemas: FormSchema[] = [
   //   }
   // }
 ];
+const showForm = ref(false);
+const schemas2: FormSchema[] = [
+  {
+    field: 'filed1',
+    label: '',
+    component: 'Switch',
+    slot: 'switchSlot'
+  },
+  {
+    field: 'field',
+    component: 'Input',
+    label: '',
+    colProps: {
+      span: 3,
+    },
+    componentProps: {
+      placeholder: '自定义placeholder',
+      onChange: (e) => {
+        console.log(e);
+      },
+    },
+  },
+];
+const FormAdd: any = reactive([]);
+const FormItem = Form.Item;
 export default defineComponent({
-  components: { BasicForm, CollapseContainer, PageWrapper, Icon },
+  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, SelectItem },
   setup() {
-    const [register, { setProps, updateSchema, appendSchemaByField, removeSchemaByField }] =
+    const [register, { setProps, updateSchema }] =
       useForm({
         labelWidth: 0,
         schemas,
@@ -212,6 +260,7 @@ export default defineComponent({
           span: 6,
         },
       });
+
     function changeLabel3() {
       updateSchema({
         field: 'field3',
@@ -232,17 +281,18 @@ export default defineComponent({
     }
 
     function appendField() {
-      appendSchemaByField(
-        {
-          field: 'field10',
-          label: '字段10',
-          component: 'Input',
-          colProps: {
-            span: 8,
-          },
-        },
-        'field3',
-      );
+
+      // appendSchemaByField(
+      //   {
+      //     field: 'field10',
+      //     label: '字段10',
+      //     component: 'Input',
+      //     colProps: {
+      //       span: 8,
+      //     },
+      //   },
+      //   'field3',
+      // );
     }
     function deleteField() {
       removeSchemaByField('field11');
@@ -254,40 +304,53 @@ export default defineComponent({
     const n = ref(1);
     // 添加规则
     function addRule() {
-      appendSchemaByField(
-        {
-          field: `field${n.value}a`,
-          label: '',
-          component: 'Select',
-          componentProps: {
-            options: [{
-              label: '工单更新时间',
-              value: '1',
-              key: '1'
-            }, {
-              label: '更改时间',
-              value: '2',
-              key: '2'
-            }]
-          },
-          colProps: {
-            span: 8,
-          },
-          required: true,
-        },
-        '',
-      );
+      showForm.value = true;
+      // appendSchemaByField(
+      //   {
+      //     field: `field${n.value}a`,
+      //     label: '',
+      //     component: 'Select',
+      //     componentProps: {
+      //       options: [{
+      //         label: '工单更新时间',
+      //         value: '1',
+      //         key: '1'
+      //       }, {
+      //         label: '更改时间',
+      //         value: '2',
+      //         key: '2'
+      //       }]
+      //     },
+      //     colProps: {
+      //       span: 8,
+      //     },
+      //     required: true,
+      //   },
+      //   '',
+      // );
+      FormAdd.push({
+        'account': ''
+      })
+      console.log(FormAdd, '?...FormAdd...?')
+    }
+    function handleSubmit() {
+
     }
     return {
       register,
       schemas,
+      schemas2,
+      showForm,
+      FormItem,
+      FormAdd,
       setProps,
       changeLabel3,
       changeLabel34,
       appendField,
       deleteField,
       e_Device,
-      addRule
+      addRule,
+      handleSubmit
     };
   },
 });

@@ -88,7 +88,7 @@ export default defineComponent({
       openModal(true, {
         record,
         isModifiy:1,
-        isUpdate: true,
+        isUpdate: false,
       });
     }
 

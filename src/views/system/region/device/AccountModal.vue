@@ -1,19 +1,20 @@
 <template>
-  <BasicModal width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
+  <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
     <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
     </BasicTable>
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref, reactive, toRaw, onMounted } from 'vue';
+import { defineComponent, ref, computed, unref, reactive, toRaw } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { editDeviceArea } from '@/api/demo/region';
-import { deviceTree, deviceList, getDeviceType } from '@/api/demo/region'
+import { deviceTree, getReginDevice, getDeviceType } from '@/api/demo/region'
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { columns, searchFormSchema } from './accountModel.data';
 export default defineComponent({
   name: 'AccountModal',
+  props: ['Device'],
   components: { BasicModal, BasicForm, BasicTable, TableAction },
   emits: ['success', 'register'],
   setup(_, { emit }) {
@@ -22,13 +23,12 @@ export default defineComponent({
     const TreeTableData: any = reactive([]);
     const dataSource: any = ref([]);
     const checkedKeys = ref<Array<string | number>>([]);
-    var pagination = reactive({ PageNum: 1, PageSize: 10 })
+    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 2 })
     const paramList: any = ref();
     function onChange() {
     }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-      console.log(data, '...accountModal...')
-      paramList.value=data.params
+      paramList.value = data.params
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
       // 获取设备分类
@@ -87,16 +87,19 @@ export default defineComponent({
     function onSelectChange(selectedRowKeys: []) {
       checkedKeys.value = selectedRowKeys;
     }
-    onMounted(() => {
-      getData()
-    })
+    function ModelStatus(isOpen){
+       isOpen?getData():''
+    }
+    // onMounted(() => {
+    // })
     // 获取table数据
     async function getData() {
       //  获取区域设备
       dataSource.value = [];
-      const { List, Total } = await deviceList(pagination)
+      const { Page } = await getReginDevice(pagination)
+      const result = Page.List;
       const TypeList: any = [];
-      List.map(async (item) => {
+      result.map(async (item) => {
         const DeviceList = await getDeviceType({
           Id: item.TypeId
         })
@@ -104,9 +107,8 @@ export default defineComponent({
         item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
         dataSource.value.push(item)
       })
-      // dataSource.value = List;
       setPagination({
-        total: Total
+        total: Page.Total
       })
     }
 
@@ -115,19 +117,19 @@ export default defineComponent({
         // const values = await validate();
         const params = {
           DeviceId: toRaw(checkedKeys.value),
-          RegionId:paramList.value
+          RegionId: paramList.value
 
         }
         setModalProps({ confirmLoading: true });
         !unref(isUpdate) ? await editDeviceArea(params) : ''
         closeModal();
-        emit('success', { isUpdate: unref(isUpdate) });
+        emit('success');
       } finally {
         setModalProps({ confirmLoading: false });
       }
     }
 
-    return { registerModal, registerTable, handleSubmit, onSelectChange, getData, paramList, checkedKeys, getTitle, searchInfo, dataSource };
+    return { registerModal, registerTable, handleSubmit, onSelectChange, getData,ModelStatus, paramList, checkedKeys, getTitle, searchInfo, dataSource };
   },
 });
 </script>

@@ -23,7 +23,7 @@ export const getReginList = (params?) =>
   realHttp.get({ url: Api.regionList, params },{isTransformResponse: true})
 
 // 获取区域关联设备列表
-export const getReginDevice=(params?:regionParam)=>
+export const getReginDevice=(params?)=>
 realHttp.get({url:Api.regionUnionDevice,params},{isTransformResponse: true})
 
 // 获取设备分类树形列表

@@ -17,6 +17,7 @@ export default defineComponent({
     const isUpdate = ref(true);
     const isModifiy = ref(0);
     const RegionId = ref('');
+    const ParentId = ref('');
     const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
       labelWidth: 100,
       baseColProps: { span: 24 },
@@ -29,6 +30,8 @@ export default defineComponent({
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
       isModifiy.value = data?.isModifiy;
+      ParentId.value = data.record?.ParentId;
+      RegionId.value = data.record?.RegionId;
       if (unref(isUpdate)) {
         RegionId.value = data.record.RegionId;
         setFieldsValue({
@@ -43,12 +46,14 @@ export default defineComponent({
       });
     });
 
-    const getTitle = computed(() => (!unref(isUpdate) ? '创建区域' : '修改区域') && unref(isModifiy)==1?'添加区域':!unref(isUpdate) ? '创建区域' : '修改区域' );
+    const getTitle = computed(() => (!unref(isUpdate) ? '创建区域' : '修改区域') && unref(isModifiy) == 1 ? '添加区域' : !unref(isUpdate) ? '创建区域' : '修改区域');
 
 
     async function handleSubmit() {
       try {
         const values = await validate();
+
+        unref(isModifiy) == 1 ? Object.assign(values, { ParentId:RegionId.value}) : ''
         setModalProps({ confirmLoading: true });
         // await createDept(values)
         !unref(isUpdate) ? await addRegion(values) : await editRegion({ ...values, RegionId: RegionId.value })
