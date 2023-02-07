@@ -3,7 +3,8 @@
         <BasicForm @register="registerForm">
             <template #formFooter>
                 <div class="flex items-center justify-center">
-                    <div class="pr-2" style="width: 100px;text-align: right;"><span class="text-red-600">*</span> 正面照片</div>
+                    <div class="pr-2" style="width: 100px;text-align: right;"><span class="text-red-600">*</span> 正面照片
+                    </div>
                     <div style="width: calc(100% - 100px);">
                         <CropperAvatar :uploadApi="uploadApi" :value="showAvatar" @change="cropperOk" />
                     </div>
@@ -27,13 +28,14 @@ import { visitorTypeListApi, visitorEditApi, visitorSaveApi, seeFileApi } from '
 import { uploadApi } from '@/api/sys/upload';
 import { CropperAvatar } from '@/components/Cropper';
 import { message } from 'ant-design-vue';
+import { fileUrl } from '@/utils/file/fileUrl'
 
 export default defineComponent({
     name: 'DeptModal',
     components: { BasicModal, BasicForm, CropperAvatar },
     emits: ['success', 'register'],
     setup(_, { emit }) {
-        const url = ref('http://192.168.8.180:4000/api/v1/')
+        const url = ref('')
         const showAvatar = ref('');
         const avatar = ref('');
         const isUpdate = ref(true);
@@ -48,6 +50,7 @@ export default defineComponent({
         });
 
         const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+            showAvatar.value = ''
             resetFields();
             setModalProps({ confirmLoading: false });
             isUpdate.value = !!data?.isUpdate;
@@ -56,16 +59,20 @@ export default defineComponent({
                 console.log(VisitorId, '...data.obj...')
                 console.log(data.obj)
                 disabled.value = data.disabled
-                if(data.obj.Photo){
+                if (data.obj.Photo) {
                     avatar.value = data.obj.Photo
-                    showAvatar.value = url.value+data.obj.Photo
-                }else{
+                    showAvatar.value = fileUrl() + data.obj.Photo
+                } else {
                     avatar.value = '/src/assets/images/motou.png'
+                    showAvatar.value = '/src/assets/images/motou.png'
                 }
 
                 setFieldsValue({
                     ...data.obj,
                 });
+            } else {
+                avatar.value = '/src/assets/images/motou.png'
+                showAvatar.value = '/src/assets/images/motou.png'
             }
 
             const VisitorData = await getAccountList().then((res) => {
@@ -105,7 +112,7 @@ export default defineComponent({
 
                 if (avatar.value != '/src/assets/images/motou.png') {
                     values.Photo = avatar.value
-                }else{
+                } else {
                     message.warn('请上传正面照片。')
                     return;
                 }
@@ -122,12 +129,12 @@ export default defineComponent({
         }
 
         function cropperOk(source: any, data: any) {
-            showAvatar.value = url.value + source.data.Data
+            showAvatar.value = fileUrl() + source.data.Data
             avatar.value = source.data.Data
             // console.log(source, data)
         }
 
-        return { registerModal, registerForm, getTitle, handleSubmit, uploadApi: uploadApi as any, avatar, cropperOk, url,showAvatar };
+        return { registerModal, registerForm, getTitle, handleSubmit, uploadApi: uploadApi as any, avatar, cropperOk, url, showAvatar };
     },
 });
 </script>

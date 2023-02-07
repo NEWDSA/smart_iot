@@ -72,17 +72,20 @@ import visitorModel from './visitorModal.vue';
 import { message, Select, Input } from 'ant-design-vue';
 import { useLoading } from '@/components/Loading';
 import { PageWrapper } from '@/components/Page';
+import { fileUrl } from '@/utils/file/fileUrl'
 
 export default defineComponent({
   components: { BasicTable, TableAction, visitorModel, Select, Input, PageWrapper },
   setup() {
+    const devImg=ref('');
     onMounted(() => {
+      
       visitorTypeListApi().then(res => {
         VisitorTypeList.value = res.Detail
       })
     })
 
-    const url = ref('http://192.168.8.180:4000/api/v1/')
+    const url = ref(fileUrl())
 
     const [registerModal, { openModal }] = useModal();
     // 表格数据
@@ -293,7 +296,8 @@ export default defineComponent({
       getFormValues,
       resetFormValues,
       TypeChange,
-      url
+      url,
+      devImg
     };
   },
 });

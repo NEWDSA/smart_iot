@@ -40,7 +40,7 @@ export default defineComponent({
             }
         });
 
-        const getTitle = computed(() => (!unref(isUpdate) ? '新增访客类型' : '编辑访客类型'));
+        const getTitle = computed(() => (!unref(isUpdate) ? '添加访客类型' : '编辑访客类型'));
 
         async function handleSubmit() {
             try {
