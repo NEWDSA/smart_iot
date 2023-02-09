@@ -1,10 +1,42 @@
 <template>
   <PageWrapper title="触发条件">
     <template #extra>
-      <a-button type="primary"> 保存设置 </a-button>
+      <Form :model="RuleForm">
+        <Row class="enter-x col_flex">
+          <Col :span="4">
+          <FormItem name="switch" class="enter-x">
+            <Switch v-model:checked="isShake" checked-children="开启防抖" un-checked-children="关闭防抖" />
+          </FormItem>
+          </Col>
+          <template v-if="isShake">
+            <Col :span="5">
+            <FormItem class="enter-x">
+              <div style="display: flex;align-items: center;">
+                <InputNumber />
+                <div>分钟内触发</div>
+              </div>
+            </FormItem>
+            </Col>
+            <Col :span="5">
+            <FormItem>
+              <div style="display:flex;align-items: center;">
+                <InputNumber />
+                <div>次及以上</div>
+              </div>
+            </FormItem>
+            </Col>
+            <Col :span="6">
+            <FormItem>
+              <Select :options="options1">
+              </Select>
+            </FormItem>
+            </Col>
+          </template>
+        </Row>
+      </Form>
     </template>
     <div class="rounded-md pt-5 pl-5 border  bg-light-50 h-100">
-      <BasicForm @register="register">
+      <BasicForm :schemas="schemas" @register="register">
         <template #customSlot="{ model, field }">
           <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
             <template #suffix>
@@ -13,47 +45,78 @@
           </a-input>
         </template>
       </BasicForm>
-      <!-- <BasicForm v-if="showForm"  :showActionButtonGroup="false" :labelWidth="0" :schemas="schemas2"
-        :actionColOptions="{ span: 24 }" @submit="handleSubmit">
-        <template #switchSlot="{ model, field }">
-          <Switch checked-children="OR" un-checked-children="AND" v-model:checked="model[field]" />
-        </template>
-      </BasicForm> -->
-      <Form :model="FormAdd" ref="formRef">
-        <template v-for="item in FormAdd" :key="item.account">
-          <FormItem :name="item.account" class="enter-x">
-            <Input class="fix-auto-fill" size="large" v-model:value="item.account" :placeholder="222" />
-          </FormItem>
-          <FormItem>
-            <a-select v-model:value="item.account">
-              <a-select-option value="jack">Jack</a-select-option>
-              <a-select-option value="jack">Jack</a-select-option>
-              <a-select-option value="jack">Jack</a-select-option>
-              <a-select-option value="jack">Jack</a-select-option>
-              <a-select-option value="jack">Jack</a-select-option>
-            </a-select>
-          </FormItem>
-        </template>
-      </Form>
+      <template v-if="Object.keys(FormAdd)">
+        <Form v-if="Object.keys(FormAdd).length > 0" class="p-4 enter-x" :model="FormAdd" ref="formRef">
+          <template v-for="item, index in FormAdd" :key="item">
+            <Row class="enter-x" v-if="item">
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.Op" class="enter-x">
+                <Switch checked-children="AND" v-model:checked="item.Op" un-checked-children="OR" />
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.item1" class="enter-x">
+                <Select :options="options2" v-model:value="item.item1">
+                </Select>
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.item2" class="enter-x">
+                <Select :options="options3" v-model:value="item.item2">
+                </Select>
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.Gval" class="enter-x">
+                <Input v-model:value="item.Gval" />
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <!-- 移除附加条件 -->
+              <FormItem>
+                <Icon @click="remove_attach(index)" icon="ant-design:close-outlined"></Icon>
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <!-- 移除图标 -->
+              <FormItem>
+                <Icon icon="ant-design:delete-outlined"></Icon>
+              </FormItem>
+              </Col>
+            </Row>
+          </template>
+        </Form>
+      </template>
+
+
+      <!-- 引入模态框 -->
+      <AccountTable @register="registerMyTable" @success="handleSuccess" />
       <!-- 添加过滤条件 -->
       <span @click="addRule">
         <Icon icon="bi:plus" size="14" />
         添加过滤条件
       </span>
+      <a-button type="primary" class="my-4" @click="handel_Add">
+        图片Url下载
+      </a-button>
     </div>
   </PageWrapper>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, ref } from 'vue';
-import { Switch, Form } from 'ant-design-vue';
+import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
 import { PageWrapper } from '@/components/Page';
 import { Icon } from '@/components/Icon';
+import AccountTable from './AccountTable.vue';
+import { useModal } from '@/components/Modal';
 import SelectItem from '@/layouts/default/setting/components/SelectItem.vue';
-const schemas: FormSchema[] = [
+const [registerMyTable, { openModal }] = useModal();
+const schemas: FormSchema[] = [];
+const schemas_normal = [
   {
-    field: 'field1',
+    field: 'ConditionItems',
     component: 'Select',
     label: '',
     colProps: {
@@ -93,7 +156,7 @@ const schemas: FormSchema[] = [
   },
   // 设备
   {
-    field: 'field2',
+    field: 'device',
     label: '',
     component: 'Input',
     slot: 'customSlot',
@@ -102,8 +165,82 @@ const schemas: FormSchema[] = [
     },
     // 判断显示隐藏
     show: ({ values }) => {
-      console.log(values.field1)
-      return values.field1 == '1';
+      return values.ConditionItems == '1';
+    }
+  },
+  // 设备参数
+  {
+    field: 'Gvalparams',
+    component: 'Select',
+    label: '',
+    colProps: {
+      span: 3,
+    },
+    show: ({ values }) => {
+      return values.device && values.ConditionItems == '1';
+    },
+    componentProps: {
+      placeholder: '请选择设备参数',
+      options: [{
+        label: '环境温度',
+        value: '0',
+        key: '0'
+      }, {
+        label: '时间点',
+        value: '1',
+        key: '1'
+      }, {
+        label: '关机',
+        value: '2',
+        key: '2'
+      }, {
+        label: '开机',
+        value: '3',
+        key: '3'
+      }]
+    }
+  },
+  // 设备参数环境温度参数
+  {
+    field: 'Gval1',
+    component: 'Select',
+    label: '',
+    colProps: {
+      span: 3,
+    },
+    show: ({ values }) => {
+      return values.Gvalparams == 0 && values.ConditionItems == '1';
+    },
+    componentProps: {
+      placeholder: '请选择设备条件',
+      options: [{
+        label: '大于',
+        value: '>',
+        key: '>'
+      }, {
+        label: '小于',
+        value: '<',
+        key: '<'
+      }, {
+        label: '大于等于',
+        value: '>=',
+        key: '>='
+      }, {
+        label: '小于等于',
+        value: '<=',
+        key: '<='
+      }]
+    }
+  },
+  {
+    field: 'Gvalparams',
+    component: 'InputNumber',
+    label: '',
+    colProps: {
+      span: 3,
+    },
+    show: ({ values }) => {
+      return values.Gval1 && values.Gvalparams == 0 && values.ConditionItems == '1';
     }
   },
   // 工单
@@ -198,30 +335,7 @@ const schemas: FormSchema[] = [
         key: '3'
       }]
     }
-  },
-  // // 工单条件
-  // {
-  //   field: 'tickets',
-  //   component: 'Select',
-  //   label: '',
-  //   colProps: {
-  //     span: 3,
-  //   },
-  //   show: ({ values }) => {
-  //     return values.field1 == '6' || values.field1 == '7';
-  //   },
-  //   componentProps: {
-  //     options: [{
-  //       label: '工单更新时间',
-  //       value: '1',
-  //       key: '1'
-  //     }, {
-  //       label: '更改时间',
-  //       value: '2',
-  //       key: '2'
-  //     }]
-  //   }
-  // }
+  }
 ];
 const showForm = ref(false);
 const schemas2: FormSchema[] = [
@@ -248,19 +362,68 @@ const schemas2: FormSchema[] = [
 ];
 const FormAdd: any = reactive([]);
 const FormItem = Form.Item;
+const options1 = ref([{
+  value: 'jack',
+  label: 'jack'
+}])
+const options2 = ref([{
+  value: '1',
+  label: '温度'
+}, {
+  value: '2',
+  label: '时间'
+}, {
+  value: '3',
+  label: '光照'
+}, {
+  value: '4',
+  label: '系统时间'
+}])
+const options3 = ref([{
+  value: '>',
+  label: '大于'
+}, {
+  value: '>=',
+  label: '大于等于'
+}, {
+  value: '<',
+  label: '小于'
+}, {
+  value: '<=',
+  label: '小于等于'
+}])
+const isShake = ref(false);
+const RuleForm = reactive([{
+  switch: '',
+
+}]);
 export default defineComponent({
-  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, SelectItem },
+  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, AccountTable, InputNumber, Input, Row, Col, Select, SelectItem },
   setup() {
-    const [register, { setProps, updateSchema }] =
+    const [register, { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue }] =
       useForm({
         labelWidth: 0,
-        schemas,
         showActionButtonGroup: false,
         actionColOptions: {
           span: 6,
         },
       });
+    function handel_Add() {
+      console.log('!!!添加!!!');
+      schemas_normal.forEach((item) => {
+        appendSchemaByField({...item}, '')
+      })
 
+
+    }
+    function handleSuccess(params) {
+      const obj = { ...params }
+      // DeviceName
+      console.log(obj[0].DeviceName, '...obj...?')
+      setFieldsValue({
+        device: obj[0].DeviceName,
+      });
+    }
     function changeLabel3() {
       updateSchema({
         field: 'field3',
@@ -279,59 +442,36 @@ export default defineComponent({
         },
       ]);
     }
-
+    function remove_attach(index) {
+      delete FormAdd[index]
+      console.log(FormAdd, '?...item...?');
+    }
     function appendField() {
-
-      // appendSchemaByField(
-      //   {
-      //     field: 'field10',
-      //     label: '字段10',
-      //     component: 'Input',
-      //     colProps: {
-      //       span: 8,
-      //     },
-      //   },
-      //   'field3',
-      // );
     }
     function deleteField() {
-      removeSchemaByField('field11');
+      // removeSchemaByField('field11');
     }
     // 选择设备
-    function e_Device() {
-
+    function e_Device(record) {
+      //  打开弹窗
+      openModal(true, {
+        record,
+        isUpdate: true
+      });
     }
     const n = ref(1);
     // 添加规则
     function addRule() {
-      showForm.value = true;
-      // appendSchemaByField(
-      //   {
-      //     field: `field${n.value}a`,
-      //     label: '',
-      //     component: 'Select',
-      //     componentProps: {
-      //       options: [{
-      //         label: '工单更新时间',
-      //         value: '1',
-      //         key: '1'
-      //       }, {
-      //         label: '更改时间',
-      //         value: '2',
-      //         key: '2'
-      //       }]
-      //     },
-      //     colProps: {
-      //       span: 8,
-      //     },
-      //     required: true,
-      //   },
-      //   '',
-      // );
-      FormAdd.push({
-        'account': ''
-      })
-      console.log(FormAdd, '?...FormAdd...?')
+      const values: any = getFieldsValue();
+      console.log(Object.keys(values), '?...values...?')
+      Object.keys(values).length > 0 ? (FormAdd.push({
+        Op: '',
+        item1: '',
+        item2: '',
+        item3: '',
+        Gval: ''
+      }), showForm.value = true) : ''
+
     }
     function handleSubmit() {
 
@@ -339,10 +479,16 @@ export default defineComponent({
     return {
       register,
       schemas,
+      schemas_normal,
       schemas2,
       showForm,
       FormItem,
       FormAdd,
+      RuleForm,
+      options1,
+      options2,
+      options3,
+      isShake,
       setProps,
       changeLabel3,
       changeLabel34,
@@ -350,8 +496,24 @@ export default defineComponent({
       deleteField,
       e_Device,
       addRule,
-      handleSubmit
+      remove_attach,
+      handleSubmit,
+      registerMyTable,
+      handel_Add,
+      handleSuccess
     };
   },
 });
 </script>
+<style lang="less" scoped>
+::v-deep(.ant-page-header-heading) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.col_flex {
+  display: flex;
+  align-items: center;
+}
+</style>

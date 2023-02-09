@@ -122,8 +122,8 @@ export const formSchema: FormSchema[] = [
   },
   {
     label: ' ',
-    field: 'menu',
-    slot: 'menu',
+    field: 'menuIds',
+    slot: 'menuIds',
     component: 'Input',
   },
 ];

@@ -23,6 +23,7 @@ enum Api {
   MenuList = '/system/getMenuList',
   MenuRealList = '/system/menu',
   MenuTree='/system/menu/treeSelect',
+  RoleMenuTree='/system/menu/roleMenuTreeSelect',
   RouterList = '/system/user/getRouters',
   CreateDept = '/system/dept',
   RolePageList = '/system/getRoleListByPage',
@@ -45,6 +46,12 @@ export const getAccountList = (params: AccountParams) =>
 export const modifiAccountList = (params: AccountParams) =>
   realHttp.put<AccountListGetResultModel>(
     { url: Api.AccountList, params },
+    { isTransformResponse: true }
+  )
+// 根据编号获取详细信息
+export const getUserRole = (params?) =>
+  realHttp.get(
+    { url: `${Api.AccountList}/${params}` },
     { isTransformResponse: true }
   )
 // 新增用户信息
@@ -134,6 +141,12 @@ export const DelMenuList = (params?: MenuParams) =>
 // 获取菜单下拉列表树
 export const getMenTree = (params?) =>
   realHttp.get({ url: Api.MenuTree, params },{isTransformResponse: true})
+
+// 根据角色加载对应菜单列表树
+export const geRoletMenTree = (params?) =>
+  realHttp.get({ url: `${Api.RoleMenuTree}/${params}` },{isTransformResponse: true})
+
+
 
 export const getRoleListByPage = (params?: RolePageParams) =>
   realHttp.get({ url: Api.RoleRealPageList, params }) //后端接口

@@ -1,9 +1,9 @@
 <template>
   <BasicDrawer v-bind="$attrs" @register="registerDrawer" showFooter :title="getTitle" width="500px" @ok="handleSubmit">
     <BasicForm @register="registerForm">
-      <template #menu="{ model, field }">
-        <BasicTree v-model:value="model[field]" :treeData="treeData" :fieldNames="{ title: 'Name', key: 'Id' }"
-          checkable toolbar title="菜单分配" />
+      <template #menuIds="{ model, field }">
+        <BasicTree v-model:value="model[field]" :checkedKeys="checkedMenu"  :treeData="treeData"
+          :fieldNames="{ title: 'Name', key: 'Id' }" checkable toolbar title="菜单分配" />
       </template>
     </BasicForm>
   </BasicDrawer>
@@ -15,7 +15,7 @@ import { formSchema } from './role.data';
 import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
 import { BasicTree, TreeItem } from '@/components/Tree';
 
-import { getMenTree, CreateRole, ModifiRole } from '@/api/demo/system';
+import { geRoletMenTree, CreateRole, ModifiRole } from '@/api/demo/system';
 
 export default defineComponent({
   name: 'RoleDrawer',
@@ -31,24 +31,31 @@ export default defineComponent({
       schemas: formSchema,
       showActionButtonGroup: false,
     });
-
+    const checkedMenu = ref<Array<string | number>>([]);
+    const RoleId=ref('');
     const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
       resetFields();
       setDrawerProps({ confirmLoading: false });
       // 需要在setFieldsValue之前先填充treeData，否则Tree组件可能会报key not exist警告
-      if (unref(treeData).length === 0) {
-        const {TreeSelect}=await getMenTree();
-  
-        treeData.value = (TreeSelect) as any as TreeItem[];
 
-      }
       isUpdate.value = !!data?.isUpdate;
 
       if (unref(isUpdate)) {
-        // rowId.value = data.record.RoleId;
         setFieldsValue({
           ...data.record,
         });
+        // if (unref(treeData).length === 0) {
+          RoleId.value=data.record.RoleId;
+          const { TreeSelect, checkedKeys
+          } = await geRoletMenTree(data.record.RoleId);
+          checkedMenu.value=checkedKeys;
+          treeData.value = (TreeSelect) as any as TreeItem[];
+
+
+        // }
+        console.log(checkedKeys,'!!!升级!!!');
+
+
       }
     });
 
@@ -57,12 +64,11 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         const values = await validate();
-        console.log(values,'value')
+        console.log(values, 'value')
         debugger;
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
-        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({...values,MenuIds:values.menu})
-        console.log('测试123')
+        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values,RoleId:RoleId.value,MenuIds: values.menu })
         emit('success');
 
       } finally {
@@ -74,6 +80,8 @@ export default defineComponent({
       registerDrawer,
       registerForm,
       getTitle,
+      RoleId,
+      checkedMenu,
       handleSubmit,
       treeData,
     };

@@ -62,23 +62,23 @@ export const usePermissionStore = defineStore({
   }),
   getters: {
     getPermCodeList(): string[] | number[] {
-      console.log(this.permCodeList,'...permCodeList...')
+      console.log(this.permCodeList, '...permCodeList...')
       return this.permCodeList
     },
     getBackMenuList(): Menu[] {
-      console.log(this.backMenuList,'...backMenuList...')
+      console.log(this.backMenuList, '...backMenuList...')
       return this.backMenuList
     },
     getFrontMenuList(): Menu[] {
-      console.log(this.frontMenuList,'...frontMenuList...')
+      console.log(this.frontMenuList, '...frontMenuList...')
       return this.frontMenuList
     },
     getLastBuildMenuTime(): number {
-      console.log(this.lastBuildMenuTime,'...lastBuildMenuTime...')
+      console.log(this.lastBuildMenuTime, '...lastBuildMenuTime...')
       return this.lastBuildMenuTime
     },
     getIsDynamicAddedRoute(): boolean {
-      console.log(this.isDynamicAddedRoute,'...isDynamicAddedRoute...')
+      console.log(this.isDynamicAddedRoute, '...isDynamicAddedRoute...')
       return this.isDynamicAddedRoute
     }
   },
@@ -122,6 +122,7 @@ export const usePermissionStore = defineStore({
 
       let routes: AppRouteRecordRaw[] = []
       const roleList = toRaw(userStore.getRoleList) || []
+
       // 获取权限模式
       const { permissionMode = projectSetting.permissionMode } = appStore.getProjectConfig
 
@@ -130,7 +131,6 @@ export const usePermissionStore = defineStore({
         const { meta } = route
         // 抽出角色
         const { roles } = meta || {}
-        console.log(roles,'...roles..22')
         if (!roles) return true
         // 进行角色权限判断
         return roleList.some((role) => roles.includes(role))

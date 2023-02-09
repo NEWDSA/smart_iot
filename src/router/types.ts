@@ -11,6 +11,7 @@ export type Component<T = any> =
 export interface AppRouteRecordRaw extends Omit<RouteRecordRaw, 'meta'> {
   name: string
   meta: RouteMeta
+  hidden?:boolean
   component?: Component | string
   components?: Component
   children?: AppRouteRecordRaw[]
