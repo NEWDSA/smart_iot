@@ -34,9 +34,7 @@ export function getUserInfo() {
   // return defHttp.get<GetUserInfoModel>({ url: Api.GetUserInfo }, { errorMessageMode: 'none' })  //模拟数据
   return realHttp.get<GetUserInfoModel>({
     url:Api.GetUserInfoReal
-  },{
-    errorMessageMode: 'none'
-  })
+  },{ errorMessageMode: 'modal' })
 }
 
 export function getPermCode() {

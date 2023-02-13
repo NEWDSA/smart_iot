@@ -49,14 +49,10 @@ const transform: AxiosTransform = {
       // return '[HTTP] Request has no return value';
       throw new Error(t('sys.api.apiRequestFailed'))
     }
-    //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-    // TODO:根据后端进行修改  const { code, result, message } = data
-    // const { code, result, message } = data   //模拟数据接口
+
     const { Code, Data, Msg } = data
 
     // 这里逻辑可以根据项目进行修改
-    // TODO:根据后端真实接口进行更改 code
-    // const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS //模拟数据
     const hasSuccess = Data && Reflect.has(data, 'Code') && Code === ResultEnum.SUCCESS // 后端接口数据
     if (hasSuccess) {
       // let successMsg = message //模拟数据
@@ -86,13 +82,11 @@ const transform: AxiosTransform = {
     }
 
     // 如果code==10000
-    const halkblank  = Code == 10000 // 后端接口数据
+    const halkblank = Code == 10000 // 后端接口数据
     if (halkblank) {
-
       return Msg
     }
 
-   
     //真实数据
     switch (Code) {
       case ResultEnum.TIMEOUT:
@@ -103,6 +97,11 @@ const transform: AxiosTransform = {
         break
       default:
         if (Msg) {
+          if (Code === 30001) {
+            const userStore = useUserStoreWithOut()
+            userStore.setToken(undefined)
+            userStore.logout(true)
+          }
           timeoutMsg = Msg
         }
     }
@@ -205,9 +204,9 @@ const transform: AxiosTransform = {
     // const msg: string = response?.data?.error?.message ?? ''
 
     let msg: string = response?.data?.Error ?? ''
-    msg=msg.replace("rpc error: code = Unknown desc =","");
+    msg = msg.replace('rpc error: code = Unknown desc =', '')
     // 去掉字符串中的多余参数
-
+    console.log(code, '...code...?')
     const err: string = error?.toString?.() ?? ''
     let errMessage = ''
 
@@ -228,6 +227,11 @@ const transform: AxiosTransform = {
           createErrorModal({ title: t('sys.api.errorTip'), content: errMessage })
         } else if (errorMessageMode === 'message') {
           createMessage.error(errMessage)
+          console.log(code, '?...code...?')
+          if (code == 30001 && msg == 'Token鉴权失败') {
+            const userStore = useUserStoreWithOut()
+            userStore.logout(true)
+          }
         }
         return Promise.reject(error)
       }
@@ -316,12 +320,3 @@ export const uploadHttp = createAxios({
     apiUrl: '/upload'
   }
 })
-
-
-// other api url
-// export const otherHttp = createAxios({
-//   requestOptions: {
-//     apiUrl: 'xxx',
-//     urlPrefix: 'xxx',
-//   },
-// });

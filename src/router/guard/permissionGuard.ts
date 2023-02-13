@@ -1,3 +1,4 @@
+// 登录权限设置
 import type { Router, RouteRecordRaw } from 'vue-router'
 
 import { usePermissionStoreWithOut } from '@/store/modules/permission'
