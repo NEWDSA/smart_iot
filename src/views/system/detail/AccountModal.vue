@@ -1,75 +1,104 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
-    <BasicForm @register="registerForm" />
+  <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle"
+    @ok="handleSubmit">
+    <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+    </BasicTable>
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref } from 'vue';
+import { defineComponent, ref, computed, unref, reactive, toRaw } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
-import { accountFormSchema } from './account.data';
-import { getUserRole, getDeptDrop, modifiAccountList, createAccountList } from '@/api/demo/system';
+import { RoleUnUserList, buckPermissionUser } from '@/api/demo/system';
+import { BasicTable, useTable, TableAction } from '@/components/Table';
+import { columns, searchFormSchema } from './accountModel.data';
 export default defineComponent({
   name: 'AccountModal',
-  components: { BasicModal, BasicForm },
+  props: ['Device'],
+  components: { BasicModal, BasicForm, BasicTable, TableAction },
   emits: ['success', 'register'],
   setup(_, { emit }) {
     const isUpdate = ref(true);
-    const UserId = ref('');
-    const [registerForm, { setFieldsValue, updateSchema, resetFields, validate }] = useForm({
-      labelWidth: 100,
-      baseColProps: { lg: 12, md: 12 },
-      schemas: accountFormSchema,
-      showActionButtonGroup: false
-    });
+    const searchInfo = reactive<Recordable>({});
+    const TreeTableData: any = reactive([]);
+    const dataSource: any = ref([]);
+    const checkedKeys = ref<Array<string | number>>([]);
+    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 2 })
+    const RoleId: any = ref();
+    function onChange() {
+    }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-      resetFields();
+      console.log(data, '大于')
+      RoleId.value = data.RoleId;
+      // paramList.value = data.params
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
 
-      if (unref(isUpdate)) {
-        UserId.value = data.record.UserId;
-        setFieldsValue({
-          ...data.record,
-        });
-        const result = await getUserRole(
-          data.record.UserId
-        )
-        var resd = result.Roles.filter((item) => {
-          if (item.RoleId == Number(result.RoleIds.join(','))) {
-            return item
-          }
-        })
-        console.log(resd, '?...resd...?')
-        updateSchema({
-          field: 'RoleIds',
-          defaultValue: Object.keys(resd).length > 0 ? result.RoleIds : '',
-          componentProps: { treeData: result.Roles }
-        })
-      }
-      const treeData = await getDeptDrop().then((res) => {
-        return res.TreeSelect
-      });
-      updateSchema({
-        field: 'DeptId',
-        componentProps: { treeData },
-      });
-
     });
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增账号' : '编辑账号'));
+
+    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getForm }] = useTable({
+      title: '',
+      onChange,
+      rowSelection: {
+        type: 'checkbox',
+        selectedRowKeys: checkedKeys,
+        onChange: onSelectChange,
+      },
+      rowKey: 'UserId',
+      formConfig: {
+        labelWidth: 100,
+        schemas: searchFormSchema,
+        autoSubmitOnEnter: true,
+      },
+      columns,
+      pagination: true,
+      useSearchForm: true,
+      showTableSetting: true,
+      showIndexColumn: false,
+      bordered: true,
+      handleSearchInfoFn(info) {
+        Object.assign(pagination, info);
+        getData()
+      }
+    });
+    const getTitle = computed(() => (!unref(isUpdate) ? '添加角色用户' : '编辑账号'));
+    function onSelectChange(selectedRowKeys: []) {
+
+      checkedKeys.value = selectedRowKeys;
+      console.log(checkedKeys.value, '选中了多项!!!!')
+    }
+    function ModelStatus(isOpen) {
+      isOpen ? getData() : ''
+    }
+    // 获取table数据
+    async function getData() {
+      dataSource.value = [];
+      const { List, Total } = await RoleUnUserList(pagination)
+      dataSource.value = List;
+
+      setPagination({
+        total: Total
+      })
+    }
+
     async function handleSubmit() {
       try {
-        const values = await validate();
+        const params = {
+          RoleId: RoleId.value,
+          UserIds: toRaw(checkedKeys.value)
+        }
         setModalProps({ confirmLoading: true });
-        Object.assign(values, { RoleIds: values.RoleIds });
-        !unref(isUpdate) ? await createAccountList(values) : await modifiAccountList({ ...values, UserId: UserId.value })
+        !unref(isUpdate) ? await buckPermissionUser(params) : ''
         closeModal();
-        emit('success', { isUpdate: unref(isUpdate), values: { ...values, UserId: UserId.value } });
+        await reload();
+        await emit('success');
       } finally {
+
         setModalProps({ confirmLoading: false });
       }
     }
-    return { registerModal, registerForm, getTitle, handleSubmit };
+
+    return { registerModal, registerTable, handleSubmit, onSelectChange, getData, ModelStatus, RoleId, checkedKeys, getTitle, searchInfo, dataSource };
   },
 });
 </script>

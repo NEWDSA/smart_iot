@@ -6,10 +6,8 @@
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref, onMounted } from 'vue';
-import { useMessage } from '@/hooks/web/useMessage';
+import { defineComponent, ref,onMounted } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
-// import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
 import { getDeptDrop } from '@/api/demo/system';
 export default defineComponent({
@@ -17,12 +15,8 @@ export default defineComponent({
   components: { BasicModal, BasicTree },
   emits: ['success', 'register', 'select'],
   setup(_, { emit }) {
-    // const isUpdate = ref(true);
     const treeRef = ref<Nullable<TreeActionType>>(null);
     const treeData = ref<TreeItem[]>([]);
-    const {
-      createConfirm
-    } = useMessage();
     const checkData = ref('');
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     });
@@ -36,12 +30,6 @@ export default defineComponent({
     }
     function handleSelect(keys) {
       checkData.value = keys.checked;
-      // keys.checked.length > 1 ? createConfirm({
-      //   iconType: 'info',
-      //   title: '提示',
-      //   content: '只能选择一项',
-      // }) : ''
-
     }
     async function handleSubmit() {
       try {

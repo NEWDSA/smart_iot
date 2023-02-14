@@ -94,8 +94,8 @@ export default defineComponent({
         reload();
       }
     }
-    function handleDetail() {
-      go('/system/detail')
+    function handleDetail(record) {
+      go(`/system/detail/${record.RoleId}`)
     }
     function handleSuccess() {
       reload();
