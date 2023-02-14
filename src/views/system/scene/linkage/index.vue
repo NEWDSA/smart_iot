@@ -17,6 +17,7 @@
         <!-- 卡片 -->
         <ProjectCard :loading="loading" class="enter-y" />
         <CompForm/>
+        <SetForm/>
       </div>
       <div class="lg:w-3/10 w-full enter-y">
         <div class="scroll-wrap">
@@ -41,6 +42,7 @@ import { Description } from '@/components/Description/index';
 import { Button } from 'ant-design-vue';
 import ProjectCard from './components/ProjectCard.vue';
 import CompForm from './components/CompForm.vue';
+import SetForm from './components/SetForm.vue'
 import { Icon } from '@/components/Icon';
 import { ScrollContainer } from '@/components/Container/index';
 import { BasicTable, useTable } from '@/components/Table';
@@ -54,7 +56,7 @@ import {
   personData,
 } from './data';
 export default defineComponent({
-  components: { Description, BasicTable, PageWrapper, [Divider.name]: Divider, ScrollContainer, Icon, ProjectCard, BasicForm, useForm,Button,CompForm },
+  components: { Description, BasicTable, PageWrapper, [Divider.name]: Divider, ScrollContainer, Icon, ProjectCard, BasicForm, useForm,Button,CompForm ,SetForm},
   setup() {
     const top = ref<number>(10);
     const loading = ref(true);

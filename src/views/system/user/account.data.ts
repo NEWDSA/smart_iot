@@ -44,6 +44,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'Status',
     width: 120,
     customRender: ({ record }) => {
+      console.log(record.Status)
       const status = record.Status
       const enable = ~~status === 0
       const color = enable ? 'green' : 'red'

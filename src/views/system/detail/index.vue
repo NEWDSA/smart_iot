@@ -1,10 +1,10 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
-    <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
+    <DeptTree :RoleId="RoleId" class="w-1/4 xl:w-1/5" @select="handleSelect" />
     <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleBulk">批量调动</a-button>
-        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+        <a-button type="primary" @click="handleBulk">批量取消授权</a-button>
+        <a-button type="primary" @click="handleCreate">添加用户</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'DeptName'">
@@ -13,55 +13,41 @@
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
-              icon: 'ant-design:delete-outlined',
-              color: 'error',
-              tooltip: '删除此账号',
-              popConfirm: {
-                title: '是否确认删除',
-                placement: 'left',
-                confirm: handleDelete.bind(null, record),
-              },
-            },
-            {
-              icon: 'clarity:note-edit-line',
-              tooltip: '编辑用户资料',
-              onClick: handleEdit.bind(null, record),
-            },
-            {
-              icon: 'ri:lock-password-fill',
-              tooltip: '修改密码',
-              onClick: handleEditPwd.bind(null, record)
+              icon: 'icon-park-outline:delete-five',
+              tooltip: '取消授权',
+              onClick: handleEdit.bind(null, record)
             }
           ]" />
         </template>
       </template>
     </BasicTable>
-    <component :is="currentModal" v-model:visible="modalVisible" :data="myData" @success="Dat" :isUpdate="true" />
     <AccountModal @register="registerModal" @success="handleSuccess" />
-    <AccountTable @register="registerMyTable" @success="Dat" />
-    <pwdModal @register="registerpwdModal" @success="pwdSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
-import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
+import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, getCurrentInstance, ComponentInternalInstance } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
-import { useMessage } from '@/hooks/web/useMessage';
-import { getAccountList, getDeptList, BulkDept, delAccount } from '@/api/demo/system';
+import { delAuthUser, BulkDept, delAccount, RoleUserList, delAuthUserList } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
-
+import { useMessage } from '@/hooks/web/useMessage';
 import { useModal } from '@/components/Modal';
 import AccountModal from './AccountModal.vue';
-import AccountTable from './AccountTable.vue';
-import pwdModal from './pwdModal.vue';
 import { columns, searchFormSchema } from './account.data';
+import { useRoute } from 'vue-router';
 import { useGo } from '@/hooks/web/usePage';
 export default defineComponent({
   name: 'AccountManagement',
-  components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction, pwdModal },
+  components: { BasicTable, PageWrapper, DeptTree, AccountModal, TableAction },
   setup() {
+    const route = useRoute();
     const go = useGo();
+    const treeRef = ref('');
     const dataSource: any = ref([]);
+    const RoleId = ref(Number(route.params?.RoleId))
+    const {
+      createConfirm
+    } = useMessage();
     const myData: any = ref('');
     const update = getCurrentInstance() as ComponentInternalInstance | null
     const [registerModal, { openModal }] = useModal();
@@ -72,18 +58,13 @@ export default defineComponent({
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
     const basicData: any = ref('');
     const modalVisible = ref<Boolean>(false);
-    const {
-      createConfirm
-    } = useMessage();
     function onChange() {
       pagination.PageNum = arguments[0].current;
-      getData()
-
-
+      roleAccount()
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
@@ -113,7 +94,8 @@ export default defineComponent({
       handleSearchInfoFn(info) {
         // 接入接口进行数据查询
         Object.assign(pagination, info)
-        getData();
+        // getData();
+        roleAccount()
         return info;
       },
       actionColumn: {
@@ -124,57 +106,57 @@ export default defineComponent({
     });
     function handleCreate() {
       openModal(true, {
-        isUpdate: false,
+        RoleId: RoleId.value,
+        isUpdate: false
       });
     }
-    function pwdSuccess() {
-      reload();
-      // currentModal.value = pwdModal;
-      //   nextTick(() => {
-      //     modalVisible.value = true;
-      //   })
-    }
-    async function getData() {
-
-      dataSource.value = [];
-      const { List, Total } = await getAccountList(pagination);
+    async function roleAccount() {
+      searchInfo.RoleId = RoleId.value;
+      Object.assign(pagination, searchInfo);
+      const { List, Total } = await RoleUserList(pagination);
       setPagination({
         total: Total
       })
-      const accountList = List;
-      accountList?.map(async item => {
-        const { List } = await getDeptList();
-        item.DeptName = List.find(async item1 => await item1.DeptId == await item.DeptId)?.DeptName
-        dataSource.value.push(item);
-      })
-
-
+      dataSource.value = List;
     }
     function onSelectChange(selectedRowKeys: (string | number)[]) {
       checkedKeys.value = selectedRowKeys;
     }
-    function handleBulk(record: Recordable) {
-      if (getSelectRowKeys().length > 0) {
-        currentModal.value = AccountTable;
-        nextTick(() => {
-          modalVisible.value = true;
-        })
-      } else {
+    async function handleBulk(record: Recordable) {
+      console.log(getSelectRowKeys().length, 'your en')
+      if (getSelectRowKeys().length <= 0) {
         createConfirm({
           iconType: 'info',
           title: '提示',
           content: '至少选择一项',
         });
+        return
+      }
+      try {
+        await delAuthUserList({
+          RoleId: RoleId.value,
+          UserIds: toRaw(checkedKeys.value)
+        })
+      } finally {
+        // reload();
+        roleAccount();
+      }
+
+
+    }
+    // 取消授权
+    async function handleEdit(record: Recordable) {
+      try {
+        await deleteTableDataRecord(record.UserId);
+        // await bulkDeviceOut(param)
+       await delAuthUser({ UserId: record.UserId, RoleId: RoleId.value })
+
+      } finally {
+        // reload();
+        roleAccount();
 
       }
 
-    }
-    // 编辑用户
-    function handleEdit(record: Recordable) {
-      openModal(true, {
-        record,
-        isUpdate: true,
-      });
     }
     // 删除账号
     async function handleDelete(record: Recordable) {
@@ -187,7 +169,7 @@ export default defineComponent({
 
     }
     onMounted(() => {
-      getData()
+      roleAccount()
     })
     function Dat(values) {
       if (values) {
@@ -201,37 +183,24 @@ export default defineComponent({
         } finally {
           reload();
         }
-      }else{
+      } else {
         reload();
       }
-
-
-
-
     }
 
-    async function handleSuccess({ isUpdate, values }) {
-      if (isUpdate) {
-        // 演示不刷新表格直接更新内部数据。
-        // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-        await updateTableDataRecord(values.RoleId, values);
-      } else {
-        await reload();
-      }
+    async function handleSuccess() {
+       await roleAccount()
+    //  await reload();
     }
-    function handleEditPwd(record: Recordable) {
-      // 弹出修改用户密码框
-      currentModal.value = pwdModal;
-      myData.value = record;
-      nextTick(() => {
-        modalVisible.value = true;
-      })
-    }
-    function handleSelect(DeptId = '') {
-      searchInfo.DeptId = DeptId;
+    function handleSelect(params = '') {
+      console.log(params, '压缩')
+      searchInfo.RoleId = Number(params);
+      RoleId.value = Number(params);
       Object.assign(pagination, searchInfo);
-      getData()
-      reload();
+      roleAccount();
+      // 
+      // getData()
+      // reload();
     }
     return {
       registerTable,
@@ -243,15 +212,15 @@ export default defineComponent({
       handleDelete,
       handleSuccess,
       handleSelect,
-      handleEditPwd,
       handleBulk,
       onSelectChange,
       onChange,
       openModal2,
       openModal3,
       Dat,
-      pwdSuccess,
-      getData,
+      roleAccount,
+      RoleId,
+      treeRef,
       pagination,
       internalInstance,
       modalVisible,

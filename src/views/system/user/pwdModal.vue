@@ -7,10 +7,10 @@
 import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm, FormSchema } from '@/components/Form/index';
-import { modifiAccountList } from '@/api/demo/system';
+import { updatePwd } from '@/api/demo/system';
 const schemas: FormSchema[] = [
   {
-    field: 'Password',
+    field: 'NewPassword',
     component: 'Input',
     label: '重置密码',
     componentProps: {
@@ -52,12 +52,12 @@ export default defineComponent({
       try {
         const values = await validate();
         const value2 = props.data;
-        const param = (({ DeptId, DeptName, Email, NickName, PhoneNumber, Remark, RoleId, RoleIds, Roles, UserId, UserName, UserType
-        }) => ({ DeptId, DeptName, Email, NickName, PhoneNumber, Remark, RoleId, RoleIds, Roles, UserId, UserName, UserType }))(value2)
+        const param = (({UserId
+        }) => ({ UserId}))(value2)
         setModalProps({ confirmLoading: true });
         // 调用接口进行密码修改
         Object.assign(values, param);
-        modifiAccountList({
+        updatePwd({
           ...values
         })
         closeModal();

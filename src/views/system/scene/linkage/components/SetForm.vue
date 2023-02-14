@@ -1,61 +1,41 @@
 <template>
-  <PageWrapper title="触发条件">
+  <PageWrapper title="执行动作">
     <template #extra>
       <Form :model="RuleForm">
-        <Row class="enter-x col_flex">
-          <Col :span="4">
-          <FormItem name="switch" class="enter-x">
-            <Switch v-model:checked="isShake" checked-children="开启防抖" un-checked-children="关闭防抖" />
-          </FormItem>
+        <Row :gutter="5" class="enter-x col_flex">
+          <Col>
+          <a-button type="primary">串行</a-button>
           </Col>
-          <!-- <template v-if="isShake">
-            <Col :span="5">
-            <FormItem class="enter-x">
-              <div style="display: flex;align-items: center;">
-                <InputNumber />
-                <div>分钟内触发</div>
-              </div>
-            </FormItem>
-            </Col>
-            <Col :span="5">
-            <FormItem>
-              <div style="display:flex;align-items: center;">
-                <InputNumber />
-                <div>次及以上</div>
-              </div>
-            </FormItem>
-            </Col>
-            <Col :span="6">
-            <FormItem>
-              <Select :options="options1">
-              </Select>
-            </FormItem>
-            </Col>
-          </template> -->
+          <Col>
+          <a-button type="primary">并行</a-button>
+          </Col>
         </Row>
       </Form>
     </template>
     <div class="rounded-md pt-5 pl-5 border  bg-light-50">
+
       <template v-for="item, index in add" :key="index">
-        <BasicForm :schemas="item.schemas_normal" @register="register">
-          <template #customSlot="{ model, field }">
-            <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
-              <template #suffix>
-                <Icon icon="carbon:logo-github" />
-              </template>
-            </a-input>
-          </template>
-        </BasicForm>
+        <draggable class="dreg">
+          <BasicForm :schemas="item.schemas_normal" @register="register">
+            <template #customSlot="{ model, field }">
+              <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
+                <template #suffix>
+                  <Icon icon="carbon:logo-github" />
+                </template>
+              </a-input>
+            </template>
+          </BasicForm>
+        </draggable>
         <template v-if="Object.keys(item.FormAdd)">
           <Form v-if="Object.keys(item.FormAdd).length > 0" class="p-4 enter-x" :model="item.FormAdd" ref="formRef">
             <template v-for="itemr, cindex in item.FormAdd" :key="itemr">
               <Row class="enter-x" :gutter="0" v-if="itemr">
-                <Col class="p-1"  :span="2">
+                <Col class="p-1" :span="2">
                 <FormItem :name="itemr.Op" class="enter-x">
                   <Switch checked-children="AND" v-model:checked="item.Op" un-checked-children="OR" />
                 </FormItem>
                 </Col>
-                <Col class="p-1"  :span="2">
+                <Col class="p-1" :span="2">
                 <FormItem :name="itemr.item1" class="enter-x">
                   <Select style="width:80px;" :options="options2" v-model:value="item.item1">
                   </Select>
@@ -75,7 +55,7 @@
                 <Col class="p-1" :span="2">
                 <!-- 移除附加条件 -->
                 <FormItem>
-                  <Icon @click="remove_attach(index,cindex)" icon="ant-design:close-outlined"></Icon>
+                  <Icon @click="remove_attach(index, cindex)" icon="ant-design:close-outlined"></Icon>
                 </FormItem>
                 </Col>
                 <Col class="p-1" :span="2">
@@ -88,15 +68,7 @@
             </template>
           </Form>
         </template>
-        <!-- 添加过滤条件 -->
-        <div class="p-1 relative" @click="addRule(index)">
-          <Icon icon="bi:plus" size="14" />
-          添加过滤条件
-        </div>
       </template>
-
-
-
       <!-- 引入模态框 -->
       <AccountTable @register="registerMyTable" @success="handleSuccess" />
 
@@ -107,11 +79,12 @@
   </PageWrapper>
 </template>
 <script lang="tsx">
-import { defineComponent, reactive, ref} from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
 import { PageWrapper } from '@/components/Page';
+import draggable from 'vuedraggable';
 import { Icon } from '@/components/Icon';
 import AccountTable from './AccountTable.vue';
 import { useModal } from '@/components/Modal';
@@ -403,7 +376,7 @@ const RuleForm = reactive([{
 
 }]);
 export default defineComponent({
-  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, AccountTable, InputNumber, Input, Row, Col, Select, SelectItem },
+  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, AccountTable, InputNumber, Input, Row, Col, Select, SelectItem, draggable },
   setup() {
     const [register, { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue }] =
       useForm({
@@ -415,7 +388,7 @@ export default defineComponent({
       });
     function handel_Add() {
       add.value.push({
-        FormAdd:[],
+        FormAdd: [],
         schemas_normal
       })
     }
@@ -447,8 +420,8 @@ export default defineComponent({
         },
       ]);
     }
-    function remove_attach(index,cindex) {
-     delete add.value[index].FormAdd[cindex];
+    function remove_attach(index, cindex) {
+      delete add.value[index].FormAdd[cindex];
     }
     function appendField() {
     }

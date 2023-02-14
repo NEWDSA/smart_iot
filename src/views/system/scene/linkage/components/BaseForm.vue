@@ -1,113 +1,20 @@
 <template>
-  <PageWrapper title="触发条件">
-    <template #extra>
-      <Form :model="RuleForm">
-        <Row class="enter-x col_flex">
-          <Col :span="4">
-          <FormItem name="switch" class="enter-x">
-            <Switch v-model:checked="isShake" checked-children="开启防抖" un-checked-children="关闭防抖" />
-          </FormItem>
-          </Col>
-          <!-- <template v-if="isShake">
-            <Col :span="5">
-            <FormItem class="enter-x">
-              <div style="display: flex;align-items: center;">
-                <InputNumber />
-                <div>分钟内触发</div>
-              </div>
-            </FormItem>
-            </Col>
-            <Col :span="5">
-            <FormItem>
-              <div style="display:flex;align-items: center;">
-                <InputNumber />
-                <div>次及以上</div>
-              </div>
-            </FormItem>
-            </Col>
-            <Col :span="6">
-            <FormItem>
-              <Select :options="options1">
-              </Select>
-            </FormItem>
-            </Col>
-          </template> -->
-        </Row>
-      </Form>
-    </template>
-    <div class="rounded-md pt-5 pl-5 border  bg-light-50">
-      <template v-for="item, index in add" :key="index">
-        <BasicForm :schemas="item.schemas_normal" @register="register">
-          <template #customSlot="{ model, field }">
-            <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
-              <template #suffix>
-                <Icon icon="carbon:logo-github" />
-              </template>
-            </a-input>
+  <div class="rounded-md pt-5 pl-5 border  bg-light-50">
+    <BasicForm :schemas="schemas_normal" @register="register">
+      <template #customSlot="{ model, field }">
+        <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
+          <template #suffix>
+            <Icon icon="carbon:logo-github" />
           </template>
-        </BasicForm>
-        <template v-if="Object.keys(item.FormAdd)">
-          <Form v-if="Object.keys(item.FormAdd).length > 0" class="p-4 enter-x" :model="item.FormAdd" ref="formRef">
-            <template v-for="itemr, cindex in item.FormAdd" :key="itemr">
-              <Row class="enter-x" :gutter="0" v-if="itemr">
-                <Col class="p-1"  :span="2">
-                <FormItem :name="itemr.Op" class="enter-x">
-                  <Switch checked-children="AND" v-model:checked="item.Op" un-checked-children="OR" />
-                </FormItem>
-                </Col>
-                <Col class="p-1"  :span="2">
-                <FormItem :name="itemr.item1" class="enter-x">
-                  <Select style="width:80px;" :options="options2" v-model:value="item.item1">
-                  </Select>
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <FormItem :name="itemr.item2" class="enter-x">
-                  <Select style="width:80px;" :options="options3" v-model:value="item.item2">
-                  </Select>
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <FormItem :name="itemr.Gval" class="enter-x">
-                  <Input v-model:value="item.Gval" />
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <!-- 移除附加条件 -->
-                <FormItem>
-                  <Icon @click="remove_attach(index,cindex)" icon="ant-design:close-outlined"></Icon>
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <!-- 移除图标 -->
-                <FormItem>
-                  <Icon icon="ant-design:delete-outlined"></Icon>
-                </FormItem>
-                </Col>
-              </Row>
-            </template>
-          </Form>
-        </template>
-        <!-- 添加过滤条件 -->
-        <div class="p-1 relative" @click="addRule(index)">
-          <Icon icon="bi:plus" size="14" />
-          添加过滤条件
-        </div>
+        </a-input>
       </template>
-
-
-
-      <!-- 引入模态框 -->
-      <AccountTable @register="registerMyTable" @success="handleSuccess" />
-
-      <a-button type="primary" class="my-4" @click="handel_Add">
-        添加条件
-      </a-button>
-    </div>
-  </PageWrapper>
+    </BasicForm>
+    <!-- 引入模态框 -->
+    <AccountTable @register="registerMyTable" @success="handleSuccess" />
+  </div>
 </template>
 <script lang="tsx">
-import { defineComponent, reactive, ref} from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
@@ -118,8 +25,7 @@ import { useModal } from '@/components/Modal';
 import SelectItem from '@/layouts/default/setting/components/SelectItem.vue';
 const [registerMyTable, { openModal }] = useModal();
 const schemas: FormSchema[] = [];
-const add: any = ref([]);
-const schemas_normal: FormSchema[] = [
+const schemas_normal:FormSchema[] = [
   {
     field: 'ConditionItems',
     component: 'Select',
@@ -170,6 +76,7 @@ const schemas_normal: FormSchema[] = [
     },
     // 判断显示隐藏
     show: ({ values }) => {
+      console.log('22222222222222222')
       return values.ConditionItems == '1';
     }
   },
@@ -413,18 +320,19 @@ export default defineComponent({
           span: 6,
         },
       });
-    function handel_Add() {
-      add.value.push({
-        FormAdd:[],
-        schemas_normal
-      })
-    }
+    // function handel_Add() {
+    //   // const fomrInstance = new
+    //     console.log('!!!添加!!!');
+    //   // schemas_normal.forEach((item) => {
+    //   //   appendSchemaByField({ ...item }, '')
+    //   // })
+
+
+    // }
     function handleSuccess(params) {
-      console.log(getFieldsValue(), '?...getFieldsValue...?')
       const obj = { ...params }
       // DeviceName
       console.log(obj[0].DeviceName, '...obj...?')
-
       setFieldsValue({
         device: obj[0].DeviceName,
       });
@@ -447,8 +355,9 @@ export default defineComponent({
         },
       ]);
     }
-    function remove_attach(index,cindex) {
-     delete add.value[index].FormAdd[cindex];
+    function remove_attach(index) {
+      delete FormAdd[index]
+      console.log(FormAdd, '?...item...?');
     }
     function appendField() {
     }
@@ -465,38 +374,17 @@ export default defineComponent({
     }
     const n = ref(1);
     // 添加规则
-    function addRule(index1) {
-      console.log(index1)
+    function addRule() {
       const values: any = getFieldsValue();
       console.log(Object.keys(values), '?...values...?')
-      // Object.keys(values).length > 0 ? (FormAdd.push({
-      //   Op: '',
-      //   item1: '',
-      //   item2: '',
-      //   item3: '',
-      //   Gval: ''
-      // }), showForm.value = true) : ''
-      add.value.map((item, index) => {
-        // item[].FormAdd=[];
-        if (index == index1) {
-          // item.FormAdd = [];
-          item.FormAdd.push({
-            Op: '',
-            item1: '',
-            item2: '',
-            item3: '',
-            Gval: ''
-          })
-        }
-        // item.Op = '',
-        // item.item1 = '',
-        // item.item2 = '',
-        // item.item3 = '',
-        // item.Gval = ''
-        return item;
+      Object.keys(values).length > 0 ? (FormAdd.push({
+        Op: '',
+        item1: '',
+        item2: '',
+        item3: '',
+        Gval: ''
+      }), showForm.value = true) : ''
 
-      })
-      console.log(add.value, '?...item...?')
     }
     function handleSubmit() {
 
@@ -514,7 +402,6 @@ export default defineComponent({
       options2,
       options3,
       isShake,
-      add,
       setProps,
       changeLabel3,
       changeLabel34,
@@ -525,9 +412,16 @@ export default defineComponent({
       remove_attach,
       handleSubmit,
       registerMyTable,
-      handel_Add,
+      // handel_Add,
       handleSuccess
     };
+  },
+  render() {
+    return (
+      <div>
+        9999999
+      </div>
+    );
   }
 });
 </script>
