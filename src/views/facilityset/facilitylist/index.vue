@@ -642,13 +642,13 @@ export default defineComponent({
 
     // 详情
     function pathDetail(id) {
-      go('/facilityset/facility_detail/' + id)
+      go('/facilityset/facility_detail/' + id +'/detail')
     }
 
     // 启动
     function enableDevice(id, index1, index2) {
       console.log(index1, index2)
-      console.log(facilityList[index1].facility[index2].NetworkStatus)
+      // console.log(facilityList[index1].facility[index2].NetworkStatus)
       if (facilityTabIndex.value == '0' && !SearchStatus.value) {
         // nextTick(() => {
         facilityList[index1].facility[index2].NetworkStatus = 1

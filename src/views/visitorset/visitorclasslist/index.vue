@@ -92,7 +92,7 @@ export default defineComponent({
 
     async function handleDelete(record) {
       await deleteTableDataRecord(record.VisitorTypeId);
-      await visitorDeleteApi({ VisitorTypeId: record.VisitorTypeId })
+      await visitorTypeDeleteApi({ VisitorTypeId: record.VisitorTypeId })
       reload();
     }
 

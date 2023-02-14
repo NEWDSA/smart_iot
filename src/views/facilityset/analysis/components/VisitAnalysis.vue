@@ -15,6 +15,7 @@ const chartRef = ref<HTMLDivElement | null>(null)
 const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>)
 
 onMounted(() => {
+  
   setOptions({
     title: {
       text: '访问来源'

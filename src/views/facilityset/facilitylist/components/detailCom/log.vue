@@ -23,6 +23,7 @@ import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getRoleListByPage } from '@/api/demo/system';
 import detailDrawer from '../detailDrawer.vue';
 import { useDrawer } from '@/components/Drawer';
+import { getLogFormConfig } from '../tableData';
 import { facilityLogListApi } from '@/api/facility/facility';
 
 const DetailId = ref()
@@ -82,10 +83,13 @@ const [registertab] = useTable({
   // canRowDrag: true
   api: facilityLogListApi,
   searchInfo: {
-    DeviceSerial: props.DeviceName
+    DeviceSerial: props.DeviceName,
+    StartTime:1672502400,
+    EndTime:Date.parse(new Date(new Date().getTime()))/1000,
   },
   columns: TreeTabColumns,
   showIndexColumn: false,
+  useSearchForm: true,
   striped: false,
   actionColumn: {
     width: 80,
@@ -105,6 +109,9 @@ const [registertab] = useTable({
     totalField: 'Total'
   },
   titleHelpMessage: '树形组件不能和序列号列同时存在',
+  formConfig: getLogFormConfig(),
+  showTableSetting: true,
+  tableSetting: { fullScreen: true },
 })
 
 const [registerDrawer, { openDrawer }] = useDrawer()
@@ -120,7 +127,7 @@ const props = defineProps({
   },
 })
 
-const handleLook = (record) => {
+const handleLook = (record) => { 
   console.log('查看详情', record)
   DetailId.value = record.DetailId
   logDetail.value = record

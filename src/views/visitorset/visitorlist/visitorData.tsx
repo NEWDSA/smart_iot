@@ -5,10 +5,11 @@ import { Icon } from '@/components/Icon';
 
 export function TabColumns() {
   return [
+
     {
       title: '用户',
       dataIndex: 'VisitorName',
-      width: 150,
+      width: 80,
     },
     {
       title: '联系电话',
@@ -17,7 +18,7 @@ export function TabColumns() {
     },
     {
       title: '访客类型',
-      dataIndex: 'VisitorTypeId',
+      dataIndex: 'VisitorTypeName',
       width: 50,
     },
     {
@@ -62,22 +63,23 @@ export function TabColumns() {
 
           case 3:
             return h(Tag, { color: 'rgb(26, 177, 196)' }, () => '已登记');
-            
+
           case 4:
             return h(Tag, { color: 'rgb(203, 203, 203)' }, () => '已离开');
-            
+
           case 5:
             return h(Tag, { color: 'red' }, () => '已取消');
-            
+
           case 6:
             return h(Tag, { color: 'rgb(255, 191, 0)' }, () => '已推迟');
-            
+
           default:
             return '状态异常'
         }
       }
     },
-  ];
+
+  ]
 }
 
 export function getFormConfig() {
@@ -85,22 +87,66 @@ export function getFormConfig() {
     labelWidth: 100,
     // showSubmitButton:false,
     autoAdvancedLine: 2,
+    gutter:32,
     schemas: [
       {
-        field: 'SearchType',
-        // label: '排序方式',
+        field: 'VisitorTypeId',
+        label: '访客类型',
         component: 'Select',
         componentProps: {
+          placeholder: '请选择访客类型',
+          fieldNames: {
+            label: 'VisitorTypeName',
+            key: 'VisitorTypeId',
+            value: 'VisitorTypeId'
+          },
+          // options: [
+          //   { label: '访客类型', value: 'VisitorTypeId' },
+          //   { label: '手机号', value: 'VisitorPhone' },
+          //   { label: '访客名称', value: 'VisitorName' },
+          //   { label: '车牌号', value: 'LicensePlate' },
+          //   { label: '预定时间', value: 'AppointTime' },
+          // ],
+        },
+        colProps: { span: 4 },
+      },
+      {
+        field: 'Status',
+        label: '访客状态',
+        component: 'Select',
+        componentProps: {
+          placeholder: '请选择访客状态',
           options: [
-            { label: '访客类型', value: 'VisitorTypeId' },
-            { label: '手机号', value: 'VisitorPhone' },
-            { label: '访客名称', value: 'VisitorName' },
-            { label: '车牌号', value: 'LicensePlate' },
-            { label: '预定时间', value: 'AppointTime' },
+            { label: '待确认', value: 1 },
+            { label: '已预约', value: 2 },
+            { label: '已登记', value: 3 },
+            { label: '已离开', value: 4 },
+            { label: '已取消', value: 5 },
+            { label: '已推迟', value: 6 },
           ],
         },
-        colProps: { span: 5 },
+        colProps: { span: 4 },
       },
+      {
+        field: 'Search',
+        // label: '',
+        component: 'Select',
+        defaultValue:'VisitorName',
+        componentProps: {
+          placeholder: '请选择查询字段',
+          options: [
+            { label: '访客姓名', value: 'VisitorName' },
+            { label: '联系电话', value: 'VisitorPhone' },
+          ],
+        },
+        colProps: { span: 3,push:1},
+      },
+      {
+        field: 'SearchValue',
+        // label: '',
+        component: 'Input',
+        colProps: { span: 6,push:2 },
+      }, 
     ],
   };
 }
@@ -108,16 +154,23 @@ export function getFormConfig() {
 
 export const formSchema: FormSchema[] = [
   {
-    label: '用户',
+    label: '访客姓名',
     field: 'VisitorName',
     component: 'Input',
     required: true,
+    componentProps: {
+      placeholder: '请输入访客姓名',
+
+    }
   },
   {
     label: '联系电话',
     field: 'VisitorPhone',
     component: 'Input',
     required: true,
+    componentProps: {
+      placeholder: '请输入联系电话',
+    }
   },
   {
     label: '访客类型',
@@ -125,6 +178,7 @@ export const formSchema: FormSchema[] = [
     component: 'Select',
     required: true,
     componentProps: {
+      placeholder: '请选择访客类型',
       fieldNames: {
         value: 'VisitorTypeId',
         label: 'VisitorTypeName'
@@ -137,11 +191,13 @@ export const formSchema: FormSchema[] = [
     component: 'Select',
     required: true,
     componentProps: {
+      placeholder: '请选择接待人',
       mode: 'multiple',
       fieldNames: {
         value: 'UserId',
         label: 'UserName'
       },
+      
       // getPopupContainer: () => document.body
     },
 
@@ -151,6 +207,7 @@ export const formSchema: FormSchema[] = [
     field: "yuyueTime",
     component: 'DatePicker',
     componentProps: {
+      placeholder: '请选择预约时间',
       showTime: { format: 'HH:mm:ss' },
       valueFormat: "YYYY-MM-DD HH:mm:ss"
     },
@@ -160,7 +217,10 @@ export const formSchema: FormSchema[] = [
     label: '单位名称',
     field: 'Company',
     component: 'Input',
-    required: true
+    required: true,
+    componentProps: {
+      placeholder: '请输入单位名称',
+    },
   },
   // {
   //   label: '正面照片',
@@ -175,19 +235,26 @@ export const formSchema: FormSchema[] = [
     label: '车牌号',
     field: 'LicensePlate',
     component: 'Input',
-    required: false
+    required: false,
+    componentProps: {
+      placeholder: '请输入车牌号',
+    },
   },
   {
     label: '到访事由',
     field: 'Reason',
     component: 'Input',
     required: true,
+    componentProps: {
+      placeholder: '请输入到访事由',
+    },
   },
   {
-    label: '状态',
+    label: '状态', 
     field: 'Status',
     component: 'Select',
-    required: false,
+    required: true,
+    defaultValue:1,
     componentProps: {
       options: [
         { label: '待确认', value: 1 },
@@ -199,11 +266,11 @@ export const formSchema: FormSchema[] = [
       ],
     },
   },
-  {
-    label: '备注',
-    field: 'Remarks',
-    component: 'Input',
-    required: false,
-  },
+  // {
+  //   label: '备注',
+  //   field: 'Remarks',
+  //   component: 'Input',
+  //   required: false,
+  // },
 
 ];

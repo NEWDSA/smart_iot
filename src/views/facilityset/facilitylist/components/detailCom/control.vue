@@ -163,7 +163,7 @@ watch(() => devices.value, (newVal, oldVal) => {
     console.log('devices.value', devices.value)
     for (var j in devices.value.properties) {
         for (let i = 0; i < model.value.length; i++) {
-            // console.log('比较',model.value[i].model.field,j)
+            console.log('比较',model.value[i].model.field,j)
             if (model.value[i].model.field == j) {
                 model.value[i].value.value = devices.value.properties[j].value
             }

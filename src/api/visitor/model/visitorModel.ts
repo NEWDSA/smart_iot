@@ -1,6 +1,8 @@
 
     export interface visitorListParams {
-        DeviceSerial: string
-        PageSize: string
-        PageNum: string
+        VisitorName: string,
+        VisitorPhone:number,
+        PageSize: number
+        PageNum: number,
+        Status:number
     }

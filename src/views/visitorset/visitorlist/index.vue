@@ -1,39 +1,58 @@
 <template>
   <PageWrapper contentFullHeight title="访客列表">
-    <div class="">
-      <div class="p-2 bg-white flex justify-between items-center">
+    <div class="bg-white">
+      <div class="p-2 flex justify-between items-center">
 
-        <div class="flex p-3">
-          <div class="mr-3">
+        <!-- <div class="flex p-3"> -->
+        <!-- <div class="mr-3">
             <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut">
               <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
                 {{ item.label }}
               </div>
             </Select>
-          </div>
+          </div> -->
 
 
-          <div class="w-50 mr-3" v-if="souSelect.key != ''">
-            <Select class="w-45" @change="TypeChange" v-if="souSelect.key == 'VisitorTypeId'">
-              <div :value="item.VisitorTypeName" v-for="(item, index) in VisitorTypeList" :key="item.VisitorTypeId">
-                {{ item.VisitorTypeName }}
-              </div>
-            </Select>
+        <!-- <div class="mr-3 flex items-center">
+            <div class="flex items-center mr-3">
+              <div class="px-2 w-20 text-center">访客类型</div>
+              <Select v-model:value="souOrder.VisitorTypeName" class="w-45" @change="TypeChange" placeholder="请选择访客类型">
+                <div :value="item.VisitorTypeName" v-for="(item, index) in VisitorTypeList" :key="item.VisitorTypeId">
+                  {{ item.VisitorTypeName }}
+                </div>
+              </Select>
+            </div>
 
-            <Input v-if="souSelect.key == 'VisitorPhone'" v-model:value="souOrder.VisitorPhone"></Input>
-            <Input v-if="souSelect.key == 'VisitorName'" v-model:value="souOrder.VisitorName"></Input>
-            <Input v-if="souSelect.key == 'LicensePlate'" v-model:value="souOrder.LicensePlate"></Input>
+            <div class="flex items-center mr-3">
+              <div class="px-2 w-20 text-center">访客状态</div>
+              <Select v-model:value="souOrder.StatusName" class="w-45" @change="StatusChange" placeholder="请选择访客状态">
+                <div :value="item.StatusName" v-for="(item, index) in VisitorStatus" :key="item.StatusId">
+                  {{ item.StatusName }}
+                </div>
+              </Select>
+            </div>
+
+            <div class="flex items-center mr-3">
+              <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut" placeholder="请选择查询状态">
+                <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
+                  {{ item.label }}
+                </div>
+              </Select>
+            </div>
+
+            <Input :disabled="souSelect.key == ''" v-model:value="souSelect.InputValue"
+              :placeholder="souSelect.key == '' ? '请选择查询状态' : '请输入关键字'"></Input>
           </div>
 
           <a-button type="primary" @click="getFormValues" class="mr-3">查询</a-button>
           <a-button @click="resetFormValues" class="mr-3">重置</a-button>
 
-        </div>
+        </div> -->
 
 
         <div>
           <a-button type="primary" preIcon="ic:baseline-plus" @click="addVisitor()">
-            创建新的访客
+            添加预约访客
           </a-button>
         </div>
       </div>
@@ -65,7 +84,7 @@
 <script>
 import { ref, defineComponent, reactive, onMounted, nextTick } from 'vue';
 import { BasicTable, TableAction, useTable } from '@/components/Table'
-import { visitorListApi, visitorInfoApi, visitorTypeListApi } from '@/api/visitor/visitor'
+import { visitorListApi, visitorInfoApi, visitorTypeListApi, visitorStatusEditApi } from '@/api/visitor/visitor'
 import { TabColumns, getFormConfig } from './visitorData'
 import { useModal } from '@/components/Modal';
 import visitorModel from './visitorModal.vue';
@@ -77,9 +96,8 @@ import { fileUrl } from '@/utils/file/fileUrl'
 export default defineComponent({
   components: { BasicTable, TableAction, visitorModel, Select, Input, PageWrapper },
   setup() {
-    const devImg=ref('');
+    const devImg = ref('');
     onMounted(() => {
-      
       visitorTypeListApi().then(res => {
         VisitorTypeList.value = res.Detail
       })
@@ -93,7 +111,7 @@ export default defineComponent({
     const [registertab, { getForm, reload }] = useTable({
       api: visitorListApi,
       columns: TabColumns(),
-      useSearchForm: false,
+      useSearchForm: true,
       searchInfo: searchInfo,
       actionColumn: {
         width: 80,
@@ -106,46 +124,146 @@ export default defineComponent({
       showTableSetting: true,
       tableSetting: { fullScreen: true },
       showIndexColumn: false,
+      handleSearchInfoFn: (e) => {
+        if (e.Search || e.Search != undefined || e.SearchValue != '') {
+          e[e.Search] = e.SearchValue
+        }
+        e.Search = undefined
+        e.SearchValue = undefined
+
+      }
     })
 
-    const souSelect = reactive({
-      value: '',
-      key: '',
-      list: [
-        { label: '访客类型', value: 'VisitorTypeId' },
-        { label: '手机号', value: 'VisitorPhone' },
-        { label: '访客名称', value: 'VisitorName' },
-        { label: '车牌号', value: 'LicensePlate' },
-        { label: '预定时间', value: 'AppointTime' }
-      ]
-    })
+    // const souSelect = reactive({
+    //   value: null,
+    //   key: '',
+    //   InputValue: null,
+    //   list: [
+    //     { label: '访客姓名', value: 'VisitorName' },
+    //     { label: '手机号', value: 'VisitorPhone' },
+    //   ]
+    // })
 
-    const souOrder = reactive({
-      VisitorTypeId: null,
-      VisitorPhone: null,
-      VisitorName: null,
-      LicensePlate: null,
-      AppointTime: null,
-    })
+    setTimeout(() => {
+      getForm().updateSchema({
+        field: 'VisitorTypeId',
+        componentProps: { options: VisitorTypeList.value },
+      });
+    }, 1000)
 
     const VisitorTypeList = ref()
+    // const VisitorStatus = ref([
+    //   { StatusName: '待确认', StatusId: 1 },
+    //   { StatusName: '已预约', StatusId: 2 },
+    //   { StatusName: '已登记', StatusId: 3 },
+    //   { StatusName: '已离开', StatusId: 4 },
+    //   { StatusName: '已取消', StatusId: 5 },
+    //   { StatusName: '已推迟', StatusId: 6 },
+    // ])
+
+    // const souOrder = reactive({
+    //   VisitorTypeName: null,
+    //   VisitorTypeId: null,
+    //   VisitorName: null,
+    //   Status: null,
+    //   StatusName: null,
+    // })
 
     // 操作
     function createActions(record) {
-      return [
-        {
-          label: '取消',
-          onClick: handleLook.bind(null, record)
-        },
-        {
-          label: '修改',
-          onClick: handleEdit.bind(null, record)
-        },
-        {
-          label: '查看',
-          onClick: handleLook.bind(null, record)
-        }
-      ]
+
+      if (record.Status == 5 || record.Status == 4) {
+        return [
+          {
+            label: '查看',
+            onClick: handleLook.bind(null, record)
+          }
+        ]
+      }
+
+      if (record.Status == 1) {
+        return [
+          {
+            label: '预约',
+            popConfirm: {
+              title: '是否确认预约',
+              placement: 'left',
+              confirm: handlecancel.bind(null, record,2),
+            },
+            // onClick: handleLook.bind(null, record)
+          },
+          {
+            label: '取消',
+            popConfirm: {
+              title: '是否确认取消',
+              placement: 'left',
+              confirm: handlecancel.bind(null, record,5),
+            },
+            // onClick: handleLook.bind(null, record)
+          },
+          {
+            label: '修改',
+            onClick: handleEdit.bind(null, record)
+          },
+          {
+            label: '查看',
+            onClick: handleLook.bind(null, record)
+          }
+        ]
+      }
+
+      if (record.Status == 2 || record.Status == 6) {
+        return [
+          {
+            label: '登记',
+            popConfirm: {
+              title: '是否确认登记',
+              placement: 'left',
+              confirm: handlecancel.bind(null, record,3),
+            },
+            // onClick: handleLook.bind(null, record)
+          },
+          {
+            label: '取消',
+            popConfirm: {
+              title: '是否确认取消',
+              placement: 'left',
+              confirm: handlecancel.bind(null, record,5),
+            },
+            // onClick: handleLook.bind(null, record)
+          },
+          {
+            label: '修改',
+            onClick: handleEdit.bind(null, record)
+          },
+          {
+            label: '查看',
+            onClick: handleLook.bind(null, record)
+          }
+        ]
+      }
+
+      if (record.Status == 3) {
+        return [
+          {
+            label: '离开',
+            popConfirm: {
+              title: '是否确认离开',
+              placement: 'left',
+              confirm: handlecancel.bind(null, record,4),
+            },
+            // onClick: handleLook.bind(null, record)
+          },
+          {
+            label: '修改',
+            onClick: handleEdit.bind(null, record)
+          },
+          {
+            label: '查看',
+            onClick: handleLook.bind(null, record)
+          }
+        ]
+      }
     }
 
     function addVisitor() {
@@ -189,8 +307,18 @@ export default defineComponent({
         });
         // }
       })
+    }
 
-
+    function handlecancel(record,status) {
+      //Status 5 因为是取消所以固定死
+      visitorStatusEditApi({ Status: status, VisitorId: record.VisitorId }).then(res => {
+        if (res == 0) {
+          reload()
+        } else {
+          message.error('操作失败')
+        }
+        // console.log(res)
+      })
     }
 
     function handleSuccess() {
@@ -198,63 +326,83 @@ export default defineComponent({
       reload();
     }
 
-    function reset(type) {
-      if (type) {
-        nextTick(() => {
-          souSelect.value = ''
-          souSelect.key = ''
-        })
+    // 重置 （总的/select的）
+    // function reset(type) {
+    //   if (type) {
+    //     nextTick(() => {
+    //       souSelect.value = null
+    //       souSelect.key = ''
+    //       souOrder.VisitorTypeName = null
+    //       souOrder.VisitorTypeId = null
+    //       souOrder.StatusName = null
+    //       souOrder.Status = null
+    //     })
 
-      }
-      searchInfo.value = null
-      souOrder.VisitorTypeId = null
-      souOrder.VisitorPhone = null
-      souOrder.VisitorName = null
-      souOrder.LicensePlate = null
-      souOrder.AppointTime = null
-    }
+    //   }
+    //   searchInfo.value = null
+    //   souSelect.InputValue = null
+    // }
 
-    function SelectCut(value, data) {
-      reset()
+    // function SelectCut(value, data) {
+    //   reset()
 
-      souSelect.key = data.key
-      console.log(souSelect.key)
-    }
+    //   souSelect.key = data.key
+    //   console.log(souSelect.key)
+    // }
 
-    function getFormValues() {
-      var obj = {}
-      if (souSelect.key != '') {
-        if (souOrder[souSelect.key] != '' || souOrder[souSelect.key] != null) {
-          obj[souSelect.key] = souOrder[souSelect.key]
-        }
-        searchInfo.value = obj
-        openWrapLoading()
-        // 延迟
-        setTimeout(() => {
-          reload()
-          closeWrapLoading()
-        }, 500);
+    // // 查询
+    // function getFormValues() {
 
-      } else {
-        reload()
-      }
-      // console.log(obj)
-    }
+    //   var obj = {}
 
-    function resetFormValues() {
-      openWrapLoading()
+    //   // 类型
+    //   if (souOrder.VisitorTypeId != '' || souSelect.VisitorTypeId != null) {
+    //     obj.VisitorTypeId = souOrder.VisitorTypeId
+    //   }
 
-      reset(true)
-      // 延迟
-      setTimeout(() => {
-        reload()
-        closeWrapLoading()
-      }, 500);
-    }
+    //   // 状态
+    //   if (souOrder.Status != '' || souSelect.Status != null) {
+    //     obj.Status = souOrder.Status
+    //   }
 
-    function TypeChange(value, data) {
-      souOrder.VisitorTypeId = data.key
-    }
+    //   // input
+    //   if (souSelect.key != '' || souSelect.InputValue != null) {
+    //     obj[souSelect.key] = souSelect.InputValue
+    //   }
+
+    //   searchInfo.value = obj
+    //   openWrapLoading()
+    //   // 延迟
+    //   setTimeout(() => {
+    //     reload()
+    //     closeWrapLoading()
+    //   }, 500);
+
+    //   // console.log(obj)
+    // }
+
+    // // 重置
+    // function resetFormValues() {
+    //   openWrapLoading()
+
+    //   reset(true)
+    //   // 延迟
+    //   setTimeout(() => {
+    //     reload()
+    //     closeWrapLoading()
+    //   }, 500);
+    // }
+
+    // function TypeChange(value, data) {
+    //   // console.log(data)
+    //   souOrder.VisitorTypeName = data.value
+    //   souOrder.VisitorTypeId = data.key
+    // }
+
+    // function StatusChange(value, data) {
+    //   souOrder.StatusName = data.value
+    //   souOrder.Status = data.key
+    // }
 
     // loading
     const [openWrapLoading, closeWrapLoading] = useLoading({
@@ -288,16 +436,18 @@ export default defineComponent({
       handleEdit,
       HuanTime,
       searchInfo,
-      souSelect,
+      // souSelect,
       VisitorTypeList,
-      souOrder,
-      reset,
-      SelectCut,
-      getFormValues,
-      resetFormValues,
-      TypeChange,
+      // reset,
+      // SelectCut,
+      // getFormValues,
+      // resetFormValues,
+      // TypeChange,
       url,
-      devImg
+      // souOrder,
+      devImg,
+      // VisitorStatus,
+      // StatusChange
     };
   },
 });

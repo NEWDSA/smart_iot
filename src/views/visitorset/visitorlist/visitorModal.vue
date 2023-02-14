@@ -5,8 +5,12 @@
                 <div class="flex items-center justify-center">
                     <div class="pr-2" style="width: 100px;text-align: right;"><span class="text-red-600">*</span> 正面照片
                     </div>
-                    <div style="width: calc(100% - 100px);">
-                        <CropperAvatar :uploadApi="uploadApi" :value="showAvatar" @change="cropperOk" />
+                    <div style="width: calc(100% - 100px);" v-if="!disabled">
+                        <CropperAvatar :uploadApi="uploadApi" :value="showAvatar" @change="cropperOk" :showIcon="false" />
+                    </div>
+                    <div style="width: calc(100% - 100px);" v-else>
+                        <img :src="showAvatar" alt="正面照片" style="width: 200px;height: 200px;border-radius: 50%;">
+                        <!-- <CropperAvatar :uploadApi="uploadApi" :value="showAvatar" @change="cropperOk" /> -->
                     </div>
 
                 </div>
@@ -19,7 +23,7 @@
 
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref } from 'vue';
+import { defineComponent, ref, computed, unref, reactive } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { formSchema } from './visitorData';
@@ -29,6 +33,7 @@ import { uploadApi } from '@/api/sys/upload';
 import { CropperAvatar } from '@/components/Cropper';
 import { message } from 'ant-design-vue';
 import { fileUrl } from '@/utils/file/fileUrl'
+import headerImg from '@/assets/images/motou.png'
 
 export default defineComponent({
     name: 'DeptModal',
@@ -49,8 +54,38 @@ export default defineComponent({
             showActionButtonGroup: false,
         });
 
+        const obj = reactive({
+            PageNum: 1,
+            PageSize: 10
+        })
+
+        const VisitorData: any = ref([])
+
+
+        const getCompanyList = async (type)=> {
+            if (!type) {
+                obj.PageNum = 1
+                VisitorData.value = []
+            } else {
+                obj.PageNum += 1
+            }
+            await getAccountList(obj).then(res => {
+                for (let i = 0; i < res.List.length; i++) {
+                    VisitorData.value.push(res.List[i])
+                }
+
+                console.log(res.PageSize * res.PageNum, res.Total)
+                console.log(VisitorData.value)
+                if ((res.PageSize * res.PageNum) < res.Total) {
+                    getCompanyList('next')
+                    // return VisitorData.value
+                }
+            })
+        }
+
         const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
             showAvatar.value = ''
+            await getCompanyList();
             resetFields();
             setModalProps({ confirmLoading: false });
             isUpdate.value = !!data?.isUpdate;
@@ -58,13 +93,15 @@ export default defineComponent({
                 VisitorId.value = data.obj.VisitorId;
                 console.log(VisitorId, '...data.obj...')
                 console.log(data.obj)
+
                 disabled.value = data.disabled
+
                 if (data.obj.Photo) {
                     avatar.value = data.obj.Photo
                     showAvatar.value = fileUrl() + data.obj.Photo
                 } else {
                     avatar.value = '/src/assets/images/motou.png'
-                    showAvatar.value = '/src/assets/images/motou.png'
+                    showAvatar.value = headerImg
                 }
 
                 setFieldsValue({
@@ -72,13 +109,13 @@ export default defineComponent({
                 });
             } else {
                 avatar.value = '/src/assets/images/motou.png'
-                showAvatar.value = '/src/assets/images/motou.png'
+                showAvatar.value = headerImg
+
+                disabled.value = false
+                
+                console.log(avatar.value)
             }
 
-            const VisitorData = await getAccountList().then((res) => {
-                console.log(res)
-                return res.List
-            });
             const VisitorTypeData = await visitorTypeListApi().then((res) => {
                 console.log(res)
                 return res.Detail
@@ -86,7 +123,7 @@ export default defineComponent({
 
             updateSchema({
                 field: 'ReceptionId',
-                componentProps: { options: VisitorData },
+                componentProps: { options: VisitorData.value },
             });
             updateSchema({
                 field: 'VisitorTypeId',
@@ -95,7 +132,7 @@ export default defineComponent({
 
         });
 
-        const getTitle = computed(() => (!unref(isUpdate) ? '新增访客类型' : disabled.value ? '访客详情' : '编辑访客类型'));
+        const getTitle = computed(() => (!unref(isUpdate) ? '预约访客' : disabled.value ? '访客详情' : '编辑访客类型'));
 
         async function handleSubmit() {
             try {
@@ -110,6 +147,7 @@ export default defineComponent({
 
                 values.VisitorPhone = Number(values.VisitorPhone)
 
+                // console.log(avatar.value, 'avatar.value')
                 if (avatar.value != '/src/assets/images/motou.png') {
                     values.Photo = avatar.value
                 } else {
@@ -134,7 +172,7 @@ export default defineComponent({
             // console.log(source, data)
         }
 
-        return { registerModal, registerForm, getTitle, handleSubmit, uploadApi: uploadApi as any, avatar, cropperOk, url, showAvatar };
+        return { registerModal, registerForm, getTitle, handleSubmit, uploadApi: uploadApi as any, avatar, cropperOk, url, showAvatar,disabled };
     },
 });
 </script>

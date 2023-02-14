@@ -13,7 +13,7 @@
             },
             {
               icon: 'ion:add-circle-outline',
-              onClick:handelChildren.bind(null)
+              onClick:handelChildren.bind(null,record)
             },
             {
               icon: 'ant-design:delete-outlined',
@@ -103,9 +103,11 @@ export default defineComponent({
 
     }
     // 添加子部门
-    function handelChildren(){
+    function handelChildren(record:Recordable){
       openModal(true, {
-        isUpdate: true,
+        record,
+        isUpdate: false,
+        isModifiy:1,
       });
     }
     function handleEdit(record: Recordable) {

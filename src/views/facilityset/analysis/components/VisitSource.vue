@@ -1,7 +1,7 @@
 <template>
   <Card title="快捷入口" :loading="loading">
     <template #extra>
-      <div class="text-blue-600">管理</div>
+      <div class="text-blue-600" @click="haldkModal()">管理</div>
     </template>
 
     <div class="flex items-center flex-wrap border-b">
@@ -32,8 +32,8 @@
       </div>
       <div class="">
         <div class="flex items-center pb-2" v-for="(item, index) in shortcutList" :key="index">
-          <div >
-            <Tag class="mb-2" color="blue" >
+          <div>
+            <Tag class="mb-2" color="blue">
               通知
             </Tag>
           </div>
@@ -44,11 +44,18 @@
 
   </Card>
 
+  <RoleDrawer @register="registerDrawer" @success="handleSuccess"></RoleDrawer>
 </template>
 <script lang="ts" setup>
 import Icon from '@/components/Icon';
 import { Ref, ref, watch } from 'vue';
-import { Card,Tag } from 'ant-design-vue';
+import { Card, Tag } from 'ant-design-vue';
+
+import { useDrawer } from '@/components/Drawer';
+import RoleDrawer from './modal/SourceDrawer.vue';
+
+const [registerDrawer, { openDrawer }] = useDrawer();
+
 const props = defineProps({
   loading: Boolean,
   width: {
@@ -70,6 +77,17 @@ watch(
   },
   { immediate: true }
 )
+
+
+function haldkModal() {
+  openDrawer(true, {
+    isUpdate: false,
+  });
+}
+
+function handleSuccess(){
+  
+}
 
 const shortcutList = ref([
   {

@@ -29,8 +29,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import { CountTo } from '@/components/CountTo/index'
+import { facilityDataApi } from '@/api/facility/facility'
 // import { Icon } from '@/components/Icon'
 import { Tag, Card } from 'ant-design-vue'
 
@@ -40,28 +41,47 @@ defineProps({
   }
 })
 
+onMounted(()=>{
+  getfacilityData()
+})
+
+// StartTime:new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf(),
+//     EndTime:new Date(new Date().getTime()).valueOf(),
+
+function getfacilityData(){
+  facilityDataApi().then(res=>{
+    deviceList.value[0].value = res.DeviceTotal
+    deviceList.value[0].fuValue = res.OffLineDeviceTotal
+
+    deviceList.value[1].value = res.RunDeviceTotal
+    deviceList.value[1].fuValue  = res.OnlineDeviceTotal
+
+    deviceList.value[2].value = res.GatewayDeviceTotal
+  })
+}
+
 const deviceList = ref([
   {
     title: '设备数量',
-    value: 200,
+    value: 0,
     fuTitle: '离线设备',
-    fuValue: 23,
+    fuValue: 0,
   },
   {
-    title: '设备数量',
-    value: 200,
+    title: '当前运行',
+    value: 0,
+    fuTitle: '在线设备',
+    fuValue: 0,
   },
   {
-    title: '设备数量',
-    value: 200,
-    fuTitle: '离线设备',
-    fuValue: 23,
+    title: '网关设备数量',
+    value: 0,
   },
   {
-    title: '设备数量',
-    value: 200,
-    fuTitle: '离线设备',
-    fuValue: 23,
+    title: '当日告警数量',
+    value: 0,
+    fuTitle: '同比前一日',
+    fuValue: 0,
   }
 ])
 

@@ -19,7 +19,7 @@ enum Api {
     DeviceSave = '/device/save',
     DeviceEdit = '/device/edit',
     DeviceDelete = '/device/delete',
-
+    DeviceData = '/device/data',
 
     DeviceCheckRule = '/device/check/rule',
     DeviceDisableRule = 'device/disable/rule',
@@ -35,13 +35,18 @@ enum Api {
     DeviceTypeEdit = '/device/type/edit',
     DeviceTypeDelete = '/device/type/delete',
 
+    
 
-    DeviceLogList = '/device/log/list',
+    DeviceLogList = '/device/log',
     DeviceLogInfo = '/device/log/info',
     DeviceAlertList = '/device/alert/list',
     DeviceAlertIgnore = '/device/alert/ignore',
     DeviceAlertNotice = '/device/alert/notice',
-    
+    DeviceState = '/device/state',
+
+    DeviceTrendRatio = '/device/trendRatio',
+    DeviceBoardNum = '/device/board/num',
+
 
     regionList = '/region/list', //区域列表
     regionInfo = '/region/info'   // 区域详情
@@ -191,7 +196,7 @@ export function ruleDisableApi(params) {
 }
 
 // 设备日志列表
-export function facilityLogListApi(params:facilityLogParams) {
+export function facilityLogListApi(params) {
     return realHttp.get({
         url: Api.DeviceLogList,
         params
@@ -252,4 +257,39 @@ export function facilityAlertNoticeApi(params:facilityAlertPostParams) {
         params
     });
 }
+
+// 设备控制状态
+export function facilityStateApi(params) {
+    return realHttp.get({
+        url: Api.DeviceState,
+        params
+    });
+}
+
+// 查询用电数据趋势(日) Type:day week month 电field：power Number：5 7 12
+export function facilityTrendRatioApi(params) {
+    return realHttp.get({
+        url: Api.DeviceTrendRatio,
+        params
+    });
+}
+
+// 今日用电量
+export function facilityBoardNumApi(params) {
+    return realHttp.get({
+        url: Api.DeviceBoardNum,
+        params
+    });
+}
+
+// 设备统计
+export function facilityDataApi() {
+    return realHttp.get({
+        url: Api.DeviceData
+    });
+}
+
+
+
+
 

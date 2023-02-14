@@ -21,7 +21,8 @@ export {
     send_device_command,
     list_device_by_area,
     video_stop,
-    devices
+    devices,
+    subscribeDeviceStatusNew
 }
 
 function connect() {
@@ -192,7 +193,8 @@ function subscribeDeviceStatus() {
     ws.send(JSON.stringify(cmd))
 }
 
-function subscribeDeviceStatusNew(device) {
+function subscribeDeviceStatusNew(device:number) {
+   
     var cmd = {
         command: "subscribe",
         "session-id": token,
@@ -204,6 +206,7 @@ function subscribeDeviceStatusNew(device) {
             extend: 100
         }
     }
+    console.log(cmd)
     ws.send(JSON.stringify(cmd))
 }
 

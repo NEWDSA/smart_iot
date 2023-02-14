@@ -67,7 +67,14 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
       if(node.name == 'Facilitylist'){
         node.meta.ignoreKeepAlive = false
       }
-      node.meta.hideMenu=node.hidden;
+
+      if(node.hidden == true){
+        node.meta.hideMenu = true
+      }
+      // console.log(node)
+      // : false,
+      console.log(node,'nodenode');
+      // debugger;
       return {
         ...(node.meta || {}),
         meta: node.meta,

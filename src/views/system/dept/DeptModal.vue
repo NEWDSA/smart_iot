@@ -1,6 +1,6 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
-    <BasicForm @register="registerForm"/>
+    <BasicForm @register="registerForm" />
   </BasicModal>
 </template>
 <script lang="ts">
@@ -17,7 +17,10 @@ export default defineComponent({
   setup(_, { emit }) {
     const isUpdate = ref(true);
     const deptId = ref('');
-    const isShow=ref(false);
+    const isShow = ref(false);
+    const isModifiy = ref(0);
+    const DeptId = ref('');
+
     const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
       labelWidth: 100,
       baseColProps: { span: 24 },
@@ -29,6 +32,8 @@ export default defineComponent({
       resetFields();
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
+      isModifiy.value = data?.isModifiy;
+      DeptId.value = data.record?.DeptId;
       if (unref(isUpdate)) {
         setFieldsValue({
           ...data.record,
@@ -40,17 +45,19 @@ export default defineComponent({
       updateSchema({
         field: 'ParentId',
         componentProps: { treeData },
-        ifShow:unref(isUpdate)
+        ifShow: !unref(isUpdate) ? false : !data.record ? true : data.record.ParentId == 0  ? false : true
       });
 
     });
-    const getTitle = computed(() => (!unref(isUpdate) ? '创建部门' : '添加部门'));
+    const getTitle = computed(() => (!unref(isUpdate) ? '创建部门' : '修改部门') && unref(isModifiy) == 1 ? '添加部门' : !unref(isUpdate) ? '创建部门' : '修改部门');
 
     async function handleSubmit() {
       try {
         const values = await validate();
+
+        unref(isModifiy) == 1 ? Object.assign(values, { ParentId:DeptId.value}) : ''
         setModalProps({ confirmLoading: true });
-        !unref(isUpdate) ? await createDept({...values,ParentId:0}) : await modifiDept({ ...values, deptId:deptId.value })
+        !unref(isUpdate) ? await createDept(values) : await modifiDept({ ...values, deptId: deptId.value })
         console.log(values);
         closeModal();
         emit('success');
@@ -59,7 +66,7 @@ export default defineComponent({
       }
     }
 
-    return { registerModal, registerForm, getTitle,isShow,isUpdate,handleSubmit };
+    return { registerModal, registerForm, getTitle, isShow, isUpdate, isModifiy, DeptId, handleSubmit };
   },
 });
 </script>

@@ -150,7 +150,7 @@ export interface FormSchema {
   component: ComponentType
   // Component parameters
   componentProps?:
-    | ((opt: {
+    | ((opt: {f
         schema: FormSchema
         tableAction: TableActionType
         formActionType: FormActionType

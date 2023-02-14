@@ -38,10 +38,11 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import { CountTo } from '@/components/CountTo/index'
 // import { Icon } from '@/components/Icon
 import { Tag, Card,Progress } from 'ant-design-vue'
+import { facilityBoardNumApi } from '@/api/facility/facility'
 
 defineProps({
   loading: {
@@ -49,10 +50,27 @@ defineProps({
   }
 })
 
+onMounted(()=>{
+  getBoardNum()
+})
+
+function getBoardNum(){
+  let obj = {
+    StartTime:new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf(),
+    EndTime:new Date(new Date().getTime()).valueOf(),
+    Field:'power',
+    TypeId:1
+  }
+  facilityBoardNumApi(obj).then(res=>{
+    if(res.Code == 200){
+      deviceList.value[0].value = res.Data
+    }
+  })
+}
 const deviceList = ref([
   {
     title: '当日用电量（KW/H）',
-    value: 13714,
+    value: '',
   },
 ])
 

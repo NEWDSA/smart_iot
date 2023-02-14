@@ -14,6 +14,7 @@ enum Api {
     visitorEdit = '/visitor/edit',
     visitorDelete = '/visitor/delete',
     visitorInfo = '/visitor/info',
+    visitorStatusEdit = '/visitor/status-edit',
 
     ruleVisitorList = '/rule/visitor/list',
     ruleEnable = '/rule/enable',
@@ -54,6 +55,16 @@ export const visitorInfoApi = (params) =>
     }, {
         isTransformResponse: true
     });
+
+//访客状态编辑
+export const visitorStatusEditApi = (params) =>
+    realHttp.post({
+        url: Api.visitorStatusEdit,
+        params
+    }, {
+        isTransformResponse: true
+    });
+
 
 // 访客添加
 export const visitorSaveApi = (params: visitorListParams) =>
@@ -103,44 +114,44 @@ export const visitorTypeDeleteApi = (params) =>
 
 // 访客场景联动列表
 export const ruleVisitorListApi = (params) =>
-realHttp.get({
-    url: Api.ruleVisitorList,
-    params
-}, {
-    isTransformResponse: true
-});
+    realHttp.get({
+        url: Api.ruleVisitorList,
+        params
+    }, {
+        isTransformResponse: true
+    });
 
 // 启动访客场景
 export const ruleEnableApi = (params) =>
-realHttp.get({
-    url: Api.ruleEnable,
-    params
-}, {
-    isTransformResponse: true
-});
+    realHttp.get({
+        url: Api.ruleEnable,
+        params
+    }, {
+        isTransformResponse: true
+    });
 
 // 禁用访客场景
 export const ruleDisableApi = (params) =>
-realHttp.get({
-    url: Api.ruleDisable,
-    params
-}, {
-    isTransformResponse: true
-});
+    realHttp.get({
+        url: Api.ruleDisable,
+        params
+    }, {
+        isTransformResponse: true
+    });
 
 // 删除访客场景
 export const ruleDeleteApi = (params) =>
-realHttp.delete({
-    url: Api.ruleDelete,
-    params
-}, {
-    isTransformResponse: true
-});
+    realHttp.delete({
+        url: Api.ruleDelete,
+        params
+    }, {
+        isTransformResponse: true
+    });
 
 // 上传文件
 export const seeFileApi = (params) =>
-realHttp.get({
-    url:params,
-}, {
-    isTransformResponse: true
-});
+    realHttp.get({
+        url: params,
+    }, {
+        isTransformResponse: true
+    });

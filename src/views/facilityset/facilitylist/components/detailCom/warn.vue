@@ -10,13 +10,18 @@
       </template>
     </template>
   </BasicTable>
+
+  <warnDrawer @register="registerModal" @success="handleSuccess" />
+
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getBasicColumns, getFormConfig } from '../tableData';
-
 import { facilityAlertListApi, facilityAlertIgnoreApi, facilityAlertNoticeApi } from '@/api/facility/facility';
+import { useModal } from '@/components/Modal';
+import warnDrawer from '../warnDrawer.vue';
+const [registerModal, { openModal }] = useModal();
 
 // console.log(demoListApi)
 const props = defineProps({
@@ -73,13 +78,21 @@ function getFormValues() {
 
 }
 
+function handleSuccess(){
+  console.log(1)
+}
+
 function handleUp(record) {
-  console.log(record)
-  facilityAlertNoticeApi({ 'Id': record.Id }).then(res => {
-    if (res == '0') {
-      reload()
-    }
-  })
+
+  openModal(true, {
+    record,
+    isUpdate: false,
+  });
+  // facilityAlertNoticeApi({ 'Id': record.Id }).then(res => {
+  //   if (res == '0') {
+  //     reload()
+  //   }
+  // })
 
 }
 

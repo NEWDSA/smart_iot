@@ -1,7 +1,7 @@
 <template>
   <div :class="getClass" :style="getStyle">
     <div :class="`${prefixCls}-image-wrapper`" :style="getImageWrapperStyle" @click="openModal">
-      <div :class="`${prefixCls}-image-mask`" :style="getImageWrapperStyle">
+      <div :class="`${prefixCls}-image-mask`" :style="getImageWrapperStyle" v-if="showIcon == true">
         <Icon
           icon="ant-design:cloud-upload-outlined"
           :size="getIconWidth"
@@ -53,7 +53,8 @@ const props = {
   showBtn: { type: Boolean, default: true },
   btnProps: { type: Object as PropType<ButtonProps> },
   btnText: { type: String, default: '' },
-  uploadApi: { type: Function as PropType<({ file: Blob, name: string }) => Promise<void>> }
+  uploadApi: { type: Function as PropType<({ file: Blob, name: string }) => Promise<void>> },
+  showIcon:{ type: Boolean, default: true }
 }
 
 export default defineComponent({
