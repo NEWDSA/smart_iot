@@ -13,41 +13,83 @@
       </Form>
     </template>
     <div class="rounded-md pt-5 pl-5 border">
+
       <template v-for="item, index in add" :key="index">
-        <div draggable="true" @dragstart="dragstart(index)">
+        <draggable :list="item.schemas_normal">
+          <template #item>
+            <BasicForm :draggable="true" :schemas="item.schemas_normal" @register="register">
+              <template #customSlot="{ model, field }">
+                <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
+                  <template #suffix>
+                    <Icon icon="carbon:logo-github" />
+                  </template>
+                </a-input>
+              </template>
+            </BasicForm>
+          </template>
 
-          <BasicForm v-if="item && item.schemas_normal" :draggable="true" :schemas="item.schemas_normal"
-            @register="register">
-
-            <template #customSlot="{ model, field }">
-              <a-input placeholder="请选择设备" v-model:value="model[field]">
-                <template #suffix>
-                  <Icon icon="carbon:logo-github" />
-                </template>
-              </a-input>
+        </draggable>
+        <template v-if="Object.keys(item.FormAdd)">
+          <Form v-if="Object.keys(item.FormAdd).length > 0" class="p-4 enter-x" :model="item.FormAdd" ref="formRef">
+            <template v-for="itemr, cindex in item.FormAdd" :key="itemr">
+              <Row class="enter-x" :gutter="0" v-if="itemr">
+                <Col class="p-1" :span="2">
+                <FormItem :name="itemr.Op" class="enter-x">
+                  <Switch checked-children="AND" v-model:checked="item.Op" un-checked-children="OR" />
+                </FormItem>
+                </Col>
+                <Col class="p-1" :span="2">
+                <FormItem :name="itemr.item1" class="enter-x">
+                  <Select style="width:80px;" :options="options2" v-model:value="item.item1">
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col class="p-1" :span="2">
+                <FormItem :name="itemr.item2" class="enter-x">
+                  <Select style="width:80px;" :options="options3" v-model:value="item.item2">
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col class="p-1" :span="2">
+                <FormItem :name="itemr.Gval" class="enter-x">
+                  <Input v-model:value="item.Gval" />
+                </FormItem>
+                </Col>
+                <Col class="p-1" :span="2">
+                <!-- 移除附加条件 -->
+                <FormItem>
+                  <Icon @click="remove_attach(index, cindex)" icon="ant-design:close-outlined"></Icon>
+                </FormItem>
+                </Col>
+                <Col class="p-1" :span="2">
+                <!-- 移除图标 -->
+                <FormItem>
+                  <Icon icon="ant-design:delete-outlined"></Icon>
+                </FormItem>
+                </Col>
+              </Row>
             </template>
-          </BasicForm>
-        </div>
+          </Form>
+        </template>
       </template>
       <!-- 引入模态框 -->
       <AccountTable @register="registerMyTable" @success="handleSuccess" />
 
       <a-button type="primary" class="my-4" @click="handel_Add">
-        添加动作
+        添加条件
       </a-button>
     </div>
-</PageWrapper>
+  </PageWrapper>
 </template>
 <script lang="tsx">
-import { defineComponent, reactive, ref, toRaw } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
 import { PageWrapper } from '@/components/Page';
-// import draggable from 'vuedraggable';
+import AccountTable from './AccountTable.vue';
 import draggable from "vuedraggable";
 import { Icon } from '@/components/Icon';
-import AccountTable from './AccountTable.vue';
 import { useModal } from '@/components/Modal';
 import SelectItem from '@/layouts/default/setting/components/SelectItem.vue';
 const [registerMyTable, { openModal }] = useModal();
@@ -55,13 +97,6 @@ const schemas: FormSchema[] = [];
 const add: any = ref([]);
 const myArray: any = ref('');
 const schemas_normal: FormSchema[] = [
-  // {
-  //   field: 'Icon',
-  //   label: '',
-  //   component: 'Input',
-  //   slot: 'IconSlot'
-  // },
-
   {
     field: 'ConditionItems',
     component: 'Select',
@@ -353,19 +388,13 @@ export default defineComponent({
         showActionButtonGroup: false,
         actionColOptions: {
           span: 6,
-          style: {
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center'
-          }
         },
       });
     function handel_Add() {
       add.value.push({
-        schemas_normal: schemas_normal
+        FormAdd: [],
+        schemas_normal
       })
-
-      console.log(toRaw(add), 'ddd?')
     }
     function handleSuccess(params) {
       console.log(getFieldsValue(), '?...getFieldsValue...?')
@@ -411,13 +440,23 @@ export default defineComponent({
         isUpdate: true
       });
     }
+    const n = ref(1);
     // 添加规则
     function addRule(index1) {
       console.log(index1)
       const values: any = getFieldsValue();
       console.log(Object.keys(values), '?...values...?')
+      // Object.keys(values).length > 0 ? (FormAdd.push({
+      //   Op: '',
+      //   item1: '',
+      //   item2: '',
+      //   item3: '',
+      //   Gval: ''
+      // }), showForm.value = true) : ''
       add.value.map((item, index) => {
+        // item[].FormAdd=[];
         if (index == index1) {
+          // item.FormAdd = [];
           item.FormAdd.push({
             Op: '',
             item1: '',
@@ -426,13 +465,15 @@ export default defineComponent({
             Gval: ''
           })
         }
+        // item.Op = '',
+        // item.item1 = '',
+        // item.item2 = '',
+        // item.item3 = '',
+        // item.Gval = ''
         return item;
 
       })
       console.log(add.value, '?...item...?')
-    }
-    function dragstart(index) {
-      console.log(index, '...index...?')
     }
     function handleSubmit() {
 
@@ -459,7 +500,6 @@ export default defineComponent({
       deleteField,
       e_Device,
       addRule,
-      dragstart,
       remove_attach,
       handleSubmit,
       registerMyTable,
@@ -470,23 +510,11 @@ export default defineComponent({
 });
 </script>
 <style lang="less" scoped>
-::v-deep(.ant-form-item) {
-  padding: 10px;
-  background: #F3F3F3;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    border-left: 2px solid #000000;
-    width: 7px;
-    margin-top: 9px;
-    height: 7px;
-    background-color: #000000;
-    border-radius: 12px;
-  }
+::v-deep(.ant-page-header-heading) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
-
 
 .col_flex {
   display: flex;

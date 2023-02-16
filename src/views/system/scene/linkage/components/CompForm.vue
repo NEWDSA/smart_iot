@@ -5,109 +5,85 @@
         <Row class="enter-x col_flex">
           <Col :span="4">
           <FormItem name="switch" class="enter-x">
-            <Switch v-model:checked="isShake" checked-children="开启防抖" un-checked-children="关闭防抖" />
+            <Switch v-model:checked="isShake" checked-children="边缘触发" un-checked-children="水平触发" />
           </FormItem>
           </Col>
-          <!-- <template v-if="isShake">
-            <Col :span="5">
-            <FormItem class="enter-x">
-              <div style="display: flex;align-items: center;">
-                <InputNumber />
-                <div>分钟内触发</div>
-              </div>
-            </FormItem>
-            </Col>
-            <Col :span="5">
-            <FormItem>
-              <div style="display:flex;align-items: center;">
-                <InputNumber />
-                <div>次及以上</div>
-              </div>
-            </FormItem>
-            </Col>
-            <Col :span="6">
-            <FormItem>
-              <Select :options="options1">
-              </Select>
-            </FormItem>
-            </Col>
-          </template> -->
         </Row>
       </Form>
     </template>
-    <div class="rounded-md pt-5 pl-5 border  bg-light-50">
+    <div class="rounded-md pt-5 pl-5 border">
       <template v-for="item, index in add" :key="index">
-        <BasicForm :schemas="item.schemas_normal" @register="register">
-          <template #customSlot="{ model, field }">
-            <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
-              <template #suffix>
-                <Icon icon="carbon:logo-github" />
-              </template>
-            </a-input>
-          </template>
-        </BasicForm>
-        <template v-if="Object.keys(item.FormAdd)">
-          <Form v-if="Object.keys(item.FormAdd).length > 0" class="p-4 enter-x" :model="item.FormAdd" ref="formRef">
-            <template v-for="itemr, cindex in item.FormAdd" :key="itemr">
-              <Row class="enter-x" :gutter="0" v-if="itemr">
-                <Col class="p-1"  :span="2">
-                <FormItem :name="itemr.Op" class="enter-x">
-                  <Switch checked-children="AND" v-model:checked="item.Op" un-checked-children="OR" />
-                </FormItem>
-                </Col>
-                <Col class="p-1"  :span="2">
-                <FormItem :name="itemr.item1" class="enter-x">
-                  <Select style="width:80px;" :options="options2" v-model:value="item.item1">
-                  </Select>
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <FormItem :name="itemr.item2" class="enter-x">
-                  <Select style="width:80px;" :options="options3" v-model:value="item.item2">
-                  </Select>
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <FormItem :name="itemr.Gval" class="enter-x">
-                  <Input v-model:value="item.Gval" />
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <!-- 移除附加条件 -->
-                <FormItem>
-                  <Icon @click="remove_attach(index,cindex)" icon="ant-design:close-outlined"></Icon>
-                </FormItem>
-                </Col>
-                <Col class="p-1" :span="2">
-                <!-- 移除图标 -->
-                <FormItem>
-                  <Icon icon="ant-design:delete-outlined"></Icon>
-                </FormItem>
-                </Col>
-              </Row>
+        <div :class="[index <= 0 ? 'border bg-light-100 p-4 lc_liner' : 'border bg-light-100 p-4 mt-5 lc_liner']">
+          <BasicForm v-if="item && item.schemas_normal" :schemas="item.schemas_normal" @register="register">
+            <template #customSlot="{ model, field }">
+              <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
+                <template #suffix>
+                  <Icon icon="carbon:logo-github" />
+                </template>
+              </a-input>
             </template>
-          </Form>
-        </template>
-        <!-- 添加过滤条件 -->
-        <div class="p-1 relative" @click="addRule(index)">
-          <Icon icon="bi:plus" size="14" />
-          添加过滤条件
+            <template v-if="item.FormAdd.length <= 0" #deleteSlot="{ model, field }">
+              <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" />
+            </template>
+          </BasicForm>
+          <template v-if="Object.keys(item.FormAdd) && item">
+            <Form v-if="item && Object.keys(item.FormAdd).length > 0" class="p-4 enter-x" :model="item.FormAdd"
+              ref="formRef">
+              <template v-for="itemr, cindex in item.FormAdd" :key="itemr">
+                <Row class="enter-x" :gutter="0" v-if="itemr">
+                  <Col class="p-1" :span="2">
+                  <FormItem :name="itemr.Op" class="enter-x">
+                    <Switch checked-children="AND" v-model:checked="itemr.Op" un-checked-children="OR" />
+                  </FormItem>
+                  </Col>
+                  <Col class="p-1" :span="2">
+                  <FormItem :name="itemr.item1" class="enter-x">
+                    <Select style="width:80px;" :options="options2" v-model:value="itemr.item1">
+                    </Select>
+                  </FormItem>
+                  </Col>
+                  <Col class="p-1" :span="2">
+                  <FormItem :name="itemr.item2" class="enter-x">
+                    <Select style="width:80px;" :options="options3" v-model:value="itemr.item2">
+                    </Select>
+                  </FormItem>
+                  </Col>
+                  <Col class="p-1" :span="2">
+                  <FormItem :name="itemr.Gval" class="enter-x">
+                    <Input v-model:value="itemr.Gval" />
+                  </FormItem>
+                  </Col>
+                  <Col class="item_felx" :span="2">
+                  <!-- 移除附加条件 -->
+                  <div style="padding:5px;">
+                    <Icon @click="remove_attach(index, cindex)" icon="ant-design:close-outlined"></Icon>
+                  </div>
+                  <!-- 移除图标 -->
+                  <div style="padding:5px;">
+                    <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined"></Icon>
+                  </div>
+                  </Col>
+                </Row>
+              </template>
+            </Form>
+          </template>
+          <!-- 添加过滤条件 -->
+          <div v-if="item && item.schemas_normal.length > 0" class="p-1 relative" @click="addRule(index)">
+            <Icon icon="bi:plus" size="14" />
+            添加过滤条件
+          </div>
         </div>
       </template>
-
-
-
       <!-- 引入模态框 -->
       <AccountTable @register="registerMyTable" @success="handleSuccess" />
-
       <a-button type="primary" class="my-4" @click="handel_Add">
         添加条件
       </a-button>
     </div>
-  </PageWrapper>
+</PageWrapper>
 </template>
 <script lang="tsx">
-import { defineComponent, reactive, ref} from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
@@ -119,13 +95,14 @@ import SelectItem from '@/layouts/default/setting/components/SelectItem.vue';
 const [registerMyTable, { openModal }] = useModal();
 const schemas: FormSchema[] = [];
 const add: any = ref([]);
+
 const schemas_normal: FormSchema[] = [
   {
     field: 'ConditionItems',
     component: 'Select',
     label: '',
     colProps: {
-      span: 2,
+      span: 3
     },
     componentProps: {
       options: [{
@@ -166,7 +143,7 @@ const schemas_normal: FormSchema[] = [
     component: 'Input',
     slot: 'customSlot',
     colProps: {
-      span: 3,
+      span: 3
     },
     // 判断显示隐藏
     show: ({ values }) => {
@@ -211,7 +188,7 @@ const schemas_normal: FormSchema[] = [
     component: 'Select',
     label: '',
     colProps: {
-      span: 3,
+      span: 3
     },
     show: ({ values }) => {
       return values.Gvalparams == 0 && values.ConditionItems == '1';
@@ -242,7 +219,7 @@ const schemas_normal: FormSchema[] = [
     component: 'InputNumber',
     label: '',
     colProps: {
-      span: 3,
+      span: 3
     },
     show: ({ values }) => {
       return values.Gval1 && values.Gvalparams == 0 && values.ConditionItems == '1';
@@ -254,7 +231,7 @@ const schemas_normal: FormSchema[] = [
     component: 'Select',
     label: '',
     colProps: {
-      span: 3,
+      span: 3
     },
     show: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7';
@@ -285,7 +262,7 @@ const schemas_normal: FormSchema[] = [
     component: 'Select',
     label: '',
     colProps: {
-      span: 8,
+      span: 8
     },
     show: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7';
@@ -320,7 +297,7 @@ const schemas_normal: FormSchema[] = [
     component: 'Select',
     label: '',
     colProps: {
-      span: 3,
+      span: 3
     },
     show: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7';
@@ -339,6 +316,14 @@ const schemas_normal: FormSchema[] = [
         value: '3',
         key: '3'
       }]
+    }
+  }, {
+    field: 'delete',
+    label: '',
+    component: 'Input',
+    slot: 'deleteSlot',
+    colProps: {
+      span: 3
     }
   }
 ];
@@ -403,7 +388,7 @@ const RuleForm = reactive([{
 
 }]);
 export default defineComponent({
-  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, AccountTable, InputNumber, Input, Row, Col, Select, SelectItem },
+  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch,AccountTable,InputNumber, Input, Row, Col, Select, SelectItem },
   setup() {
     const [register, { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue }] =
       useForm({
@@ -415,18 +400,19 @@ export default defineComponent({
       });
     function handel_Add() {
       add.value.push({
-        FormAdd:[],
-        schemas_normal
+        FormAdd: [
+        ],
+        schemas_normal: schemas_normal
       })
     }
+    function delete_rule(index) {
+      add.value[index].schemas_normal = [];
+      add.value[index].FormAdd = [];
+    }
     function handleSuccess(params) {
-      console.log(getFieldsValue(), '?...getFieldsValue...?')
       const obj = { ...params }
-      // DeviceName
-      console.log(obj[0].DeviceName, '...obj...?')
-
       setFieldsValue({
-        device: obj[0].DeviceName,
+        device: obj[0].DeviceName
       });
     }
     function changeLabel3() {
@@ -447,8 +433,8 @@ export default defineComponent({
         },
       ]);
     }
-    function remove_attach(index,cindex) {
-     delete add.value[index].FormAdd[cindex];
+    function remove_attach(index, cindex) {
+      delete add.value[index].FormAdd[cindex];
     }
     function appendField() {
     }
@@ -466,16 +452,6 @@ export default defineComponent({
     const n = ref(1);
     // 添加规则
     function addRule(index1) {
-      console.log(index1)
-      const values: any = getFieldsValue();
-      console.log(Object.keys(values), '?...values...?')
-      // Object.keys(values).length > 0 ? (FormAdd.push({
-      //   Op: '',
-      //   item1: '',
-      //   item2: '',
-      //   item3: '',
-      //   Gval: ''
-      // }), showForm.value = true) : ''
       add.value.map((item, index) => {
         // item[].FormAdd=[];
         if (index == index1) {
@@ -515,6 +491,7 @@ export default defineComponent({
       options3,
       isShake,
       add,
+      delete_rule,
       setProps,
       changeLabel3,
       changeLabel34,
@@ -541,5 +518,44 @@ export default defineComponent({
 .col_flex {
   display: flex;
   align-items: center;
+}
+
+.item_felx {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.lc_liner {
+  position: relative;
+
+  width: 85%;
+
+  &::before {
+    position: absolute;
+    display: block;
+    content: '';
+    top: 50%;
+    right: -10px;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-bottom: 1px solid #ffff;
+  }
+
+  // &::after {
+  //   position: absolute;
+  //   top: 50%;
+  //   right: -10px;
+  //   display: block;
+  //   // transform: @elemPosFunc; // 注意CSS是不支持函数的，所以要调用JS中定义的函数
+  //   transform: ${myItem.computed.elemPosFunc};
+  //   width: 10px;
+  //   height: 10px;
+  //   background: green;
+  //   border: 1px solid #ffff;
+  //   border-radius: 100%;
+  // }
 }
 </style>

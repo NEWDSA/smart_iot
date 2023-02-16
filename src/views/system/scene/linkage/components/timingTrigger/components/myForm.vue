@@ -1,67 +1,77 @@
 <template>
-  <PageWrapper title="执行动作">
-    <template #extra>
-      <Form :model="RuleForm">
-        <Row :gutter="5" class="enter-x col_flex">
-          <Col>
-          <a-button type="primary">串行</a-button>
-          </Col>
-          <Col>
-          <a-button type="primary">并行</a-button>
-          </Col>
-        </Row>
-      </Form>
-    </template>
-    <div class="rounded-md pt-5 pl-5 border">
-      <template v-for="item, index in add" :key="index">
-        <div draggable="true" @dragstart="dragstart(index)">
-
-          <BasicForm v-if="item && item.schemas_normal" :draggable="true" :schemas="item.schemas_normal"
-            @register="register">
-
-            <template #customSlot="{ model, field }">
-              <a-input placeholder="请选择设备" v-model:value="model[field]">
-                <template #suffix>
-                  <Icon icon="carbon:logo-github" />
-                </template>
-              </a-input>
+  <PageWrapper title="触发条件2">
+    <div class="rounded-md pt-5 pl-5 border  bg-light-50">
+      <BasicForm :schemas="schemas" @register="register">
+        <template #customSlot="{ model, field }">
+          <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
+            <template #suffix>
+              <Icon icon="carbon:logo-github" />
             </template>
-          </BasicForm>
-        </div>
+          </a-input>
+        </template>
+      </BasicForm>
+      <template v-if="Object.keys(FormAdd)">
+        <Form v-if="Object.keys(FormAdd).length > 0" class="p-4 enter-x" :model="FormAdd" ref="formRef">
+          <template v-for="item, index in FormAdd" :key="item">
+            <Row class="enter-x" v-if="item">
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.Op" class="enter-x">
+                <Switch checked-children="AND" v-model:checked="item.Op" un-checked-children="OR" />
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.item1" class="enter-x">
+                <Select :options="options2" v-model:value="item.item1">
+                </Select>
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.item2" class="enter-x">
+                <Select :options="options3" v-model:value="item.item2">
+                </Select>
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <FormItem :name="item?.Gval" class="enter-x">
+                <Input v-model:value="item.Gval" />
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <!-- 移除附加条件 -->
+              <FormItem>
+                <Icon @click="remove_attach(index)" icon="ant-design:close-outlined"></Icon>
+              </FormItem>
+              </Col>
+              <Col class="p-1" :span="2">
+              <!-- 移除图标 -->
+              <FormItem>
+                <Icon icon="ant-design:delete-outlined"></Icon>
+              </FormItem>
+              </Col>
+            </Row>
+          </template>
+        </Form>
       </template>
+
+
       <!-- 引入模态框 -->
       <AccountTable @register="registerMyTable" @success="handleSuccess" />
-
-      <a-button type="primary" class="my-4" @click="handel_Add">
-        添加动作
-      </a-button>
     </div>
-</PageWrapper>
+  </PageWrapper>
 </template>
-<script lang="tsx">
-import { defineComponent, reactive, ref, toRaw } from 'vue';
+<script lang="ts">
+import { defineComponent, reactive, ref } from 'vue';
 import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
 import { PageWrapper } from '@/components/Page';
-// import draggable from 'vuedraggable';
-import draggable from "vuedraggable";
 import { Icon } from '@/components/Icon';
 import AccountTable from './AccountTable.vue';
 import { useModal } from '@/components/Modal';
 import SelectItem from '@/layouts/default/setting/components/SelectItem.vue';
 const [registerMyTable, { openModal }] = useModal();
 const schemas: FormSchema[] = [];
-const add: any = ref([]);
-const myArray: any = ref('');
-const schemas_normal: FormSchema[] = [
-  // {
-  //   field: 'Icon',
-  //   label: '',
-  //   component: 'Input',
-  //   slot: 'IconSlot'
-  // },
-
+const schemas_normal = [
   {
     field: 'ConditionItems',
     component: 'Select',
@@ -345,7 +355,7 @@ const RuleForm = reactive([{
 
 }]);
 export default defineComponent({
-  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, AccountTable, InputNumber, Input, Row, Col, Select, SelectItem, draggable },
+  components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, AccountTable, InputNumber, Input, Row, Col, Select, SelectItem },
   setup() {
     const [register, { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue }] =
       useForm({
@@ -353,26 +363,20 @@ export default defineComponent({
         showActionButtonGroup: false,
         actionColOptions: {
           span: 6,
-          style: {
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center'
-          }
         },
       });
     function handel_Add() {
-      add.value.push({
-        schemas_normal: schemas_normal
+      console.log('!!!添加!!!');
+      schemas_normal.forEach((item) => {
+        appendSchemaByField({ ...item }, '')
       })
 
-      console.log(toRaw(add), 'ddd?')
+
     }
     function handleSuccess(params) {
-      console.log(getFieldsValue(), '?...getFieldsValue...?')
       const obj = { ...params }
       // DeviceName
       console.log(obj[0].DeviceName, '...obj...?')
-
       setFieldsValue({
         device: obj[0].DeviceName,
       });
@@ -395,8 +399,9 @@ export default defineComponent({
         },
       ]);
     }
-    function remove_attach(index, cindex) {
-      delete add.value[index].FormAdd[cindex];
+    function remove_attach(index) {
+      delete FormAdd[index]
+      console.log(FormAdd, '?...item...?');
     }
     function appendField() {
     }
@@ -411,28 +416,19 @@ export default defineComponent({
         isUpdate: true
       });
     }
+    const n = ref(1);
     // 添加规则
-    function addRule(index1) {
-      console.log(index1)
+    function addRule() {
       const values: any = getFieldsValue();
       console.log(Object.keys(values), '?...values...?')
-      add.value.map((item, index) => {
-        if (index == index1) {
-          item.FormAdd.push({
-            Op: '',
-            item1: '',
-            item2: '',
-            item3: '',
-            Gval: ''
-          })
-        }
-        return item;
+      Object.keys(values).length > 0 ? (FormAdd.push({
+        Op: '',
+        item1: '',
+        item2: '',
+        item3: '',
+        Gval: ''
+      }), showForm.value = true) : ''
 
-      })
-      console.log(add.value, '?...item...?')
-    }
-    function dragstart(index) {
-      console.log(index, '...index...?')
     }
     function handleSubmit() {
 
@@ -450,8 +446,6 @@ export default defineComponent({
       options2,
       options3,
       isShake,
-      add,
-      myArray,
       setProps,
       changeLabel3,
       changeLabel34,
@@ -459,34 +453,21 @@ export default defineComponent({
       deleteField,
       e_Device,
       addRule,
-      dragstart,
       remove_attach,
       handleSubmit,
       registerMyTable,
       handel_Add,
       handleSuccess
     };
-  }
+  },
 });
 </script>
 <style lang="less" scoped>
-::v-deep(.ant-form-item) {
-  padding: 10px;
-  background: #F3F3F3;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    border-left: 2px solid #000000;
-    width: 7px;
-    margin-top: 9px;
-    height: 7px;
-    background-color: #000000;
-    border-radius: 12px;
-  }
+::v-deep(.ant-page-header-heading) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
-
 
 .col_flex {
   display: flex;
