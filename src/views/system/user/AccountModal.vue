@@ -65,7 +65,11 @@ export default defineComponent({
       try {
         const values = await validate();
         setModalProps({ confirmLoading: true });
-        Object.assign(values, { RoleIds: [values.RoleIds] });
+        // 判断是为数组
+       if(values.RoleIds instanceof Array ) {Object.assign(values, { RoleIds: values.RoleIds });}
+       else{
+        Object.assign(values, { RoleIds: [values.RoleIds] })
+       }
         !unref(isUpdate) ? await createAccountList(values) : await modifiAccountList({ ...values, UserId: UserId.value })
         closeModal();
         emit('success', { isUpdate: unref(isUpdate), values: { ...values, UserId: UserId.value } });
