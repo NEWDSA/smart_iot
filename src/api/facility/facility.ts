@@ -251,8 +251,8 @@ export function facilityAlertIgnoreApi(params:facilityAlertPostParams) {
 }
 
 // 设备告警上报
-export function facilityAlertNoticeApi(params:facilityAlertPostParams) {
-    return realHttp.get({
+export function facilityAlertNoticeApi(params) {
+    return realHttp.post({
         url: Api.DeviceAlertNotice,
         params
     });

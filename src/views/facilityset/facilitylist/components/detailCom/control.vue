@@ -14,21 +14,35 @@
                     Th.value.value == false ? '关闭'
                         : '打开'
                 }}</div>
-                <div class="w-1/4">
+
+                <div class="w-1/4"  v-if="ModelId == 'curtain'">
+                    <div class="flex">
+                        <div class="px-2 rounded mr-3" @click="buttomCut(1, Th)"
+                            :class="Th.value.value == 1 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                            全开</div>
+
+                        <div class="px-2 rounded mr-3" @click="buttomCut(0, Th)"
+                            :class="Th.value.value == 2 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                            停止</div>
+
+                        <div class="px-2 rounded mr-3" @click="buttomCut(2, Th)"
+                            :class="Th.value.value == 0 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                            全关</div>
+                    </div>
+                </div>
+
+                <div class="w-1/4"  v-else>
                     <div class="flex">
                         <div class="px-2 rounded mr-3" @click="buttomCut(1, Th)"
                             :class="Th.value.value == 1 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
                             打开</div>
-
-                        <div class="px-2 rounded mr-3" @click="buttomCut(2, Th)" v-if="ModelId == 'curtain'"
-                            :class="Th.value.value == 2 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
-                            停止</div>
 
                         <div class="px-2 rounded mr-3" @click="buttomCut(0, Th)"
                             :class="Th.value.value == 0 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
                             关闭</div>
                     </div>
                 </div>
+
             </div>
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'select'">
                 <div class="w-1/4">{{ Th.model.name }}</div>
@@ -55,6 +69,7 @@
                 }}</div>
                 <div class="w-1/4">
                     <div class="flex items-center">
+
                         <Icon icon="fluent:subtract-circle-24-regular" size="20" color="blue"
                             @click="silderKong('jian', Th.value, Th.model, Th.model.field)">
                         </Icon>
@@ -62,12 +77,19 @@
                         <div class="mx-2">
                             <Input type="number" v-model:value="Th.value.value"
                                 @change="silderKong('input', Th.value.value, Th.model, Th.model.field)"
-                                style="width: 5rem;"></Input>
+                                style="width: 5rem;">
+                            <template #suffix>
+                                {{ Th.model.field == "percentage" ? '%' : '' }}
+                            </template>
+                            </Input>
                             <!-- {{ Th.value.value }}{{ Th.model.field == "percentage" ? '%' : ''}} -->
                         </div>
+
                         <Icon icon="fluent:add-circle-24-regular" size="20" color="blue"
                             @click="silderKong('jia', Th.value, Th.model, Th.model.field)">
                         </Icon>
+
+
                     </div>
                 </div>
             </div>
@@ -85,16 +107,115 @@
 
         </div>
     </div>
-    <div class="p-3" v-else-if="NetworkStatus == 0 || NetworkStatus == 2">
-        设备处于禁用状态
+
+    <!-- 禁用 -->
+    <div class="" v-else-if="NetworkStatus == 0 || NetworkStatus == 2">
+        <div v-for="(Th, index) in model" :key="index" class="">
+            <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'switch'">
+                <div class="w-1/4">{{ Th.model.name }}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
+                    Th.value.value == false ? '关闭'
+                        : '打开'
+                }}</div>
+
+                <div class="w-1/4" v-if="ModelId == 'curtain'">
+                    <div class="flex">
+                        <div class="px-2 rounded mr-3"
+                            :class="Th.value.value == 1 ? 'bg-gray-500 text-white' : 'border-soild border border-grey-600 text-grey-600'">
+                            全开</div>
+
+                        <div class="px-2 rounded mr-3" 
+                            :class="Th.value.value == 0 ? 'bg-gray-500 text-white' : 'border-soild border border-grey-600 text-grey-600'">
+                            停止</div>
+
+                        <div class="px-2 rounded mr-3"
+                            :class="Th.value.value == 2 ? 'bg-gray-500 text-white' : 'border-soild border border-grey-600 text-grey-600'">
+                            全关</div>
+                    </div>
+                </div>
+
+                <div class="w-1/4">
+                    <div class="flex">
+                        <div class="px-2 rounded mr-3"
+                            :class="Th.value.value == 1 ? 'bg-gray-500 text-white' : 'border-soild border border-grey-600 text-grey-600'">
+                            打开</div>
+
+                        <div class="px-2 rounded mr-3"
+                            :class="Th.value.value == 0 ? 'bg-gray-500 text-white' : 'border-soild border border-grey-600 text-grey-600'">
+                            关闭</div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'select'">
+                <div class="w-1/4">{{ Th.model.name }}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
+                    returnVlaue(Th.model,
+                    Th.value.value)
+                }}</div>
+                <div class="w-1/4">
+                    <div class="fasility-set-select">
+                        <Select :value="returnVlaue(Th.model, Th.value.value)" class="w-25" @change="SelectCut"
+                            disabled>
+                            <div :value="item.name" v-for="(item, index2) in Th.model['select-item']" :key="item.value"
+                                :field="Th.model.field">
+                                {{ item.value }}
+                            </div>
+                        </Select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'slide'">
+                <div class="w-1/4">{{ Th.model.name }}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }} {{
+                    Th.model.field == "percentage" ? '%' : '121'
+                }}</div>
+                <div class="w-1/4">
+                    <div class="flex items-center">
+
+                        <Icon icon="fluent:subtract-circle-24-regular" size="20" color="gray">
+                        </Icon>
+
+                        <div class="mx-2">
+                            <Input type="number" v-model:value="Th.value.value" disabled style="width: 5rem;">
+                            <template #suffix>
+                                {{ Th.model.field == "percentage" ? '%' : '' }}
+                            </template>
+                            </Input>
+                            <!-- {{ Th.value.value }}{{ Th.model.field == "percentage" ? '%' : ''}} -->
+                        </div>
+
+                        <Icon icon="fluent:add-circle-24-regular" size="20" color="gray">
+                        </Icon>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'camera'">
+                <div class="w-1/4">{{ Th.model.name }}</div>
+                <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }}</div>
+                <div class="w-1/4 flex">
+                    <div class="px-2 rounded mr-3 bg-gray-400 text-white">
+                        关闭
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- 设备处于禁用状态 -->
     </div>
     <div class="p-3" v-else-if="!model && NetworkStatus != 0 || NetworkStatus != 2">
+        <!-- && NetworkStatus != 0 || NetworkStatus != 2 -->
         暂无设备控制
     </div>
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, onDeactivated } from 'vue';
 import { Select, Input } from 'ant-design-vue';
 import { Icon } from '/@/components/Icon';
 import { useLoading } from '/@/components/Loading';
@@ -163,7 +284,7 @@ watch(() => devices.value, (newVal, oldVal) => {
     console.log('devices.value', devices.value)
     for (var j in devices.value.properties) {
         for (let i = 0; i < model.value.length; i++) {
-            console.log('比较',model.value[i].model.field,j)
+            console.log('比较', model.value[i].model.field, j)
             if (model.value[i].model.field == j) {
                 model.value[i].value.value = devices.value.properties[j].value
             }
@@ -174,7 +295,6 @@ watch(() => devices.value, (newVal, oldVal) => {
 })
 
 // 个别设备登录 subscribeDeviceStatusNew
-
 
 
 const buttomCut = (e, data) => {

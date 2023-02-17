@@ -26,6 +26,7 @@ export const formSchema: FormSchema[] = [
         field: 'RegionId',
         component: 'TreeSelect',
         componentProps: {
+            placeholder:'请选择区域',
             fieldNames: {
                 children: 'child', label: 'RegionName', key: 'RegionId', value: 'RegionId'
             },
@@ -36,7 +37,7 @@ export const formSchema: FormSchema[] = [
         label: '说明',
         field: 'Explain',
         component: 'Input',
-        required: true
+        required: false
     },
     {
         label: '创建时间',

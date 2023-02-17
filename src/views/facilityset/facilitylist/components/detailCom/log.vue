@@ -36,18 +36,15 @@ const TreeTabColumns = reactive([
     width: 200,
     customRender: ({ record }) => {
       let msg
-      switch (record.OperationType) {
-        case 1:
-          msg = '设备上线'
+      switch (record.LogType) {
+        case '1':
+          msg = '设备控制'
           return msg;
-        case 2:
-          msg = '设备下线'
+        case '2':
+          msg = '设备状态'
           return msg;
-        case 3:
-          msg = '功能调用'
-          return msg;
-        case 4:
-          msg = '设备查询'
+        case '3':
+          msg = '设备告警'
           return msg;
 
       }
@@ -55,7 +52,7 @@ const TreeTabColumns = reactive([
   },
   {
     title: '内容',
-    dataIndex: 'OperationContent',
+    dataIndex: 'Message',
     width: 400,
   },
   {
@@ -83,7 +80,7 @@ const [registertab] = useTable({
   // canRowDrag: true
   api: facilityLogListApi,
   searchInfo: {
-    DeviceSerial: props.DeviceName,
+    DeviceId: props.DeviceName,
     StartTime:1672502400,
     EndTime:Date.parse(new Date(new Date().getTime()))/1000,
   },
@@ -129,12 +126,12 @@ const props = defineProps({
 
 const handleLook = (record) => { 
   console.log('查看详情', record)
-  DetailId.value = record.DetailId
-  logDetail.value = record
+  // DetailId.value = record.DetailId
+  // logDetail.value = record
   // console.log(logDetail)
   openDrawer(true, {
     record,
-    isUpdate: true,
+    // isUpdate: true,
   })
 }
 

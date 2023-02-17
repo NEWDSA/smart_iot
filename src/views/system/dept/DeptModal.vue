@@ -57,7 +57,7 @@ export default defineComponent({
 
         unref(isModifiy) == 1 ? Object.assign(values, { ParentId:DeptId.value}) : ''
         setModalProps({ confirmLoading: true });
-        !unref(isUpdate) ? await createDept(values) : await modifiDept({ ...values, deptId: deptId.value })
+        !unref(isUpdate) ? await createDept(values) : await modifiDept({ ...values, deptId: DeptId.value })
         console.log(values);
         closeModal();
         emit('success');

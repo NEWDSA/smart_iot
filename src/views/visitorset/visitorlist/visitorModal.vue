@@ -1,12 +1,13 @@
 <template>
-    <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
-        <BasicForm @register="registerForm">
+    <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" :showOkBtn="!disabled? true : false">
+        <BasicForm @register="registerForm" >
             <template #formFooter>
                 <div class="flex items-center justify-center">
-                    <div class="pr-2" style="width: 100px;text-align: right;"><span class="text-red-600">*</span> 正面照片
+                    <div class="pr-2" style="width: 100px;text-align: right;"><span class="text-red-600" v-if="!disabled">*</span> 正面照片
                     </div>
                     <div style="width: calc(100% - 100px);" v-if="!disabled">
-                        <CropperAvatar :uploadApi="uploadApi" :value="showAvatar" @change="cropperOk" :showIcon="false" />
+                        <CropperAvatar :uploadApi="uploadApi" :value="showAvatar" @change="cropperOk"
+                            :showIcon="false" />
                     </div>
                     <div style="width: calc(100% - 100px);" v-else>
                         <img :src="showAvatar" alt="正面照片" style="width: 200px;height: 200px;border-radius: 50%;">
@@ -62,7 +63,7 @@ export default defineComponent({
         const VisitorData: any = ref([])
 
 
-        const getCompanyList = async (type)=> {
+        const getCompanyList = async (type) => {
             if (!type) {
                 obj.PageNum = 1
                 VisitorData.value = []
@@ -104,6 +105,30 @@ export default defineComponent({
                     showAvatar.value = headerImg
                 }
 
+                if (disabled.value) {
+                    updateSchema({ field: 'VisitorTypeId', required: false });
+                    updateSchema({ field: 'VisitorName', required: false });
+                    updateSchema({ field: 'VisitorPhone', required: false });
+                    updateSchema({ field: 'VisitorTypeId', required: false });
+                    updateSchema({ field: 'ReceptionId', required: false });
+                    updateSchema({ field: 'yuyueTime', required: false });
+                    updateSchema({ field: 'Company', required: false });
+                    updateSchema({ field: 'LicensePlate', required: false });
+                    updateSchema({ field: 'Reason', required: false });
+                    updateSchema({ field: 'Status', required: false });
+                }else{
+                    updateSchema({ field: 'VisitorTypeId', required: true });
+                    updateSchema({ field: 'VisitorName', required: true });
+                    updateSchema({ field: 'VisitorPhone', required: true });
+                    updateSchema({ field: 'VisitorTypeId', required: true });
+                    updateSchema({ field: 'ReceptionId', required: true });
+                    updateSchema({ field: 'yuyueTime', required: true });
+                    updateSchema({ field: 'Company', required: true });
+                    updateSchema({ field: 'LicensePlate', required: false });
+                    updateSchema({ field: 'Reason', required: true });
+                    updateSchema({ field: 'Status', required: true });
+                }
+
                 setFieldsValue({
                     ...data.obj,
                 });
@@ -112,7 +137,7 @@ export default defineComponent({
                 showAvatar.value = headerImg
 
                 disabled.value = false
-                
+
                 console.log(avatar.value)
             }
 
@@ -130,12 +155,18 @@ export default defineComponent({
                 componentProps: { options: VisitorTypeData },
             });
 
+
         });
 
-        const getTitle = computed(() => (!unref(isUpdate) ? '预约访客' : disabled.value ? '访客详情' : '编辑访客类型'));
+        const getTitle = computed(() => (!unref(isUpdate) ? '添加预约访客' : disabled.value ? '访客详情' : '编辑访客'));
 
         async function handleSubmit() {
             try {
+                if(disabled.value){
+                    closeModal();
+                    return;
+                }
+
                 const values = await validate();
                 setModalProps({ confirmLoading: true });
                 // await createDept(values)
@@ -172,7 +203,7 @@ export default defineComponent({
             // console.log(source, data)
         }
 
-        return { registerModal, registerForm, getTitle, handleSubmit, uploadApi: uploadApi as any, avatar, cropperOk, url, showAvatar,disabled };
+        return { registerModal, registerForm, getTitle, handleSubmit, uploadApi: uploadApi as any, avatar, cropperOk, url, showAvatar, disabled };
     },
 });
 </script>

@@ -1,4 +1,6 @@
 import { BasicColumn } from '@/components/Table/src/types/table';
+import { h } from 'vue';
+import { Tag } from 'ant-design-vue';
 
 export function getBasicColumns(): BasicColumn[] {
   return [
@@ -24,9 +26,17 @@ export function getBasicColumns(): BasicColumn[] {
       // onEditRow:
       width: 200,
       customRender: ({ record }) => {
-        let msg
-        record.Status == 1 ? msg = '正常' : msg = '停用'
-        return msg
+        switch (record.Status) {
+          case 1:
+            return h(Tag, { color: 'green' }, () => '正常');
+
+          case 2:
+            return h(Tag, { color: 'red' }, () => '停用');
+
+          default:
+            return h(Tag, { color: 'ref' }, () => '异常');  
+        }
+
       },
     },
     {

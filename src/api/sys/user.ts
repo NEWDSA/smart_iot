@@ -10,7 +10,11 @@ enum Api {
   GetUserInfo = '/getUserInfo',
   GetUserInfoReal='/system/user/getInfo',
   GetPermCode = '/getPermCode',
-  TestRetry = '/testRetry'
+  TestRetry = '/testRetry',
+
+  
+  SystemUserMenu = '/system/user/menu',
+  SystemUserMenuTreeSelect = 'system/user/menuTreeSelect'
 }
 
 
@@ -58,3 +62,28 @@ export function testRetry() {
     }
   )
 }
+
+// 渲染快捷菜单
+export function shortCutMenu() {
+  return realHttp.get(
+    { url: Api.SystemUserMenu }
+  )
+}
+
+// 添加渲染快捷菜单POST GET 的区别
+export function AddshortCutMenu(params) {
+  return realHttp.post(
+    { url: Api.SystemUserMenu,
+      params
+    }
+  )
+}
+
+// 获取快捷菜单checkbox
+export function shortCutTreeSelectMenu() {
+  return realHttp.get(
+    { url: Api.SystemUserMenuTreeSelect }
+  )
+}
+
+

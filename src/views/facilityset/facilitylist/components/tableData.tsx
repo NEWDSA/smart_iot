@@ -29,6 +29,24 @@ export function getBasicColumns(): BasicColumn[] {
       dataIndex: 'AlertLevel',
       width: 150,
       sorter: true,
+      customRender: ({ record }) => {
+        switch (record.AlertLevel) {
+          case 1:
+            return '低'
+
+          case 2:
+            return '一般'
+
+          case 3:
+            return '紧急'
+
+          case 4:
+            return '非常紧急'
+
+          default:
+            return '级别异常'
+        }
+      },
     },
     {
       title: '告警方式',
@@ -158,8 +176,8 @@ export const getwarnFormConfig: FormSchema[] = [
     component: 'Select',
     componentProps: {
       placeholder: '请选择工单模块',
-      option: [
-        { label: '默认模板', value: '1' }
+      options: [
+        { label: '默认模板', value: 1 }
       ]
     },
     required: true,
@@ -180,10 +198,10 @@ export const getwarnFormConfig: FormSchema[] = [
     defaultValue: '4',
     componentProps: {
       options: [
-        { label: '低', value: '4' },
-        { label: '一般', value: '3' },
-        { label: '紧急', value: '2' },
-        { label: '非常紧急', value: '1' }
+        { label: '低', value: 1 },
+        { label: '一般', value: 2 },
+        { label: '紧急', value: 3 },
+        { label: '非常紧急', value:4  }
       ]
     },
     required: true,

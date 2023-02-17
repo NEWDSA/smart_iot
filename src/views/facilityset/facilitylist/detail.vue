@@ -37,7 +37,7 @@ import log from './components/detailCom/log.vue'
 import scene from './components/detailCom/scene.vue'
 import { facilityDetailApi } from '@/api/facility/facility'
 import { useGo } from '@/hooks/web/usePage';
-import { useRoute } from 'vue-router';
+import { useRoute, onBeforeRouteLeave } from 'vue-router';
 import { subscribeDeviceStatusNew } from '@/utils/iot';
 const route = useRoute();
 const go = useGo();
@@ -79,15 +79,15 @@ const cutTab = (index) => {
 }
 
 watch(() => facilityDetailTabIndex.value, (data) => {
-  console.log(facilityDetailTabIndex.value)
-  if (facilityDetailTabIndex.value == '2') {
+  console.log(facilityDetailTabIndex.value,infoFacility.value.NetworkStatus)
+  if (facilityDetailTabIndex.value == '2' && infoFacility.value.NetworkStatus !=0 && infoFacility.value.NetworkStatus !=2) {
     getLod()
-   Inter.value = setInterval(getLod, 10000)
+    Inter.value = setInterval(getLod, 3000)
   } else {
     console.log('clearInterval')
     // if (Inter.value !='') {
-      clearInterval(Inter.value)
-      Inter.value = ''
+    clearInterval(Inter.value)
+    Inter.value = null
     // }
   }
   // subscribeDeviceStatusNew
@@ -96,8 +96,13 @@ watch(() => facilityDetailTabIndex.value, (data) => {
     deep: true
   })
 
+onBeforeRouteLeave(() => {
+  clearInterval(Inter.value)
+  Inter.value = null
+})
 
-function getLod(){
+
+function getLod() {
   subscribeDeviceStatusNew(infoFacility.value.DeviceSerial)
 }
 

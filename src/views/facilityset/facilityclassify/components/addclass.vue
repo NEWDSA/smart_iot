@@ -33,7 +33,7 @@
           <!-- <div style="text-align: right;color: red;">*{{ item.placeholder }}</div> -->
         </div>
 
-        <div class="pl-5 m-auto mb-5" v-if="ClassType != 'edit'">
+        <div class="pl-5 m-auto mb-5" >
           <div class="flex items-center">
             <div class="label mr-4 w-2/10" style="text-align: left;">
               <span class="text-red-400">*</span>
@@ -107,7 +107,7 @@ const RadioVal = ref<number>(1)
 const handleOk = () => {
   // console.log(RadioVal)
   if (ClassType.value == 'edit') {
-    emit('ok', 'edit', from, parentSelect, deviceid.value)
+    emit('ok', 'edit', from, parentSelect, deviceid.value,RadioVal)
   } else if (ClassType.value == 'add') {
     emit('ok', 'add', from, parentSelect, null, RadioVal)
   } else {

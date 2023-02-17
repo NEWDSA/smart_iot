@@ -5,56 +5,52 @@
 
         <!-- <div class="flex p-3"> -->
         <!-- <div class="mr-3">
-            <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut">
-              <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
-                {{ item.label }}
-              </div>
-            </Select>
-          </div> -->
+                <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut">
+                  <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
+                    {{ item.label }}
+                  </div>
+                </Select>
+              </div> -->
 
 
         <!-- <div class="mr-3 flex items-center">
-            <div class="flex items-center mr-3">
-              <div class="px-2 w-20 text-center">访客类型</div>
-              <Select v-model:value="souOrder.VisitorTypeName" class="w-45" @change="TypeChange" placeholder="请选择访客类型">
-                <div :value="item.VisitorTypeName" v-for="(item, index) in VisitorTypeList" :key="item.VisitorTypeId">
-                  {{ item.VisitorTypeName }}
+                <div class="flex items-center mr-3">
+                  <div class="px-2 w-20 text-center">访客类型</div>
+                  <Select v-model:value="souOrder.VisitorTypeName" class="w-45" @change="TypeChange" placeholder="请选择访客类型">
+                    <div :value="item.VisitorTypeName" v-for="(item, index) in VisitorTypeList" :key="item.VisitorTypeId">
+                      {{ item.VisitorTypeName }}
+                    </div>
+                  </Select>
                 </div>
-              </Select>
-            </div>
 
-            <div class="flex items-center mr-3">
-              <div class="px-2 w-20 text-center">访客状态</div>
-              <Select v-model:value="souOrder.StatusName" class="w-45" @change="StatusChange" placeholder="请选择访客状态">
-                <div :value="item.StatusName" v-for="(item, index) in VisitorStatus" :key="item.StatusId">
-                  {{ item.StatusName }}
+                <div class="flex items-center mr-3">
+                  <div class="px-2 w-20 text-center">访客状态</div>
+                  <Select v-model:value="souOrder.StatusName" class="w-45" @change="StatusChange" placeholder="请选择访客状态">
+                    <div :value="item.StatusName" v-for="(item, index) in VisitorStatus" :key="item.StatusId">
+                      {{ item.StatusName }}
+                    </div>
+                  </Select>
                 </div>
-              </Select>
-            </div>
 
-            <div class="flex items-center mr-3">
-              <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut" placeholder="请选择查询状态">
-                <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
-                  {{ item.label }}
+                <div class="flex items-center mr-3">
+                  <Select v-model:value="souSelect.value" class="w-45" @change="SelectCut" placeholder="请选择查询状态">
+                    <div :value="item.label" v-for="(item, index) in souSelect.list" :key="item.value">
+                      {{ item.label }}
+                    </div>
+                  </Select>
                 </div>
-              </Select>
-            </div>
 
-            <Input :disabled="souSelect.key == ''" v-model:value="souSelect.InputValue"
-              :placeholder="souSelect.key == '' ? '请选择查询状态' : '请输入关键字'"></Input>
-          </div>
+                <Input :disabled="souSelect.key == ''" v-model:value="souSelect.InputValue"
+                  :placeholder="souSelect.key == '' ? '请选择查询状态' : '请输入关键字'"></Input>
+              </div>
 
-          <a-button type="primary" @click="getFormValues" class="mr-3">查询</a-button>
-          <a-button @click="resetFormValues" class="mr-3">重置</a-button>
+              <a-button type="primary" @click="getFormValues" class="mr-3">查询</a-button>
+              <a-button @click="resetFormValues" class="mr-3">重置</a-button>
 
-        </div> -->
+            </div> -->
 
 
-        <div>
-          <a-button type="primary" preIcon="ic:baseline-plus" @click="addVisitor()">
-            添加预约访客
-          </a-button>
-        </div>
+
       </div>
       <BasicTable @register="registertab">
         <template #bodyCell="{ column, record }">
@@ -63,25 +59,39 @@
           </template>
 
           <template v-if="column.key === 'VisitorName'">
-            <div class="flex items-center justify-center">
-              <div class="w-10 h-10 rounded-3xl overflow-hidden mr-3" v-if="record.Photo">
-                <img :src="url + record.Photo" alt="">
+            <div class="flex items-center justify-start w-full" style="padding-left: 30%;">
+              <div class="w:1/2">
+                <div class="w-10 h-10 rounded-3xl overflow-hidden mr-3" v-if="record.Photo">
+                  <img :src="url + record.Photo" alt="">
+                </div>
               </div>
-              <div>{{ record.VisitorName }}</div>
+
+              <div class="w:1/2  overflow-ellipsis overflow-hidden ...">{{ record.VisitorName }}</div>
             </div>
 
           </template>
 
+        </template>
+
+
+        <template #form-advanceAfter>
+          <!-- <div class="" style="width: 60px;"> -->
+            <a-button type="primary" preIcon="ic:baseline-plus" @click="addVisitor()" class="ml-10">
+              添加预约访客
+            </a-button>
+          <!-- </div> -->
         </template>
       </BasicTable>
 
 
       <visitorModel @register="registerModal" @success="handleSuccess"></visitorModel>
     </div>
-  </PageWrapper>
+</PageWrapper>
 </template>
 
 <script>
+
+
 import { ref, defineComponent, reactive, onMounted, nextTick } from 'vue';
 import { BasicTable, TableAction, useTable } from '@/components/Table'
 import { visitorListApi, visitorInfoApi, visitorTypeListApi, visitorStatusEditApi } from '@/api/visitor/visitor'
@@ -119,7 +129,7 @@ export default defineComponent({
         dataIndex: 'action',
         // slots: { customRender: 'action' },
         fixed: undefined,
-      },
+      }, 
       formConfig: getFormConfig(),
       showTableSetting: true,
       tableSetting: { fullScreen: true },
@@ -188,7 +198,7 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认预约',
               placement: 'left',
-              confirm: handlecancel.bind(null, record,2),
+              confirm: handlecancel.bind(null, record, 2),
             },
             // onClick: handleLook.bind(null, record)
           },
@@ -197,7 +207,7 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认取消',
               placement: 'left',
-              confirm: handlecancel.bind(null, record,5),
+              confirm: handlecancel.bind(null, record, 5),
             },
             // onClick: handleLook.bind(null, record)
           },
@@ -219,7 +229,7 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认登记',
               placement: 'left',
-              confirm: handlecancel.bind(null, record,3),
+              confirm: handlecancel.bind(null, record, 3),
             },
             // onClick: handleLook.bind(null, record)
           },
@@ -228,7 +238,7 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认取消',
               placement: 'left',
-              confirm: handlecancel.bind(null, record,5),
+              confirm: handlecancel.bind(null, record, 5),
             },
             // onClick: handleLook.bind(null, record)
           },
@@ -250,7 +260,7 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认离开',
               placement: 'left',
-              confirm: handlecancel.bind(null, record,4),
+              confirm: handlecancel.bind(null, record, 4),
             },
             // onClick: handleLook.bind(null, record)
           },
@@ -309,7 +319,7 @@ export default defineComponent({
       })
     }
 
-    function handlecancel(record,status) {
+    function handlecancel(record, status) {
       //Status 5 因为是取消所以固定死
       visitorStatusEditApi({ Status: status, VisitorId: record.VisitorId }).then(res => {
         if (res == 0) {

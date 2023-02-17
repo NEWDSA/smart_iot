@@ -33,7 +33,7 @@
             <div>
               <div class="fasility-class-select" v-if="item.facilityTab.children">
                 <!-- //v-for="(Sonvalue, index) in item.facilitySonTab" -->
-                <TreeSelect :defaultValue="faTypeName[facilityTabIndex == '0' ? index : 0]"
+                <TreeSelect :defaultValue="faTypeName[facilityTabIndex == '0' ? index : 0]" class="overflow-ellipsis overflow-hidden ..."
                   v-if="facilityTabIndex == '0' ? facilityTab[index + 1].children : facilityTab[facilityTabIndex].children"
                   v-model:value="faTypeName[facilityTabIndex == '0' ? index : faTypeName?.length - 1]"
                   :tree-data="facilityTabIndex == '0' ? facilityTab[index + 1].children : facilityTab[facilityTabIndex].children"
@@ -163,7 +163,7 @@ export default defineComponent({
     const searchSlect = ref({
       select: [
         { lable: '设备名称', value: '1' },
-        { lable: '设备Id', value: '2' }
+        { lable: '设备ID', value: '2' }
       ],
       selectId: '1',
       selectValue: '设备名称'
@@ -223,6 +223,10 @@ export default defineComponent({
         record.LongitudeLatitude = record.Latitude + ',' + record.Longitude
       }
       record.CreatedTime = checkTime(record.Basic.CreatedAt.seconds)
+
+      if(record.RegionId == 0){
+        delete record.RegionId
+      }
       // console.log(record)
       openModal(true, {
         isUpdate: true,

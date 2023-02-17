@@ -74,7 +74,7 @@ import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner, useModal } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { getwarnFormConfig } from './tableData';
-import { facilityTypeTreeApi, facilityRegionListApi, facilityEditApi } from '@/api/facility/facility'
+import { facilityAlertNoticeApi } from '@/api/facility/facility'
 import { getDeptDrop, createDept, modifiDept } from '@/api/demo/system';
 import { message, Select, Button } from 'ant-design-vue';
 import Icon from '@/components/Icon';
@@ -90,7 +90,7 @@ export default defineComponent({
     components: { BasicModal, BasicForm, AccountTable, Select, Button, Icon, userDrawer },
     emits: ['success', 'register'],
     setup(_, { emit }) {
-        const DeviceId = ref('');
+        const warnId = ref('');
         const disabled = ref(false);
         const SZvalue = ref([]);
         const SRvalue = ref([]);
@@ -115,10 +115,14 @@ export default defineComponent({
             SZvalue.value = [];
             SRvalue.value = [];
             SGRvalue.value = [];
+            SZvalueW.value = [];
+            SRvalueW.value = [];
+            SGRvalueW.value = [];
+            
             setModalProps({ confirmLoading: false });
             console.log(data, '...data.record...')
 
-            DeviceId.value = data.record.DeviceId;
+            warnId.value = data.record.Id;
 
             console.log(data.record)
             setFieldsValue({
@@ -167,7 +171,7 @@ export default defineComponent({
             },
         ]);
 
-        const getTitle = '编辑设备';
+        const getTitle = '设备上报';
 
         async function handleSubmit() {
             try {
@@ -177,7 +181,33 @@ export default defineComponent({
                 // console.log(values)
                 console.log('values', values);//Date.parse(data)
 
-                await facilityEditApi({ ...values, DeviceId: DeviceId.value })
+                if (SZvalue.value.length && SRvalue.value.length && SGRvalue.value.length) {
+                    values.AcceptanceGroup = SZvalue.value
+                    values.Acceptor = SRvalue.value
+                    values.Followers = SGRvalue.value
+                } else {
+                    if (SZvalue.value.length < 1) {
+                        message.warn('请选择工单受理组')
+                    }
+
+                    if (SRvalue.value.length < 1) {
+                        message.warn('请选择工单受理人')
+                    }
+
+                    if (SGRvalue.value.length < 1) {
+                        message.warn('请选择工单关注人')
+                    }
+
+                    return
+                }
+
+                const obj = {
+                    Id:warnId.value,
+                    TaskTicket:values
+                }
+
+
+                await facilityAlertNoticeApi({ ...obj })
                 console.log(values);
                 closeModal();
                 emit('success');
@@ -203,17 +233,17 @@ export default defineComponent({
         }
 
 
-        function bulkPermission(data,dataW) {
+        function bulkPermission(data, dataW) {
             SZvalue.value = data
             SZvalueW.value = dataW
             // console.log(data)
         }
 
-        function bulkPermissionn(data, type,dataW) {
+        function bulkPermissionn(data, type, dataW) {
             if (type == 'S') {
                 SRvalue.value = data
                 SRvalueW.value = dataW
-                
+
             } else {
                 SGRvalue.value = data
                 SGRvalueW.value = dataW
@@ -244,7 +274,7 @@ export default defineComponent({
 
         return {
             registerModal, registerForm, getTitle, handleSubmit, tree, registerMyTable, bulkPermission, options, SZvalue, SRvalue,
-            SGRvalue, showSZu, showSRen, showGRen, registerMyTablee, bulkPermissionn, SZvalueW, SRvalueW, SGRvalueW
+            SGRvalue, showSZu, showSRen, showGRen, registerMyTablee, bulkPermissionn, SZvalueW, SRvalueW, SGRvalueW,warnId
         };
     },
 });

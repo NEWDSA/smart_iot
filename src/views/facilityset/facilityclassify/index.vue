@@ -157,6 +157,7 @@ export default defineComponent({
           addmodel.value.deviceid = data.TypeId
           addmodel.value.from[1].value = data.SortPosition
           addmodel.value.from[0].value = data.TypeName
+          addmodel.value.RadioVal = data.Status
         }
 
         if (type == 'add') {
@@ -184,7 +185,8 @@ export default defineComponent({
           TypeId: deviceid,
           TypeName: from[0].value,
           SortPosition: Number(from[1].value),
-          ParentId: Number(parentFrom[0].selectId)
+          ParentId: Number(parentFrom[0].selectId),
+          Status:RadioVal.value
         }
 
         facilityTypeEditApi(obj).then(res => {
@@ -244,7 +246,7 @@ export default defineComponent({
           onClick: handleAdd.bind(null, record),
         },
         {
-          label: '编辑',
+          icon: 'clarity:note-edit-line',
           // disabled: editableData.value ? editableData.value !== record.key : false,
           onClick: handleEdit.bind(null, record),
         },

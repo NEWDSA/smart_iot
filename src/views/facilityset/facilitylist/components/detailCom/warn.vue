@@ -18,7 +18,7 @@
 import { ref } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getBasicColumns, getFormConfig } from '../tableData';
-import { facilityAlertListApi, facilityAlertIgnoreApi, facilityAlertNoticeApi } from '@/api/facility/facility';
+import { facilityAlertListApi, facilityAlertIgnoreApi } from '@/api/facility/facility';
 import { useModal } from '@/components/Modal';
 import warnDrawer from '../warnDrawer.vue';
 const [registerModal, { openModal }] = useModal();

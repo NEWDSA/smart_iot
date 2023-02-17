@@ -88,6 +88,9 @@ export function getFormConfig() {
     // showSubmitButton:false,
     autoAdvancedLine: 2,
     gutter:32,
+    actionColOptions: {
+      span: 5,
+    },
     schemas: [
       {
         field: 'VisitorTypeId',
@@ -129,7 +132,8 @@ export function getFormConfig() {
       },
       {
         field: 'Search',
-        // label: '',
+        label: ' ',
+        labelWidth:'20px',
         component: 'Select',
         defaultValue:'VisitorName',
         componentProps: {
@@ -139,13 +143,14 @@ export function getFormConfig() {
             { label: '联系电话', value: 'VisitorPhone' },
           ],
         },
-        colProps: { span: 3,push:1},
+        colProps: { span: 3},
       },
       {
         field: 'SearchValue',
-        // label: '',
+        label: ' ',
+        labelWidth:'20px',
         component: 'Input',
-        colProps: { span: 6,push:2 },
+        colProps: { span: 6},
       }, 
     ],
   };
