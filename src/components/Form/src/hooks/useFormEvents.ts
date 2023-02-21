@@ -148,16 +148,26 @@ export function useFormEvents({
     const schemaList: FormSchema[] = cloneDeep(unref(getSchema))
 
     const index = schemaList.findIndex((schema) => schema.field === prefixField)
-
+    //  去除重复
+    const match = schemaList.some((item) => item.field === schema.field)
     if (!prefixField || index === -1 || first) {
       first ? schemaList.unshift(schema) : schemaList.push(schema)
       schemaRef.value = schemaList
       _setDefaultValue(schema)
       return
     }
-    if (index !== -1) {
+    if (index !== -1 && !match) {
       schemaList.splice(index + 1, 0, schema)
     }
+    // if (!prefixField || index === -1 || first) {
+    //   first ? schemaList.unshift(schema) : schemaList.push(schema)
+    //   schemaRef.value = schemaList
+    //   _setDefaultValue(schema)
+    //   return
+    // }
+    // if (index !== -1) {
+    //   schemaList.splice(index + 1, 0, schema)
+    // }
     _setDefaultValue(schema)
 
     schemaRef.value = schemaList

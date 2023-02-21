@@ -30,14 +30,24 @@ export default defineComponent({
     const dataSource: any = ref([]);
     const checkedKeys = ref<string | number>('');
     const rowselection = ref<any>('');
-    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 2 })
+    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 0 })
     const paramList: any = ref();
+    const ParamItem: any = ref({});
     function onChange() {
     }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      console.log(data.item, '?...AccountTable...?')
       paramList.value = data.params
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
+      if (unref(isUpdate)) {
+        ParamItem.value = data
+        console.log(data.itemindex,'....index...?...index...2222')
+        // rowId.value = data.record.id;
+        // setFieldsValue({
+        //   ...data.record,
+        // });
+      }
       // 获取设备分类
       await deviceTree().then((res) => {
         for (let i = 0; i < res.length; i++) {
@@ -59,8 +69,7 @@ export default defineComponent({
         return res;
       });
       // 接入区域列表
-      const { Detail } = await getReginList()
-      console.log(Detail, '?...Detail...?');
+      const { Detail } = await getReginList();
       getForm().updateSchema({
         field: 'TypeId',
         componentProps: { treeData: TreeTableData },
@@ -88,7 +97,6 @@ export default defineComponent({
         },
       },
       columns,
-
       pagination: true,
       useSearchForm: true,
       showTableSetting: true,
@@ -102,7 +110,7 @@ export default defineComponent({
     const getTitle = computed(() => (!unref(isUpdate) ? '' : '选择设备'));
     function onSelectChange(selectedRowKeys) {
       console.log(getSelectRows(), '...获取选中项...?')
-      rowselection.value=getSelectRows();
+      rowselection.value = getSelectRows();
       checkedKeys.value = toRaw(selectedRowKeys);
       console.log(toRaw(checkedKeys.value), '?...selectedRowKeys...?')
     }
@@ -132,16 +140,18 @@ export default defineComponent({
 
     async function handleSubmit() {
       try {
-        
         setModalProps({ confirmLoading: true });
         closeModal();
-        emit('success',getSelectRows());
+        // Object.assign(getSelectRows(), {},ParamItem.value);
+
+        console.log(getSelectRows(),'...getSelectRows...?')
+        let params=[getSelectRows(),ParamItem.value]
+        emit('success', params);
       } finally {
         setModalProps({ confirmLoading: false });
       }
     }
-
-    return { registerModal, registerTable, handleSubmit, onSelectChange, getData, ModelStatus, paramList, checkedKeys, getTitle, searchInfo, dataSource };
+    return { registerModal, registerTable, handleSubmit, onSelectChange, getData, ModelStatus, paramList, ParamItem, checkedKeys, getTitle, searchInfo, dataSource };
   },
 });
 </script>
