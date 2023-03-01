@@ -1,7 +1,7 @@
 <template>
   <PageWrapper title="场景联动详情" contentBackground>
     <template #extra>
-      <a-button type="primary"> 保存设置 </a-button>
+      <a-button type="primary" @click="saveThings"> 保存设置 </a-button>
     </template>
     <div class="lg:flex">
       <div class="lg:w-7/10 w-full !mr-4 enter-y">
@@ -20,7 +20,7 @@
         <!-- 条件触发 -->
         <template v-if="CardType == 0">
           <!-- <evenTrigger/> -->
-          <even-trigger />
+          <even-trigger ref="child" />
         </template>
         <!-- 定时触发 -->
         <template v-if="CardType == 1">
@@ -55,10 +55,10 @@
         </div>
       </div>
     </div>
-</PageWrapper>
+  </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, toRaw } from 'vue';
 import { Description } from '@/components/Description/index';
 import { Button } from 'ant-design-vue';
 import ProjectCard from './components/ProjectCard.vue';
@@ -79,9 +79,11 @@ import {
 export default defineComponent({
   components: { Description, BasicTable, PageWrapper, [Divider.name]: Divider, ScrollContainer, Icon, ProjectCard, BasicForm, useForm, Button, evenTrigger, timingTrigger },
   setup() {
+    const resultList: any = ref(null);
     const top = ref<number>(10);
     const loading = ref(true);
     const CardType = ref(0);
+    const child: any = ref(null);
     function dd(value) {
       console.log(value, '?...value...?')
     }
@@ -133,6 +135,64 @@ export default defineComponent({
       removeSchemaByField([`field${field}a`, `field${field}b`, `${field}`]);
       n.value--;
     }
+    function saveThings() {
+      console.log(child.value.myData.add
+        , '..dfdrerer...')
+      // let mergedData = {};
+      resultList.value = child.value.myData.resultList
+      // 获取子组件的方法
+      console.log(child.value.myData.getForm
+        (), '...myson...方法...');
+      // resultList.value.forEach((item) => {
+      //   Object.keys(item).forEach((key) => {
+      //     const result = item[key].result;
+      //     const result2 = item[key].result2;
+      //     if (!mergedData[key]) {
+      //       mergedData[key] = [result];
+      //     } else {
+      //       mergedData[key].push(result);
+      //     }
+      //     if (result2) {
+      //       mergedData[key] = mergedData[key].concat(result2);
+      //     }
+      //   });
+      // })
+      // mergedData = Object.entries(mergedData).map(([key, value]) => ({ [key]: value }));
+      // Object.assign(resultList.value,child.value.myData.add);
+      
+      console.log(child.value.myData.add, '....rrrrr....')
+      let result = resultList.value.reduce((acc, cur) => {
+        Object.keys(cur).forEach(key => {
+          if (!acc.hasOwnProperty(key)) {
+            acc[key] = {};
+          }
+          Object.keys(cur[key]).forEach(subKey => {
+            if (subKey === 'result2') {
+              if (!Array.isArray(cur[key][subKey])) {
+                cur[key][subKey] = [cur[key][subKey]];
+              }
+              if (!acc[key].hasOwnProperty(subKey)) {
+                acc[key][subKey] = [];
+              }
+              acc[key][subKey] = acc[key][subKey].concat(cur[key][subKey]);
+            } else {
+              acc[key][subKey] = cur[key][subKey];
+            }
+          });
+        });
+        return acc;
+      }, {});
+      var res = child.value.myData.add
+      Object.keys(result).forEach((key, i, v) => {
+        res.forEach((item, index) => {
+          if (key == index && item.hasOwnProperty('checked1')) {
+            result[key].add = true;
+            result[key].checked1 = item.checked1;
+          }
+        })
+      })
+      console.log(result,'...rsult...?')
+    }
     setTimeout(() => {
       loading.value = false;
     }, 1500);
@@ -141,8 +201,11 @@ export default defineComponent({
       add,
       del,
       myevent,
+      saveThings,
+      child,
       loading,
       refundSchema,
+      resultList,
       top,
       CardType,
       refundData,

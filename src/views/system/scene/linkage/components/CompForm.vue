@@ -13,12 +13,18 @@
     </template>
     <div class="rounded-md pt-5 pl-5 border">
       <template v-for="(item, index) in add" :key="index">
-        <div :class="[
-          index <= 0
-            ? 'border bg-light-100 p-4 lc_liner'
-            : 'border bg-light-100 p-4 mt-5 lc_liner'
-        ]">
-          <BasicForm v-if="item && item.schemas_normal" :schemas="item.schemas_normal" @register="register">
+        <div class="flex justify-center items-center lc_liner" v-if="index > 0 && item.hasOwnProperty('checked1')">
+          <div
+            style="position: relative;display:flex;height: 35px;align-items: center;justify-content: center;width: 50px;">
+            <svg style="position:absolute;" width="50" height="35">
+              <line x1="50" y1="50" x2="50" y2="0" style="stroke:rgb(0,155,5);stroke-width:3" />
+            </svg>
+            <Switch style="position:absolute;left:50%;" checkedChildren="AND" v-model:checked="item.checked1"
+              unCheckedChildren="OR"></Switch>
+          </div>
+        </div>
+        <div v-if="item && item.schemas_normal.length > 0" id="schemas" class="border bg-light-100 p-4 lc_liner">
+          <BasicForm v-if="item && item.schemas_normal.length > 0" :schemas="item.schemas_normal" @register="register">
             <template #customSlot="{ model, field }">
               <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
                 <template #suffix>
@@ -30,16 +36,19 @@
               <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" />
             </template>
           </BasicForm>
-
           <template v-if="Object.keys(item.FormAdd) && item">
-            <BasicForm v-for="(itemr, cindex) in item.FormAdd" ref="formElRef" :schemas="itemr.schemas_normal"
-              :key="itemr" @register="registerForm">
+            <BasicForm v-for="(itemr, cindex) in item.FormAdd" id="filter_form" @get-form="formvalue(arg, index, cindex)"
+              ref="formElRef" :schemas="itemr.schemas_normal" :key="itemr" @register="registerForm">
               <template #customSlot2="{ model, field }">
                 <a-input @click="filter_Device(item, index)" placeholder="请选择设备" v-model:value="model[field]">
                   <template #suffix>
                     <Icon icon="carbon:logo-github" />
                   </template>
                 </a-input>
+              </template>
+              <!-- 显示删除按钮 -->
+              <template v-if="item.FormAdd.length > 0" #deleteSlot="{ model, field }">
+                <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" />
               </template>
             </BasicForm>
           </template>
@@ -57,8 +66,7 @@
   </PageWrapper>
 </template>
 <script lang="tsx">
-import formCreate from '@form-create/ant-design-vue'
-import { defineComponent, reactive, ref, unref, nextTick, toRaw } from 'vue'
+import { defineComponent, reactive, ref, unref, nextTick, toRaw, watch } from 'vue'
 import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue'
 import { BasicForm, FormSchema, useForm, FormActionType } from '@/components/Form/index'
 import { CollapseContainer } from '@/components/Container/index'
@@ -73,6 +81,7 @@ import { error } from '@/utils/log'
 const schemas: FormSchema[] = []
 const add: any = ref([])
 const params: any = ref([])
+const result1: any = ref([])
 const schemas_normal: FormSchema[] = [
   {
     field: 'ConditionItems',
@@ -237,32 +246,25 @@ const schemas_normal: FormSchema[] = [
         }
       ]
     }
-  },
-  {
-    field: 'delete',
-    label: '',
-    component: 'Input',
-    slot: 'deleteSlot',
-    colProps: {
-      span: 3
-    }
   }
 ]
+const resultList: any = ref([]);
 const formElRef = ref<Nullable<FormActionType>>(null);
 const schemas_normal2: FormSchema[] = [
   {
-    field: 'Switch',
+    field: 'Op',
     component: 'Switch',
+    defaultValue: false,
     label: '',
     colProps: {
       span: 2
     },
     componentProps: {
+      checked: false,
       checkedChildren: 'And',
       unCheckedChildren: "OR"
     }
   },
-
   {
     field: 'ConditionItems',
     component: 'Select',
@@ -271,6 +273,9 @@ const schemas_normal2: FormSchema[] = [
       span: 3
     },
     componentProps: {
+      onChange: (e) => {
+        console.log(e, '333333333?')
+      },
       options: [
         {
           label: '设备',
@@ -609,13 +614,12 @@ export default defineComponent({
     Row,
     Col,
     Select,
-    SelectItem,
-    formCreate: formCreate.$form()
+    SelectItem
   },
-  setup() {
+  setup(_, { emit }) {
     const [
       register,
-      { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue }
+      { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue, validate: validateTaskForm }
     ] = useForm({
       labelWidth: 0,
       showActionButtonGroup: false,
@@ -623,8 +627,20 @@ export default defineComponent({
         span: 6
       }
     })
+    watch(add, (newValue, oldValue) => {
+      console.log('person的值变化了', newValue, oldValue)
+      if (newValue !== oldValue) {
+
+      }
+    }, { deep: true }) // 开启深度监视才行
     const [
-      registerForm
+      registerForm,
+      {
+        validate,
+        appendSchemaByField: appendMySchemaByField,
+        setFieldsValue: setMyFieldsValue,
+        getFieldsValue: getMyFieldsValue
+      }
     ] = useForm({
       labelWidth: 0,
       showActionButtonGroup: false,
@@ -632,6 +648,25 @@ export default defineComponent({
         span: 6
       }
     })
+    async function formvalue(arg, index, cindex) {
+      console.log(cindex, 'eeee')
+      console.log(arg, index, cindex, '...value..232.?');
+      console.log(cindex, 'cindex', index, 'index', resultList.value, 'rrrr')
+      // const result = getFieldsValue();
+      const result2 = getMyFieldsValue();
+      // var index=index+1;
+      resultList.value[cindex][index].result2 = {
+        ...result2
+      }
+
+
+      // 如果不存在这个属性则
+      console.log(resultList.value[index], '...dfdfdfdf')
+      // }
+
+
+
+    }
     async function getForm() {
       const form = unref(formElRef)
       if (!form) {
@@ -651,52 +686,118 @@ export default defineComponent({
     }
 
     function handel_Add() {
-      add.value.push({
-        FormAdd: [],
-        schemas_normal: schemas_normal
-      })
+
+      // 
+      if (add.value.length > 0) {
+        console.log(add.value, '..2223333...?')
+        add.value.push({
+          FormAdd: [],
+          checked1: false,
+          schemas_normal: schemas_normal
+        })
+      } else {
+        add.value.push({
+          FormAdd: [],
+          schemas_normal: schemas_normal
+        })
+      }
     }
-    function delete_rule(index) {
+    async function delete_rule(index) {
+      delete add.value[index].checked1
+
       add.value[index].schemas_normal = []
       add.value[index].FormAdd = []
     }
     async function handleSuccess(params) {
       const obj = { ...params }
-      // setFieldsValue({
-      //   device: obj[0][0].DeviceName
-      // })
       // 根据所选择的设备进行设备id查询
       const result = await deviceInfo({
         Id: obj[0][0].DeviceId
       })
 
-      if (Reflect.has(obj[1], 'itemindex')) {
-        console.log('....打印内容....')
+      // 判断对象是否包含该属性
+      // Reflect.has(obj[1], 'itemindex')
+      if (obj[1].hasOwnProperty('itemindex')) {
         let FormSchema = JSON.parse(result[0]?.DeviceModel)
-        FormSchema.forEach(async (item) => {
-          // 使用updateSchema添加
-          const form = await getForm()
-          form[0].setFieldsValue({
-            device: obj[0][0].DeviceName
+        console.log(FormSchema, '?...FormSchema...?')
+        setMyFieldsValue({
+          device: obj[0][0].DeviceName
+        })
+        let myobj: any = [];
+        FormSchema.forEach(async (item, index) => {
+          myobj.push({
+            name: item.model.name,
+            value: index
           })
-          form[0].appendSchemaByField({
-            field: item.model.field,
-            component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
-            label: '',
-            defaultValue: item.model['default-value'],
-            colProps: {
-              span: 3
+        })
+        appendMySchemaByField({
+          field: 'myfiled',
+          component: 'Select',
+          label: '',
+          colProps: {
+            span: 3
+          },
+          componentProps: {
+            fieldNames: {
+              label: 'name',
+              key: 'value',
+              value: 'value'
             },
-            componentProps: {
-              placeholder: item.model.name,
-              fieldNames: {
-                label: 'name',
-                key: 'value',
-                value: 'value'
+            options: myobj
+          },
+          show: ({ values }) => {
+            return values.ConditionItems == '1'
+          }
+        }, 'device')
+        FormSchema.forEach(async (item, index) => {
+          
+          // slide
+          if (item.model.view == 'slide') {
+            appendMySchemaByField({
+              field: item.model.field,
+              component: 'Slider',
+              label: '',
+              defaultValue: item.model['default-value'],
+              colProps: {
+                span: 3
               },
-              options: item.model['select-item']
-            }
-          }, 'device')
+              componentProps: {
+                placeholder: item.model.name,
+                fieldNames: {
+                  label: 'name',
+                  key: 'value',
+                  value: 'value'
+                },
+                options: item.model['select-item']
+              },
+              show: ({ values }) => {
+                return values.myfiled == index
+              }
+            }, 'myfiled')
+          } else {
+            appendMySchemaByField({
+              field: item.model.field,
+              component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
+              label: '',
+              defaultValue: item.model['default-value'],
+              colProps: {
+                span: 3
+              },
+              componentProps: {
+                placeholder: item.model.name,
+                fieldNames: {
+                  label: 'name',
+                  key: 'value',
+                  value: 'value'
+                },
+                options: item.model['select-item']
+              },
+              show: ({ values }) => {
+                return values.myfiled == index
+              }
+            }, 'myfiled')
+          }
+
         })
       }
       else if (typeof result[0]?.DeviceModel !== 'undefined' && !Reflect.has(obj[1], 'item')) {
@@ -704,7 +805,7 @@ export default defineComponent({
         setFieldsValue({
           device: obj[0][0].DeviceName
         })
-        FormSchema.forEach((item) => {
+        FormSchema.forEach((item, index) => {
           // 使用updateSchema添加
           appendSchemaByField(
             {
@@ -723,6 +824,9 @@ export default defineComponent({
                   value: 'value'
                 },
                 options: item.model['select-item']
+              },
+              show: ({ values }) => {
+                return values.ConditionItems == index
               }
             },
             'device'
@@ -765,15 +869,39 @@ export default defineComponent({
       })
     }
     // 添加规则
-    function addRule(index1) {
+    async function addRule(index1) {
       add.value.map((item, index) => {
         if (index == index1) {
-          item.FormAdd.push({ schemas_normal: schemas_normal2 });
+          item.FormAdd.push({ schemas_normal: schemas_normal2 })
         }
         return item
       })
+      const result = getFieldsValue();
+      const result2 = getMyFieldsValue();
+      resultList.value.push({
+        [index1]: {
+          result,
+          result2
+        }
+      }
+      )
+      // 添加过滤规则获取当前下标
+      console.log(resultList, '..dd')
     }
-    function handleSubmit() { }
+    // function getfileData() {
+    //   const result = getFieldsValue();
+    //   const result2 = getMyFieldsValue();
+    //   resultList.value.push({
+    //     [index1]: {
+    //       result,
+    //       result2
+    //     }
+    //   }
+    //   )
+    // }
+    function handleSubmit(values: any) {
+      console.log(values, '?...values...?')
+    }
     return {
       formData,
       formConfig,
@@ -797,6 +925,7 @@ export default defineComponent({
       options3,
       isShake,
       add,
+      formvalue,
       filter_Device,
       getForm,
       delete_rule,
@@ -807,6 +936,8 @@ export default defineComponent({
       deleteField,
       e_Device,
       addRule,
+      resultList,
+      result1,
       params,
       remove_attach,
       handleSubmit,
@@ -838,34 +969,6 @@ export default defineComponent({
 
 .lc_liner {
   position: relative;
-
   width: 85%;
-
-  &::before {
-    position: absolute;
-    display: block;
-    content: '';
-    top: 50%;
-    right: -10px;
-    transform: translateY(-50%);
-    width: 10px;
-    height: 10px;
-    background: red;
-    border-bottom: 1px solid #ffff;
-  }
-
-  // &::after {
-  //   position: absolute;
-  //   top: 50%;
-  //   right: -10px;
-  //   display: block;
-  //   // transform: @elemPosFunc; // 注意CSS是不支持函数的，所以要调用JS中定义的函数
-  //   transform: ${myItem.computed.elemPosFunc};
-  //   width: 10px;
-  //   height: 10px;
-  //   background: green;
-  //   border: 1px solid #ffff;
-  //   border-radius: 100%;
-  // }
 }
 </style>

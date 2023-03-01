@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CompForm />
+    <CompForm ref="myData" />
     <SetForm />
 </div>
 </template>

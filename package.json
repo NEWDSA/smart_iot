@@ -53,13 +53,13 @@
     "qrcode": "^1.5.1",
     "qs": "^6.11.0",
     "resize-observer-polyfill": "^1.5.1",
-    "sortablejs": "^1.15.0",
+    "sortablejs": "1.15.0",
     "vue": "^3.2.45",
     "vue-i18n": "^9.2.2",
     "vue-json-pretty": "^2.2.3",
     "vue-router": "^4.1.6",
     "vue-types": "^5.0.1",
-    "vuedraggable": "4.1.0",
+    "vuedraggable": "^4.1.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

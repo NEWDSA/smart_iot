@@ -7,9 +7,6 @@ import type { RowProps } from 'ant-design-vue/lib/grid/Row'
 import { propTypes } from '@/utils/propTypes'
 
 export const basicProps = {
-  isOn:{
-
-  },
   model: {
     type: Object as PropType<Recordable>,
     default: () => ({})

@@ -42,7 +42,7 @@ import type { FormActionType, FormProps, FormSchema } from './types/form'
 import type { AdvanceState } from './types/hooks'
 import type { Ref } from 'vue'
 
-import { defineComponent, reactive, ref, computed, unref, onMounted, watch, nextTick } from 'vue'
+import { defineComponent, reactive, ref, computed, unref, onMounted, watch, nextTick,toRaw } from 'vue'
 import { Form, Row } from 'ant-design-vue'
 import FormItem from './components/FormItem.vue'
 import FormAction from './components/FormAction.vue'
@@ -69,11 +69,12 @@ export default defineComponent({
   name: 'BasicForm',
   components: { FormItem, Form, Row, FormAction },
   props: basicProps,
-  emits: ['advanced-change', 'reset', 'submit', 'register', 'field-value-change'],
+  // 扩展自定义写法
+  emits: ['advanced-change', 'reset', 'submit', 'register', 'field-value-change','get-form'],
   setup(props, { emit, attrs }) {
     const formModel = reactive<Recordable>({})
     const modalFn = useModalContext()
-
+    
     const advanceState = reactive<AdvanceState>({
       isAdvanced: true,
       hideAdvanceBtn: false,
@@ -245,6 +246,9 @@ export default defineComponent({
         validateFields([key]).catch((_) => {})
       }
       emit('field-value-change', key, value)
+      // 合并数据
+      
+      emit('get-form',toRaw(getSchema.value))
     }
 
     function handleEnterPress(e: KeyboardEvent) {

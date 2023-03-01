@@ -4,39 +4,39 @@
       <Form :model="RuleForm">
         <Row :gutter="5" class="enter-x col_flex">
           <Col>
-          <a-button type="primary">串行</a-button>
+          <a-button @click="ActionType" type="primary">串行</a-button>
           </Col>
           <Col>
-          <a-button type="primary">并行</a-button>
+          <a-button @click="ActionType" type="primary">并行</a-button>
           </Col>
         </Row>
       </Form>
     </template>
-    <div class="rounded-md pt-5 pl-5 border">
-      <template v-for="item, index in add" :key="index">
-        <div draggable="true" @dragstart="dragstart(index)">
-
-          <BasicForm v-if="item && item.schemas_normal" :draggable="true" :schemas="item.schemas_normal"
-            @register="register">
-
-            <template #customSlot="{ model, field }">
-              <a-input placeholder="请选择设备" v-model:value="model[field]">
-                <template #suffix>
-                  <Icon icon="carbon:logo-github" />
-                </template>
-              </a-input>
-            </template>
-          </BasicForm>
-        </div>
-      </template>
+    <div ref="container" class="rounded-md pt-5 pl-5 border">
+      <draggable class="list-group" @update="onUpdate" :animation="0" itemKey="index" :disabled="!enabled" v-model="add">
+        <template #item="{ element, index }">
+          <div class="list-group-item" :class="{ 'not-draggable': !enabled }">
+            {{ index }}-333
+            <BasicForm draggable="true" v-if="element.schemas_normal" @get-form="formvalue(arg, index)"
+              @start="dragging = true" @end="dragging = false" :schemas="element.schemas_normal" @register="register">
+              <template #customSlot="{ model, field }">
+                <a-input placeholder="请选择设备" v-model:value="model[field]">
+                  <template #suffix>
+                    <Icon icon="carbon:logo-github" />
+                  </template>
+                </a-input>
+              </template>
+            </BasicForm>
+          </div>
+        </template>
+      </draggable>
       <!-- 引入模态框 -->
       <AccountTable @register="registerMyTable" @success="handleSuccess" />
-
       <a-button type="primary" class="my-4" @click="handel_Add">
         添加动作
       </a-button>
     </div>
-</PageWrapper>
+  </PageWrapper>
 </template>
 <script lang="tsx">
 import { defineComponent, reactive, ref, toRaw } from 'vue';
@@ -44,7 +44,6 @@ import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-v
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
 import { PageWrapper } from '@/components/Page';
-// import draggable from 'vuedraggable';
 import draggable from "vuedraggable";
 import { Icon } from '@/components/Icon';
 import AccountTable from './AccountTable.vue';
@@ -52,16 +51,9 @@ import { useModal } from '@/components/Modal';
 import SelectItem from '@/layouts/default/setting/components/SelectItem.vue';
 const [registerMyTable, { openModal }] = useModal();
 const schemas: FormSchema[] = [];
-const add: any = ref([]);
+
 const myArray: any = ref('');
 const schemas_normal: FormSchema[] = [
-  // {
-  //   field: 'Icon',
-  //   label: '',
-  //   component: 'Input',
-  //   slot: 'IconSlot'
-  // },
-
   {
     field: 'ConditionItems',
     component: 'Select',
@@ -187,7 +179,7 @@ const schemas_normal: FormSchema[] = [
       span: 3,
     },
     show: ({ values }) => {
-      return values.Gval1 && values.Gvalparams == 0 && values.ConditionItems == '1';
+      return values.Gvalparams == 0 && values.ConditionItems == '1';
     }
   },
   // 工单
@@ -284,7 +276,9 @@ const schemas_normal: FormSchema[] = [
     }
   }
 ];
+const add: any = ref([]);
 const showForm = ref(false);
+const enabled = true
 const schemas2: FormSchema[] = [
   {
     field: 'filed1',
@@ -344,6 +338,9 @@ const RuleForm = reactive([{
   switch: '',
 
 }]);
+const setData: any = ref([]);
+const index: any = ref(0);
+const container = ref(null);
 export default defineComponent({
   components: { BasicForm, CollapseContainer, PageWrapper, Icon, Switch, AccountTable, InputNumber, Input, Row, Col, Select, SelectItem, draggable },
   setup() {
@@ -360,6 +357,71 @@ export default defineComponent({
           }
         },
       });
+    function ActionType(type) {
+
+    }
+    function formvalue(arg, index1) {
+      console.log(arg, '...arg...?')
+      const values = getFieldsValue()
+      console.log(values, '...values2...?')
+      console.log(index, '...index3...?')
+      if (index1 == 0) {
+        setData.value.push({
+          [index1]: {
+            OperationItems: {
+              ...values
+            }
+          }
+        }
+        )
+
+      }
+
+      // 判断数组是否有下标相同项
+      // setData.forEach
+      setData.value.forEach((item, index) => {
+        Object.keys(item).forEach((key) => {
+          console.log(key, '?...key...?')
+          if (key == index1) {
+            console.log(setData.value, '...setData.value...?123')
+            setData.value[index] = {
+              [index1]: {
+                OperationItems: {
+                  ...values
+                }
+              }
+              // OperationItems: {
+              //   ...values
+              // }
+            }
+          } else {
+            setData.value.push({
+              [index1]: {
+                OperationItems: {
+                  ...values
+                }
+              }
+            }
+            )
+          }
+        })
+      })
+
+
+      console.log(setData.value, '...setData.value...?')
+
+    }
+    function onUpdate(event) {
+      // console.log(add.value[event.oaldIndex].schemas_norml=,'...333...');
+
+      add.value[event.newIndex].schemas_norml = add.value[event.oldIndex].schemas_norml;
+      delete add.value[event.oldIndex].schemas_norml
+
+      // const item = add.value.splice(event.oldIndex, 1)[0];
+      // 处理拖拽排序问题
+
+      // add.value.splice(event.newIndex, 0, item);
+    }
     function handel_Add() {
       add.value.push({
         schemas_normal: schemas_normal
@@ -431,9 +493,6 @@ export default defineComponent({
       })
       console.log(add.value, '?...item...?')
     }
-    function dragstart(index) {
-      console.log(index, '...index...?')
-    }
     function handleSubmit() {
 
     }
@@ -453,13 +512,17 @@ export default defineComponent({
       add,
       myArray,
       setProps,
+      container,
+      setData,
+      enabled,
       changeLabel3,
+      onUpdate,
       changeLabel34,
       appendField,
       deleteField,
       e_Device,
       addRule,
-      dragstart,
+      formvalue,
       remove_attach,
       handleSubmit,
       registerMyTable,
@@ -473,23 +536,15 @@ export default defineComponent({
 ::v-deep(.ant-form-item) {
   padding: 10px;
   background: #F3F3F3;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    border-left: 2px solid #000000;
-    width: 7px;
-    margin-top: 9px;
-    height: 7px;
-    background-color: #000000;
-    border-radius: 12px;
-  }
 }
 
 
 .col_flex {
   display: flex;
   align-items: center;
+}
+
+.not-draggable {
+  cursor: no-drop;
 }
 </style>
