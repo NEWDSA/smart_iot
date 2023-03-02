@@ -42,8 +42,8 @@ const type = ref('day')
 function getTrendRatio() {
   let obj = {
     Type: type.value,
-    Number: type.value == 'day' ? 5 : type.value == 'week' ? 7 : 12,
-    Field: 'power'
+    Number: type.value == 'day' ? 30 : type.value == 'week' ? 12 : 12,
+    Field: 'electricityConsumption'
   }
   facilityTrendRatioApi(obj).then(res => {
     if (res.Code == 200) {
@@ -113,7 +113,6 @@ function getTrendRatio() {
         },
         yAxis: {
           type: 'value',
-          max: 8000,
           splitNumber: 4,
           "axisLine": {     //x轴坐标轴
             "show": false

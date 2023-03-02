@@ -2,8 +2,8 @@
   <BasicDrawer v-bind="$attrs" @register="registerDrawer" showFooter :title="getTitle" width="500px" @ok="handleSubmit">
     <BasicForm @register="registerForm">
       <template #menu="{ model, field }">
-        <BasicTree :treeData="treeData" :fieldNames="{ title: 'Name', key: 'Id' }"
-          checkable :checkedKeys="checkedKey" :checkStrictly="true" @check="halkcheckedKey"/>
+        <BasicTree :treeData="treeData" :fieldNames="{ title: 'Name', key: 'Id' }" :defaultExpandAll="ExpandAll"
+          checkable :checkedKeys="checkedKey" :selectedKeys="selectedKeys" @check="halkcheckedKey" />
       </template>
     </BasicForm>
   </BasicDrawer>
@@ -26,6 +26,8 @@ export default defineComponent({
     // const rowId = ref('');
     const treeData = ref<TreeItem[]>([]);
     const checkedKey = ref()
+    const selectedKeys = ref()
+    const ExpandAll = ref(false)
     const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
       labelWidth: 90,
       baseColProps: { span: 24 },
@@ -38,7 +40,8 @@ export default defineComponent({
       showActionButtonGroup: false,
     });
     function halkcheckedKey(keys) {
-      checkedKey.value = keys.checked;
+      // console.log(keys)
+      checkedKey.value = keys;
     }
     const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
       resetFields();
@@ -51,8 +54,10 @@ export default defineComponent({
         treeData.value = (TreeSelect) as any as TreeItem[];
 
         checkedKey.value = checkedKeys
-
+        
         console.log(checkedKey)
+
+        ExpandAll.value = true
 
       // }
       isUpdate.value = !!data?.isUpdate;
@@ -79,7 +84,7 @@ export default defineComponent({
         closeDrawer();
         // !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, MenuIds: values.menu })
         console.log('测试123')
-        // emit('success');
+        emit('success');
 
       } finally {
         setDrawerProps({ confirmLoading: false });
@@ -93,7 +98,9 @@ export default defineComponent({
       handleSubmit,
       treeData,
       checkedKey,
-      halkcheckedKey
+      halkcheckedKey,
+      selectedKeys,
+      ExpandAll
     };
   },
 });

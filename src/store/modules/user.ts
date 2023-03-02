@@ -94,6 +94,7 @@ export const useUserStore = defineStore({
         // TODO:token 根据真实接口进行修改
         // const { token } = data //模拟数据
         // this.setToken(token) //模拟数据
+        console.log(data,'4as4d6as4d56a1d6a')
         const { Token } = data //真实数据
         this.setToken(Token) //真实数据
 

@@ -242,17 +242,19 @@ export default defineComponent({
       return [
         {
           icon: 'ic:baseline-plus',
-          // disabled: record.ceng ? true : false,
+          disabled: record.Inherent == 1 ? true : false,
           onClick: handleAdd.bind(null, record),
         },
         {
           icon: 'clarity:note-edit-line',
+          disabled: record.Inherent == 1 ? true : false,
           // disabled: editableData.value ? editableData.value !== record.key : false,
           onClick: handleEdit.bind(null, record),
         },
         {
           icon: 'ant-design:delete-outlined',
           color: 'error',
+          disabled: record.Inherent == 1 ? true : false,
           popConfirm: {
             title: '是否确认删除',
             placement: 'left',

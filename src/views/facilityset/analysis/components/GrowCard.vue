@@ -2,7 +2,7 @@
   <div class="md:flex">
     <Card size="default" style="" :loading="loading" title="设备数据" class=" w-full !md:mt-0">
       <template #extra>
-        <Tag color="#222222">{{ 1 }}</Tag>
+        <!-- <Tag color="#222222">{{ 1 }}</Tag> -->
       </template>
 
       <div class="w-full flex">
@@ -49,14 +49,19 @@ onMounted(()=>{
 //     EndTime:new Date(new Date().getTime()).valueOf(),
 
 function getfacilityData(){
-  facilityDataApi().then(res=>{
-    deviceList.value[0].value = res.DeviceTotal
-    deviceList.value[0].fuValue = res.OffLineDeviceTotal
+  var AlarmTime = new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf();
+  facilityDataApi({'AlarmTime':AlarmTime}).then(res=>{
+    deviceList.value[0].value = res?.DeviceTotal || 0
+    deviceList.value[0].fuValue = res?.OffLineDeviceTotal || 0
 
-    deviceList.value[1].value = res.OnlineDeviceTotal
-    deviceList.value[1].fuValue  = res.OnlineDeviceTotal
+    deviceList.value[1].value = res?.OnlineDeviceTotal || 0
+    deviceList.value[1].fuValue  = res?.OnlineDeviceTotal || 0
 
-    deviceList.value[2].value = res.GatewayDeviceTotal
+    deviceList.value[2].value = res?.GatewayDeviceTotal || 0
+
+    deviceList.value[3].value = res?.DeviceAlertTotal || 0
+    deviceList.value[3].fuValue = res?.AlertGrowthRate || 0
+    
   })
 }
 

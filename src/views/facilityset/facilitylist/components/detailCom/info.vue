@@ -10,7 +10,7 @@
             <div class="w-3/12 mt-5">设备ID：{{ infoFacility.DeviceId }}</div>
             <div class="w-3/12 mt-5">设备名称：{{ infoFacility.DeviceName }}</div>
             <div class="w-3/12 mt-5">设备类型：{{ facilityType }}</div>
-            <div class="w-3/12 mt-5">设备所在区域位置：{{ infoFacility.RegionalLocation }}</div>
+            <div class="w-3/12 mt-5">设备所在区域位置：{{ RegionDataName }}</div>
             <div class="w-3/12 mt-5">说明：{{ infoFacility.Explain }}</div>
             <div class="w-3/12 mt-5">创建时间：{{ timeZ(infoFacility.Basic.UpdatedAt.seconds) }}</div>
             <div class="w-3/12 mt-5">设备位置（经纬度）：{{
@@ -89,14 +89,14 @@ const facilityType = ref()
 
 // const faTypeName = ref()
 // const faTypeId = ref()
-// const RegionDataName = ref()
+const RegionDataName = ref()
 // const RegionDataId = ref()
 
 onMounted(() => {
     // FengfacilityTypeTree()
     checkType()
     GetfacilityRegionList()
-    // GetfacilityRegioninfo()
+    GetfacilityRegioninfo()
 })
 
 
@@ -154,15 +154,15 @@ function GetfacilityRegionList() {
     })
 }
 
-// // 区域详情
-// function GetfacilityRegioninfo(id) {
-//     facilityRegionInfoApi({ RegionId: id }).then(res => {
-//         // RegionData.value = res.Detail
-//         // console.log(res)
-//         RegionDataName.value = res.RegionName
-//         // console.log(RegionDataName.value)
-//     })
-// }
+// 区域详情
+function GetfacilityRegioninfo() {
+    facilityRegionInfoApi({ RegionId: props.infoFacility.RegionId }).then(res => {
+        // RegionData.value = res.Detail
+        // console.log(res)
+        RegionDataName.value = res.Detail.RegionName
+        // console.log(RegionDataName.value)
+    })
+}
 
 
 // const editType = ref(false)

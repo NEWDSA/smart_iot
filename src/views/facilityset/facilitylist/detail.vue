@@ -82,7 +82,7 @@ watch(() => facilityDetailTabIndex.value, (data) => {
   console.log(facilityDetailTabIndex.value,infoFacility.value.NetworkStatus)
   if (facilityDetailTabIndex.value == '2' && infoFacility.value.NetworkStatus !=0 && infoFacility.value.NetworkStatus !=2) {
     getLod()
-    Inter.value = setInterval(getLod, 3000)
+    Inter.value = setInterval(getLod, 100000)
   } else {
     console.log('clearInterval')
     // if (Inter.value !='') {

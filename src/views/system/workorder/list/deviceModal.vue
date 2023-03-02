@@ -6,7 +6,6 @@
       <a-button type="primary" @click="collapseAll">折叠全部</a-button>
     </template> -->
         </BasicTable>
-        
     </BasicModal>
 </template>
 <script lang="ts">
@@ -14,11 +13,10 @@ import { defineComponent, ref, computed, unref, onMounted } from 'vue';
 import { useMessage } from '@/hooks/web/useMessage';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
-import { columns, searchFormSchema } from '@/views/system/user/account.data';
+import { deviceColumns, searchFormSchema } from './workData';
 // import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
-import { getAccountList } from '@/api/demo/system';
-import { array } from 'vue-types';
+import { facilityListApi } from '@/api/facility/facility';
 export default defineComponent({
     name: 'AccountModal',
     components: { BasicModal, BasicTree, BasicTable },
@@ -28,26 +26,25 @@ export default defineComponent({
         const { createConfirm } = useMessage(); 
         const checkData:any = ref();
         const DataType = ref('');
-        const [registerModal, { setModalProps, closeModal }] = useModalInner(async ( data) => {
-            console.log(data,4564564)
-            DataType.value =  data?.type
+        const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+            // console.log(data,4564564)
+            DataType.value = data.type
 
-            // checkedKeys.value = []  
-            checkedKeys.value = await data?.data
-            // console.log()
+            checkedKeys.value = []
+            checkedKeys.value = data.data
             
         });
 
         const [registerTab, { reload, updateTableDataRecord, getSelectRowKeys, getSelectRows, deleteTableDataRecord }] = useTable({
-            api: getAccountList,
-            title: '用户列表',
-            rowKey: 'UserId',
+            api: facilityListApi,
+            title: '设备列表',
+            rowKey: 'DeviceId',
             rowSelection: {
-                type: 'checkbox',
+                type: 'radio',
                 selectedRowKeys: checkedKeys,
                 onChange: onSelectChange,
             },
-            columns,
+            columns:deviceColumns,
             fetchSetting: {
                 pageField: 'PageNum',
                 // 传给后台的每页显示多少条的字段
@@ -57,6 +54,7 @@ export default defineComponent({
                 // 接口返回表格总数的字段
                 totalField: 'Total'
             },
+            showIndexColumn:false,
             formConfig: {
                 labelWidth: 120,
                 schemas: searchFormSchema,
@@ -68,25 +66,25 @@ export default defineComponent({
         });
 
         function onSelectChange(selectedRowKeys: (string | number)[]) {
+            // console.log(selectedRowKeys,'selectedRowKeys')
             checkedKeys.value = selectedRowKeys;
         }
 
         async function handleSubmit() {
             try {
                 checkData.value = getSelectRows()
-                var dataKey: any = []
-                var datawen: any = []
-                if(checkData.value.length > 0){
-                    for(let i=0;i<checkData.value.length;i++){
-                        dataKey.push(checkData.value[i].UserId)
-                        datawen.push(checkData.value[i].UserName)
-                    }
-                }
+                // console.log(checkData.value)
+
+                var data: any = []
+                var dataW: any = []
+
+                data.push(checkData.value[0].DeviceId)
+                dataW.push(checkData.value[0].DeviceName)
 
                 // 将数据传递给接口
                 setModalProps({ confirmLoading: true });
                 closeModal();
-                emit('success', dataKey,DataType.value,datawen);
+                emit('success', data,dataW);
             } finally {
                 setModalProps({ confirmLoading: false });
             }

@@ -22,11 +22,11 @@
                             全开</div>
 
                         <div class="px-2 rounded mr-3" @click="buttomCut(0, Th)"
-                            :class="Th.value.value == 2 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                            :class="Th.value.value == 0 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
                             停止</div>
 
                         <div class="px-2 rounded mr-3" @click="buttomCut(2, Th)"
-                            :class="Th.value.value == 0 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
+                            :class="Th.value.value == 2 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
                             全关</div>
                     </div>
                 </div>

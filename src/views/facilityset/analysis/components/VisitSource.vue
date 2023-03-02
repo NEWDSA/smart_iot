@@ -5,7 +5,7 @@
     </template>
 
     <div class="flex items-center flex-wrap border-b">
-      <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index">
+      <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index" @click="topage(item.Component)">
         <div>
           <Icon :icon="item.Icon" size="24"></Icon>
         </div>
@@ -13,17 +13,17 @@
       </div>
     </div>
 
-    <div>
+    <!-- <div>
       <div class="px-2 py-3" style="font-size:16px">最近访问</div>
       <div class="flex items-center flex-wrap">
-        <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index">
+        <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index" @click="topage(item.Component)">
           <div>
             <Icon :icon="item.Icon" size="24"></Icon>
           </div>
           <div class="truncate ...">{{ item.MenuName }}</div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div>
       <div class="px-2 py-3 flex items-center justify-between">
@@ -56,6 +56,9 @@ import { useDrawer } from '@/components/Drawer';
 import RoleDrawer from './modal/SourceDrawer.vue';
 
 import { shortCutMenu } from '@/api/sys/user'
+
+import { useGo } from '@/hooks/web/usePage';
+const go = useGo();
 
 const [registerDrawer, { openDrawer }] = useDrawer();
 
@@ -94,7 +97,7 @@ function haldkModal() {
 }
 
 function handleSuccess() {
-
+  getShortCutMenu()
 }
 
 const shortcutList = ref()
@@ -106,5 +109,9 @@ const getShortCutMenu = ()=>{
   })
 }
 
+const topage = (Page) =>{
+  console.log(Page)
+  go(Page)
+}
 
 </script>

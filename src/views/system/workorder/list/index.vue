@@ -3,7 +3,7 @@
         <div class="bg-white">
             <div class="p-2 flex justify-between items-center">
                 <div>
-                    <a-button type="primary" preIcon="ic:baseline-plus" @click="addVisitor()">
+                    <a-button type="primary" preIcon="ic:baseline-plus" @click="addWorkOder()">
                         创建工单
                     </a-button>
                 </div>
@@ -34,37 +34,42 @@
                 </template>
             </BasicTable>
 
-
             <!-- <visitorModel @register="registerModal" @success="handleSuccess"></visitorModel> -->
         </div>
-</PageWrapper>
+
+    <addModal @register="registerModal" @success="handleSuccess"></addModal>
+
+    </PageWrapper>
+
 </template>
   
 <script lang="ts">
 
-
-
-
-
-
 import { ref, defineComponent, reactive, onMounted, nextTick } from 'vue';
+import { useUserStore } from '@/store/modules/user'
 import { BasicTable, TableAction, useTable } from '@/components/Table'
 import { TaskTicketPageApi } from '@/api/sys/workorder'
 import { TabColumns, getFormConfig } from './workData'
 import { useModal } from '@/components/Modal';
+import { useGo } from '@/hooks/web/usePage';
 //   import visitorModel from './visitorModal.vue';
 import { message, Select, Input } from 'ant-design-vue';
 import { useLoading } from '@/components/Loading';
 import { PageWrapper } from '@/components/Page';
+import addModal from './addModal.vue'
 
 export default defineComponent({
-    components: { BasicTable, TableAction, Select, Input, PageWrapper },
+    components: { BasicTable, TableAction, Select, Input, PageWrapper,addModal },
     setup() {
         onMounted(() => {
             // visitorTypeListApi().then(res => {
             //     VisitorTypeList.value = res.Detail
             // })
         })
+
+        const userStore = useUserStore()
+        // 
+        const go = useGo();
         const workTypeTab = ref([
             {
                 id: 0,
@@ -87,7 +92,7 @@ export default defineComponent({
 
         const [registerModal, { openModal }] = useModal();
         // 表格数据
-        const searchInfo = ref()
+        const searchInfo: any = ref({})
         const [registertab, { getForm, reload }] = useTable({
             api: TaskTicketPageApi,
             columns: TabColumns(),
@@ -116,9 +121,14 @@ export default defineComponent({
             showIndexColumn: false,
             handleSearchInfoFn: (e) => {
                 console.log(e)
-                // if (e.Search || e.Search != undefined || e.SearchValue != '' || e.SearchValue != undefined) {
-                //     e[e.Search] = e.SearchValue
-                // }
+                if (e.Search || e.Search != undefined || e.SearchValue != '' || e.SearchValue != undefined) {
+                    if (e.Search == 'TaskTicketNo' || e.Search == 'Title') {
+                        e[e.Search] = e.SearchValue
+                    } else {
+                        e[e.Search] = new Date(e.NoticeTime).getTime() / 1000;
+                    }
+
+                }
                 e.Search = undefined
                 e.SearchValue = undefined
 
@@ -144,69 +154,45 @@ export default defineComponent({
             ]
         }
 
-        function cutTab(id,index){
+        
+        function cutTab(id, index) {
             workTypeTabIndex.value = index
+            searchInfo.value = {}
+            const user: any = userStore.getUserInfo
+            if (index == 1) {
+                searchInfo.value.Acceptor = user.user.UserId
+                
+            }
+            if (index == 2) {
+                searchInfo.value.CreatedBy = user.user.UserId
+                
+            }
+            if (index == 3) {
+                searchInfo.value.Follower = user.user.UserId
+                
+            }
+
+            // 延迟 不然会先刷新后加条件
+            setTimeout(()=>{
+                reload()
+            },100)
+
         }
 
-        function addVisitor() {
+        function addWorkOder() {
             openModal(true, {
                 isUpdate: false,
             });
         }
 
-        function handleEdit(record) {
-            // console.log(record)
-            visitorInfoApi({ VisitorId: record.VisitorId }).then(res => {
-                // if (res == 0) {
-                var time = res.Detail.AppointTime.seconds
-                // console.log(record.record.Basic.CreatedAt.seconds)
-
-                res.Detail.yuyueTime = HuanTime(time)
-                var obj = res.Detail
-
-                openModal(true, {
-                    isUpdate: true,
-                    obj
-                });
-                // }
-            })
-
-        }
-
         function handleLook(record) {
-            visitorInfoApi({ VisitorId: record.VisitorId }).then(res => {
-                // if (res == 0) {
-                var time = res.Detail.AppointTime.seconds
-                // console.log(record.record.Basic.CreatedAt.seconds)
-
-                res.Detail.yuyueTime = HuanTime(time)
-                var obj = res.Detail
-
-                openModal(true, {
-                    isUpdate: true,
-                    obj,
-                    disabled: true
-                });
-                // }
-            })
-        }
-
-        function handlecancel(record, status) {
-            //Status 5 因为是取消所以固定死
-            visitorStatusEditApi({ Status: status, VisitorId: record.VisitorId }).then(res => {
-                if (res == 0) {
-                    reload()
-                } else {
-                    message.error('操作失败')
-                }
-                // console.log(res)
-            })
+            go('/system/workorder/workorder_detail/' + record.Id)
         }
 
         function handleSuccess() {
-            message.success('操作成功')
             reload();
         }
+
 
         // loading
         const [openWrapLoading, closeWrapLoading] = useLoading({
@@ -236,14 +222,13 @@ export default defineComponent({
             handleSuccess,
             createActions,
             handleLook,
-            addVisitor,
-            handleEdit,
+            addWorkOder,
             HuanTime,
             searchInfo,
             VisitorTypeList,
             workTypeTab,
             workTypeTabIndex,
-            cutTab
+            cutTab,
         };
     },
 });
@@ -254,31 +239,31 @@ export default defineComponent({
 
 <style lang="less">
 body {
-  font-family: 'Alibaba PuHuiTi';
+    font-family: 'Alibaba PuHuiTi';
 }
 
 .sp-blue-text {
-  color: rgb(22, 100, 255);
+    color: rgb(22, 100, 255);
 }
 
 .sp-blue-bg {
-  background: rgb(22, 100, 255);
+    background: rgb(22, 100, 255);
 }
 
 .fasility-class-select {
-  .ant-select-selector {
-    font-size: 10px;
-    border-radius: 5px !important;
-    height: 22px !important;
+    .ant-select-selector {
+        font-size: 10px;
+        border-radius: 5px !important;
+        height: 22px !important;
 
-    .ant-select-selection-item {
-      line-height: 22px !important;
+        .ant-select-selection-item {
+            line-height: 22px !important;
+        }
     }
-  }
 }
 
 .ant-select-arrow {
-  color: rgb(28, 92, 255) !important;
+    color: rgb(28, 92, 255) !important;
 }
 </style>
   

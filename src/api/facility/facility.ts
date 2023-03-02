@@ -20,6 +20,8 @@ enum Api {
     DeviceEdit = '/device/edit',
     DeviceDelete = '/device/delete',
     DeviceData = '/device/data',
+    DeviceAlertData = '/device/alert/data',
+
 
     DeviceCheckRule = '/device/check/rule',
     DeviceDisableRule = 'device/disable/rule',
@@ -283,9 +285,18 @@ export function facilityBoardNumApi(params) {
 }
 
 // 设备统计
-export function facilityDataApi() {
+export function facilityDataApi(params) {
     return realHttp.get({
-        url: Api.DeviceData
+        url: Api.DeviceData,
+        params
+    });
+}
+
+// 设备告警统计
+export function facilityAlertDataApi(params) {
+    return realHttp.get({
+        url: Api.DeviceAlertData,
+        params
     });
 }
 
