@@ -14,7 +14,7 @@ enum Api {
 
   
   SystemUserMenu = '/system/user/menu',
-  SystemUserMenuTreeSelect = 'system/user/menuTreeSelect'
+  SystemUserMenuTreeSelect = '/system/user/menuTreeSelect'
 }
 
 
