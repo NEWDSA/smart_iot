@@ -28,7 +28,7 @@ export interface LoginResultModel {
 export interface GetUserInfoModel {
   Roles: RoleInfo[]
   // 用户id
-  userId: string | number
+  UserId: string | number
   // 用户名
   username: string
   // 真实名字

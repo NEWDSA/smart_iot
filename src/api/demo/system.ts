@@ -38,7 +38,13 @@ enum Api {
   buckPermissionUser = '/system/role/authUser/selectAll',
   delAuthUser = '/system/role/authUser/cancel',
   delAuthUserList = '/system/role/authUser/cancelAll',
-  updaePwd='/system/user/updatePwd'
+  updaePwd = '/system/user/updatePwd',
+  NoticeList = '/notice/list-user-id',
+  NoticeInfo = '/notice/info',
+  NoticeTransfer = '/notice/forward',
+  DelNotice = '/notice/delete',
+  NoticeEdit='/notice/edit',
+  NoticeRead='/notice/is-read'
 }
 
 // 获取用户列表
@@ -183,19 +189,85 @@ export const setRoleStatus = (RoleId: number, Status: string) =>
 //admin12345
 
 // 查询已分配用户角色列表
-export const RoleUserList = (params?) => realHttp.get({ url: Api.RoleUserList, params }) //后端接口
+export const RoleUserList = (params?) => realHttp.get({ url: Api.RoleUserList, params })
 
 // 查询未分配用户角色列表
-export const RoleUnUserList = (params?) => realHttp.get({ url: Api.RoleUnUserList, params }) //后端接口
+export const RoleUnUserList = (params?) => realHttp.get({ url: Api.RoleUnUserList, params })
 
 // 批量选择用户授权
-export const buckPermissionUser = (params?) => realHttp.put({ url: Api.buckPermissionUser, params }) //后端接口
+export const buckPermissionUser = (params?) => realHttp.put({ url: Api.buckPermissionUser, params })
 
 // 取消授权用户
-export const delAuthUser = (params?) => realHttp.put({ url: Api.delAuthUser, params }) //后端接口
+export const delAuthUser = (params?) => realHttp.put({ url: Api.delAuthUser, params })
 
 // 批量取消授权用户
-export const delAuthUserList = (params?) => realHttp.put({ url: Api.delAuthUserList, params }) //后端接口
+export const delAuthUserList = (params?) => realHttp.put({ url: Api.delAuthUserList, params })
 
 export const isAccountExist = (account: string) =>
   defHttp.post({ url: Api.IsAccountExist, params: { account } }, { errorMessageMode: 'none' })
+
+// 获取消息通知列表
+export const NoticeList = (params?) =>
+  realHttp.get(
+    { url: Api.NoticeList, params },
+    {
+      isTransformResponse: true
+    }
+  )
+
+// 通知信息
+export const NoticeInfo = (params?) =>
+  realHttp.get(
+    { url: Api.NoticeInfo, params },
+    {
+      isTransformResponse: true
+    }
+  )
+
+// 通知转交
+export const NoticeTransfer = (params?) =>
+  realHttp.post(
+    { url: Api.NoticeTransfer, params },
+    {
+      isTransformResponse: true
+    }
+  )
+// 删除通知
+export const DelNotice = (params?) =>
+  realHttp.delete(
+    {
+      url: `${Api.DelNotice}?NoticeId=`+params.NoticeId+'&'+'UserId='+params.UserId,
+    },
+    
+    {
+      isTransformResponse: true
+    }
+  )
+
+  // 通知编辑
+  export const NoticeEdit = (params?) =>
+  realHttp.put(
+    {
+      
+      url: Api.NoticeEdit,params
+    },
+    
+    {
+      isTransformResponse: true
+    }
+  )
+
+  // 通知已读
+  export const NoticeRead = (params?) =>
+  realHttp.post(
+    {
+      
+      url: Api.NoticeRead,params
+    },
+    
+    {
+      isTransformResponse: true
+    }
+  )
+
+  
