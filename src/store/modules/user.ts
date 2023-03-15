@@ -20,7 +20,8 @@ import { h } from 'vue'
 interface UserState {
   userInfo: Nullable<UserInfo>
   token?: string
-  roleList: RoleEnum[]
+  roleList: RoleEnum[],
+  Permissions:any[],
   sessionTimeout?: boolean
   lastUpdateTime: number
 }
@@ -34,6 +35,7 @@ export const useUserStore = defineStore({
     token: undefined,
     // roleList
     roleList: [],
+    Permissions:[],
     // Whether the login expired
     sessionTimeout: false,
     // Last fetch time

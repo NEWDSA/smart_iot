@@ -6,7 +6,7 @@
         <!-- <BasicForm @register="register"></BasicForm> -->
       </div>
       <div>
-        <a-button type="primary" preIcon="ic:baseline-plus" @click="openModal(null, null)">
+        <a-button v-if="hasPermission(['openModal_Device'])" type="primary" preIcon="ic:baseline-plus" @click="openModal(null, null)">
           创建新的分类
         </a-button>
       </div>
@@ -39,7 +39,7 @@ import { BasicTable, useTable, TableAction, BasicColumn, EditRecordRow, ActionIt
 import { getBasicColumns, } from './tableData';
 import { PageWrapper } from '@/components/Page';
 import { facilityTypeTreeApi, facilityTypeSaveApi, facilityTypeSameGradeApi, facilityTypeDeleteApi, facilityTypeEditApi } from '@/api/facility/facility'
-
+import {usePermission} from '@/hooks/web/useButtonPermission';
 import addclass from './components/addclass.vue';
 import { message } from 'ant-design-vue';
 
@@ -49,6 +49,7 @@ export default defineComponent({
   name: 'AccountDetail',
   components: { BasicTable, TableAction, addclass,PageWrapper },
   setup() {
+    const { hasPermission } = usePermission();
     onMounted(() => {
       FengfacilityTypeTree();
     })
@@ -243,16 +244,19 @@ export default defineComponent({
         {
           icon: 'ic:baseline-plus',
           disabled: record.Inherent == 1 ? true : false,
+          ifShow:  hasPermission(['handleAdd_Device']),
           onClick: handleAdd.bind(null, record),
         },
         {
           icon: 'clarity:note-edit-line',
+          ifShow:  hasPermission(['handleEdit_Device']),
           disabled: record.Inherent == 1 ? true : false,
           // disabled: editableData.value ? editableData.value !== record.key : false,
           onClick: handleEdit.bind(null, record),
         },
         {
           icon: 'ant-design:delete-outlined',
+          ifShow:  hasPermission(['handleDelete_Device']),
           color: 'error',
           disabled: record.Inherent == 1 ? true : false,
           popConfirm: {
@@ -334,6 +338,7 @@ export default defineComponent({
 
 
     return {
+      hasPermission,
       TreeTableData,
       FengfacilityTypeTree,
       registertab,

@@ -2,7 +2,7 @@
   <BasicDrawer v-bind="$attrs" @register="registerDrawer" showFooter :title="getTitle" width="500px" @ok="handleSubmit">
     <BasicForm @register="registerForm">
       <template #menuIds="{ model, field }">
-        <BasicTree v-model:value="model[field]" :checkedKeys="checkedMenu"  :treeData="treeData"
+        <BasicTree v-model:value="model[field]" :checkedKeys="checkedMenu" :checkStrictly="true"   :treeData="treeData"
           :fieldNames="{ title: 'Name', key: 'Id' }" checkable toolbar title="菜单分配" />
       </template>
     </BasicForm>
@@ -64,11 +64,12 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         const values = await validate();
-        console.log(values, 'value')
+        console.log(values.menu
+, 'value')
         debugger;
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
-        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values,RoleId:RoleId.value,MenuIds: values.menu })
+        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values,RoleId:RoleId.value,menuIds: values.menuIds.checked })
         emit('success');
 
       } finally {

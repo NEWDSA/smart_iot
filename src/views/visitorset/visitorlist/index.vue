@@ -76,7 +76,7 @@
 
         <template #form-advanceAfter>
           <!-- <div class="" style="width: 60px;"> -->
-            <a-button type="primary" preIcon="ic:baseline-plus" @click="addVisitor()" class="ml-10">
+            <a-button v-if="hasPermission(['addVisitor_visitorlist'])" type="primary" preIcon="ic:baseline-plus" @click="addVisitor()" class="ml-10">
               添加预约访客
             </a-button>
           <!-- </div> -->
@@ -102,10 +102,11 @@ import { message, Select, Input } from 'ant-design-vue';
 import { useLoading } from '@/components/Loading';
 import { PageWrapper } from '@/components/Page';
 import { fileUrl } from '@/utils/file/fileUrl'
-
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   components: { BasicTable, TableAction, visitorModel, Select, Input, PageWrapper },
   setup() {
+    const { hasPermission } = usePermission();
     const devImg = ref('');
     onMounted(() => {
       visitorTypeListApi().then(res => {
@@ -198,12 +199,14 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认预约',
               placement: 'left',
+              ifShow:  hasPermission(['handlecancel_visitorlist']),
               confirm: handlecancel.bind(null, record, 2),
             },
             // onClick: handleLook.bind(null, record)
           },
           {
             label: '取消',
+            ifShow:  hasPermission(['handlecancel_visitorlist']),
             popConfirm: {
               title: '是否确认取消',
               placement: 'left',
@@ -213,10 +216,12 @@ export default defineComponent({
           },
           {
             label: '修改',
+            ifShow:  hasPermission(['handleEdit_visitorlist']),
             onClick: handleEdit.bind(null, record)
           },
           {
             label: '查看',
+            ifShow:  hasPermission(['handleLook_visitorlist']),
             onClick: handleLook.bind(null, record)
           }
         ]
@@ -226,6 +231,7 @@ export default defineComponent({
         return [
           {
             label: '登记',
+            ifShow:  hasPermission(['handlecancel_visitorlist']),
             popConfirm: {
               title: '是否确认登记',
               placement: 'left',
@@ -235,6 +241,7 @@ export default defineComponent({
           },
           {
             label: '取消',
+            ifShow:  hasPermission(['handlecancel_visitorlist']),
             popConfirm: {
               title: '是否确认取消',
               placement: 'left',
@@ -244,10 +251,12 @@ export default defineComponent({
           },
           {
             label: '修改',
+            ifShow:  hasPermission(['handleEdit_visitorlist']),
             onClick: handleEdit.bind(null, record)
           },
           {
             label: '查看',
+            ifShow:  hasPermission(['handleLook_visitorlist']),
             onClick: handleLook.bind(null, record)
           }
         ]
@@ -446,6 +455,7 @@ export default defineComponent({
       handleEdit,
       HuanTime,
       searchInfo,
+      hasPermission,
       // souSelect,
       VisitorTypeList,
       // reset,

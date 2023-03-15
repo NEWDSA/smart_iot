@@ -78,12 +78,13 @@
                   </Modal>
                   <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index, index2)"
                     v-if="facility.TypeId != -1">移出</div>
-                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="handleEdit(index, index2)">编辑</div>
+                  <div v-if="hasPermission(['Edit_visitorsceneList'])" class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="handleEdit(index, index2)">编辑</div>
                   <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded"
-                    v-if="facility.NetworkStatus == 2 || !facility.NetworkStatus"
+                  enableDevice_DeviceList
+                    v-if=" facility.NetworkStatus == 2 && hasPermission(['Enable_visitorsceneList']) || !facility.NetworkStatus && hasPermission(['Enable_visitorsceneList'])"
                     @click.stop="enableDevice(facility.DeviceId, index, index2)">启用</div>
                   <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded"
-                    v-if="facility.NetworkStatus == 1 || facility.NetworkStatus == 5"
+                    v-if="facility.NetworkStatus == 1 && hasPermission(['disableDevice_visitorsceneList']) || facility.NetworkStatus == 5 && hasPermission(['disableDevice_visitorsceneList'])" 
                     @click.stop="disableDevice(facility.DeviceId, index, index2)">禁用</div>
                   <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
                     v-if="facility.NetworkStatus == 3 || facility.NetworkStatus == 4">启用</div>
@@ -152,12 +153,13 @@ import { Loading } from '@/components/Loading';
 import { useModal } from '@/components/Modal';
 import EditModel from './EditModal/index.vue'
 import { PageWrapper } from '@/components/Page';
-
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'Facilitylist',
   components: { Select, Modal, TreeSelect, Loading, EditModel,PageWrapper },
   setup() {
     const go = useGo();
+    const { hasPermission } = usePermission();
     const [registerModal, { openModal }] = useModal();
     const searchValue = ref('');
     const searchSlect = ref({
@@ -950,6 +952,7 @@ export default defineComponent({
       checkcheckRegionTree,
       getRegion,
       tree,
+      hasPermission,
       sceneStopModal,
       sceneStopId,
       stopClick,

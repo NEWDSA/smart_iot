@@ -1,7 +1,7 @@
 <template>
   <Card title="快捷入口" :loading="loading">
     <template #extra>
-      <div class="text-blue-600" @click="haldkModal()">管理</div>
+      <div v-if="hasPermission(['haldkModal_ALanalysis'])" class="text-blue-600" @click="haldkModal()">管理</div>
     </template>
 
     <div class="flex items-center flex-wrap border-b">
@@ -47,7 +47,7 @@
 <RoleDrawer @register="registerDrawer" @success="handleSuccess"></RoleDrawer>
 </template>
 <script lang="ts" setup>
-
+import {usePermission} from '@/hooks/web/useButtonPermission';
 import Icon from '@/components/Icon';
 import { Ref, ref, watch,onMounted } from 'vue';
 import { Card, Tag } from 'ant-design-vue';
@@ -59,7 +59,7 @@ import { shortCutMenu } from '@/api/sys/user'
 
 import { useGo } from '@/hooks/web/usePage';
 const go = useGo();
-
+const { hasPermission } = usePermission();
 const [registerDrawer, { openDrawer }] = useDrawer();
 
 const props = defineProps({

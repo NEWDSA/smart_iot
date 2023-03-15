@@ -112,7 +112,16 @@ export const formSchema: FormSchema[] = [
       getPopupContainer: () => document.body
     }
   },
-
+  {
+    field: 'Perms',
+    label: '权限标识',
+    component: 'Input',
+    required: true,
+    ifShow: ({ values }) => isButton(values.MenuType),
+    componentProps:{
+      placehldr:'请输入权限标识'
+    }
+  },
   {
     field: 'OrderNum',
     label: '排序',
@@ -132,7 +141,7 @@ export const formSchema: FormSchema[] = [
     label: '组件地址',
     component: 'Input',
     required: true,
-    ifShow: ({ values }) => !isDir(values.MenuType)
+    ifShow: ({ values }) => !isDir(values.MenuType) && !isButton(values.MenuType)
   },
   {
     field: 'Path',

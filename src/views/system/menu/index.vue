@@ -2,7 +2,7 @@
   <div>
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增菜单 </a-button>
+        <a-button v-if="hasPermission(['AddBtn_Menu'])" type="primary" @click="handleCreate"> 新增菜单 </a-button>
         <a-button @click="changeexpandAll(), checkAll = !checkAll" class="mr-2"> 展开/折叠全部 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
@@ -11,10 +11,12 @@
             {
               icon: 'clarity:note-edit-line',
               onClick: handleEdit.bind(null, record),
+              ifShow:  hasPermission(['handleEdit_Menu'])
             },
             {
               icon: 'ant-design:delete-outlined',
               color: 'error',
+              ifShow:  hasPermission(['handleDelete_Menu']),
               popConfirm: {
                 title: '是否确认删除',
                 placement: 'left',
@@ -33,16 +35,16 @@ import { defineComponent, nextTick, ref } from 'vue';
 
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getMenuList, DelMenuList } from '@/api/demo/system';
-
 import { useDrawer } from '@/components/Drawer';
 import MenuDrawer from './MenuDrawer.vue';
-
 import { columns, searchFormSchema } from './menu.data';
-
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'MenuManagement',
   components: { BasicTable, MenuDrawer, TableAction },
   setup() {
+    const { hasPermission } = usePermission();
+
     const [registerDrawer, { openDrawer }] = useDrawer();
     const checkAll = ref(true);
     const [registerTable, { reload, expandAll, collapseAll }] = useTable({
@@ -138,6 +140,7 @@ export default defineComponent({
       handleSuccess,
       onFetchSuccess,
       changeexpandAll,
+      hasPermission,
       checkAll
     };
   },

@@ -3,8 +3,8 @@
     <DeptTree :RoleId="RoleId" class="w-1/4 xl:w-1/5" @select="handleSelect" />
     <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleBulk">批量取消授权</a-button>
-        <a-button type="primary" @click="handleCreate">添加用户</a-button>
+        <a-button v-if="hasPermission(['BatchAuthCancel_RoleDetail'])" type="primary" @click="handleBulk">批量取消授权</a-button>
+        <a-button v-if="hasPermission(['AddUserMenu_RoleDetail'])" type="primary" @click="handleCreate">添加用户</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'DeptName'">
@@ -13,6 +13,7 @@
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
+              ifShow:hasPermission(['CancelAuth_RoleDetail']),
               icon: 'icon-park-outline:delete-five',
               tooltip: '取消授权',
               onClick: handleEdit.bind(null, record)
@@ -36,10 +37,12 @@ import AccountModal from './AccountModal.vue';
 import { columns, searchFormSchema } from './account.data';
 import { useRoute } from 'vue-router';
 import { useGo } from '@/hooks/web/usePage';
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'AccountManagement',
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, TableAction },
   setup() {
+    const { hasPermission } = usePermission();
     const route = useRoute();
     const go = useGo();
     const treeRef = ref('');
@@ -219,6 +222,7 @@ export default defineComponent({
       openModal3,
       Dat,
       roleAccount,
+      hasPermission,
       RoleId,
       treeRef,
       pagination,

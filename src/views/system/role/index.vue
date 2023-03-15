@@ -2,20 +2,23 @@
   <div>
     <BasicTable @register="registerTable">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增角色 </a-button>
+        <a-button v-if="hasPermission(['AddRole_Role'])" type="primary" @click="handleCreate"> 新增角色 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
+              ifShow:hasPermission(['handleEdit_Role']),
               icon: 'clarity:note-edit-line',
               onClick: handleEdit.bind(null, record),
             },
             {
+              ifShow:hasPermission(['handleDetail_Role']),
               icon: 'mdi:account-plus-outline',
               onClick: handleDetail.bind(null, record),
             },
             {
+              ifShow:hasPermission(['handleDelete_Role']),
               icon: 'ant-design:delete-outlined',
               color: 'error',
               popConfirm: {
@@ -33,17 +36,18 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getRoleListByPage, DelRole } from '@/api/demo/system';
 import { useDrawer } from '@/components/Drawer';
 import RoleDrawer from './RoleDrawer.vue';
 import { columns, searchFormSchema } from './role.data';
 import { useGo } from '@/hooks/web/usePage';
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'RoleManagement',
   components: { BasicTable, RoleDrawer, TableAction },
   setup() {
+    const { hasPermission } = usePermission();
     const [registerDrawer, { openDrawer }] = useDrawer();
     const go = useGo();
     const [registerTable, { reload, deleteTableDataRecord }] = useTable({
@@ -108,7 +112,8 @@ export default defineComponent({
       handleEdit,
       handleDelete,
       handleSuccess,
-      handleDetail
+      handleDetail,
+      hasPermission
     };
   },
 });

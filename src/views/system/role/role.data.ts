@@ -4,7 +4,9 @@ import { h } from 'vue';
 import { Switch } from 'ant-design-vue';
 import { setRoleStatus } from '@/api/demo/system';
 import { useMessage } from '@/hooks/web/useMessage';
+import {usePermission} from '@/hooks/web/useButtonPermission';
 import dayjs from 'dayjs'
+const { hasPermission } = usePermission();
 export const columns: BasicColumn[] = [
   {
     title: '角色名称',
@@ -25,6 +27,7 @@ export const columns: BasicColumn[] = [
     title: '状态',
     dataIndex: 'Status',
     width: 120,
+    ifShow:hasPermission(['status_Role']),
     customRender: ({ record }) => {
       if (!Reflect.has(record, 'pendingStatus')) {
         record.pendingStatus = false;

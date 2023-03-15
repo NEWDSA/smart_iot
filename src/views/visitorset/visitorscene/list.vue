@@ -52,19 +52,19 @@
                                         @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
                                         <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
                                     </Modal> -->
-                                    <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index)">
+                                    <div v-if="hasPermission(['Delete_visitorsceneList'])" class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index)">
                                         删除
                                     </div>
 
 
-                                    <div class="bg-gray-100 py-2 px-4 mr-3 rounded"
+                                    <div v-if="hasPermission(['Edit_visitorsceneList'])" class="bg-gray-100 py-2 px-4 mr-3 rounded"
                                         @click.stop="handleEdit(index, index2)">
                                         编辑</div>
                                     <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded"
-                                        v-if="Scene.Status == 2 || !Scene.Status"
+                                        v-if="Scene.Status == 2 && hasPermission(['Enable_visitorsceneList'])  || !Scene.Status && hasPermission(['Enable_visitorsceneList'])"
                                         @click.stop="enableDevice(Scene.RuleId, index)">启用</div>
                                     <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded"
-                                        v-if="Scene.Status == 1 || Scene.Status == 5"
+                                        v-if="Scene.Status ==  1 && hasPermission(['disableDevice_visitorsceneList']) || Scene.Status == 5 && hasPermission(['disableDevice_visitorsceneList'])"
                                         @click.stop="disableDevice(Scene.RuleId, index)">禁用</div>
                                     <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
                                         v-if="Scene.Status == 3 || Scene.Status == 4">启用</div>
@@ -112,9 +112,11 @@ import { ref, defineComponent, reactive, onMounted, } from 'vue';
 import { visitorTypeListApi, ruleVisitorListApi, ruleEnableApi, ruleDisableApi, ruleDeleteApi } from '@/api/visitor/visitor'
 import { message, Modal,Pagination } from 'ant-design-vue';
 import { PageWrapper } from '@/components/Page';
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
     components: { Modal,Pagination,PageWrapper },
     setup() {
+      const { hasPermission } = usePermission();
         onMounted(() => {
             getTypeList();
         })
@@ -292,6 +294,7 @@ export default defineComponent({
         return {
             visitorSceneTab,
             visitorSceneTabIndex,
+            hasPermission,
             getTypeList,
             getSceneList,
             visitorSceneList,

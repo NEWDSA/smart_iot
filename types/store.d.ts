@@ -31,6 +31,7 @@ export interface ErrorLogInfo {
 }
 
 export interface UserInfo {
+  Permissions: any
   UserId: string | number
   username: string
   realName: string

@@ -2,7 +2,7 @@
   <PageWrapper contentFullHeight title="区域列表">
     <BasicTable :canResize="true" @register="registerTable">
       <template #tableTitle>
-        <a-button preIcon="mdi:plus" @click="handleCreate" type="primary">创建新区域</a-button>
+        <a-button v-if="hasPermission(['createNewArea_RegionList'])" preIcon="mdi:plus" @click="handleCreate" type="primary">创建新区域</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -10,14 +10,17 @@
             {
               icon: 'clarity:note-edit-line',
               onClick: handleEdit.bind(null, record),
+              ifShow:  hasPermission(['handleEdit_RegionList'])
             },
             {
               icon: 'ion:add-circle-outline',
-              onClick:handleAdd.bind(null,record)
+              onClick:handleAdd.bind(null,record),
+              ifShow:  hasPermission(['handleAdd_RegionList'])
             },
             {
               icon: 'ant-design:delete-outlined',
               color: 'error',
+              ifShow:  hasPermission(['handleDelete_RegionList']),
               popConfirm: {
                 title: '是否确认删除',
                 placement: 'left',
@@ -39,11 +42,12 @@ import { PageWrapper } from '@/components/Page';
 import { useModal } from '@/components/Modal';
 import DeptModal from './DeptModal.vue';
 import { getBasicColumns, searchFormSchema } from './dept.data';
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'DeptManagement',
   components: { PageWrapper, BasicTable, DeptModal, TableAction },
   setup() {
-
+    const { hasPermission } = usePermission();
     const [registerModal, { openModal }] = useModal();
     const ischildren=true;
     const okTitle=ref('添加');
@@ -118,6 +122,7 @@ export default defineComponent({
       handleDelete,
       handleSuccess,
       handleAdd,
+      hasPermission,
       source,
       target,
       ischildren,

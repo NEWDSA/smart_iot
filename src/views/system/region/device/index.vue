@@ -3,15 +3,16 @@
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
     <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleBulk">批量设置权限</a-button>
-        <a-button type="primary" @click="handleout">批量移出</a-button>
-        <a-button type="primary" @click="handleCreate">添加设备</a-button>
+        <a-button v-if="hasPermission(['BatchAuth_RegionDevice'])" type="primary" @click="handleBulk">批量设置权限</a-button>
+        <a-button v-if="hasPermission(['BatchOut_RegionDevice'])" type="primary" @click="handleout">批量移出</a-button>
+        <a-button v-if="hasPermission(['AddDevice_RegionDevice'])" type="primary" @click="handleCreate">添加设备</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
               label: '移出',
+              ifShow:  hasPermission(['moveOut_RegionDevice']),
               popConfirm: {
                 title: '是否确认移出',
                 placement: 'left',
@@ -20,10 +21,12 @@
             },
             {
               label: '权限设置',
+              ifShow:  hasPermission(['AuthSetting_RegionDevice']),
               onClick: handleEditPwd.bind(null, record)
             },
             {
               label: '更多',
+              ifShow:  hasPermission(['more_RegionDevice']),
               onClick: handleEdit.bind(null, record),
             }
           ]" />
@@ -48,10 +51,12 @@ import AccountTable from './AccountTable.vue';
 import AccountModal from './AccountModal.vue';
 import { columns, searchFormSchema } from './account.data';
 import { useGo } from '@/hooks/web/usePage';
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'AccountManagement',
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction },
   setup() {
+    const { hasPermission } = usePermission();
     const go = useGo();
     const searchInfo = reactive<Recordable>({});
     const [registerModal, { openModal }] = useModal();
@@ -269,6 +274,7 @@ export default defineComponent({
       handleout,
       bulkPermission,
       getData,
+      hasPermission,
       dataSource,
       modalVisible,
       currentModal,

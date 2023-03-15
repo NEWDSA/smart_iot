@@ -6,7 +6,7 @@
           <!-- <BasicForm @register="register"></BasicForm> -->
         </div>
         <div>
-          <a-button type="primary" preIcon="ic:baseline-plus" @click="handleAdd()">
+          <a-button v-if="hasPermission(['handleAdd_visitorclasslist'])" type="primary" preIcon="ic:baseline-plus" @click="handleAdd()">
             添加访客类型
           </a-button>
         </div>
@@ -38,11 +38,12 @@ import { useModal } from '@/components/Modal';
 import addModel from './addClassModal.vue'
 import { message } from 'ant-design-vue';
 import { PageWrapper } from '@/components/Page';
-
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   components: { BasicTable, TableAction, addModel,PageWrapper },
   setup() {
     const [registerModal, { openModal }] = useModal();
+    const { hasPermission } = usePermission();
     // 表格数据
     const [registertab, { reload, deleteTableDataRecord }] = useTable({
       api: visitorTypeListApi,
@@ -64,10 +65,12 @@ export default defineComponent({
       return [
         {
           label: '修改',
+          ifShow:  hasPermission(['handleEdit_visitorlist']),
           onClick: handleEdit.bind(null, record)
         },
         {
           label: '删除',
+          ifShow:  hasPermission(['handleDelete_visitorlist']),
           popConfirm: {
             title: '是否确认删除',
             placement: 'left',
@@ -104,6 +107,7 @@ export default defineComponent({
     return {
       registertab,
       handleAdd,
+      hasPermission,
       registerModal,
       handleSuccess,
       createActions,

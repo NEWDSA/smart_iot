@@ -3,7 +3,7 @@
         <div class="bg-white">
             <div class="p-2 flex justify-between items-center">
                 <div>
-                    <a-button type="primary" preIcon="ic:baseline-plus" @click="addWorkOder()">
+                    <a-button v-if="hasPermission(['addWorkOder_workorderList'])" type="primary" preIcon="ic:baseline-plus" @click="addWorkOder()">
                         创建工单
                     </a-button>
                 </div>
@@ -57,10 +57,11 @@ import { message, Select, Input } from 'ant-design-vue';
 import { useLoading } from '@/components/Loading';
 import { PageWrapper } from '@/components/Page';
 import addModal from './addModal.vue'
-
+import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
     components: { BasicTable, TableAction, Select, Input, PageWrapper,addModal },
     setup() {
+      const { hasPermission } = usePermission();
         onMounted(() => {
             // visitorTypeListApi().then(res => {
             //     VisitorTypeList.value = res.Detail
@@ -149,6 +150,7 @@ export default defineComponent({
             return [
                 {
                     label: '查看',
+                    ifShow:  hasPermission(['handleLook_workorderList']),
                     onClick: handleLook.bind(null, record)
                 }
             ]
@@ -217,6 +219,7 @@ export default defineComponent({
         }
 
         return {
+            hasPermission,
             registertab,
             registerModal,
             handleSuccess,
