@@ -43,8 +43,8 @@ enum Api {
   NoticeInfo = '/notice/info',
   NoticeTransfer = '/notice/forward',
   DelNotice = '/notice/delete',
-  NoticeEdit='/notice/edit',
-  NoticeRead='/notice/is-read'
+  NoticeEdit = '/notice/edit',
+  NoticeRead = '/notice/is-read'
 }
 
 // 获取用户列表
@@ -189,7 +189,8 @@ export const setRoleStatus = (RoleId: number, Status: string) =>
 //admin12345
 
 // 查询已分配用户角色列表
-export const RoleUserList = (params?) => realHttp.get({ url: Api.RoleUserList, params })
+export const RoleUserList = (params?) =>
+  realHttp.get({ url: Api.RoleUserList, params }, { isTransformResponse: true })
 
 // 查询未分配用户角色列表
 export const RoleUnUserList = (params?) => realHttp.get({ url: Api.RoleUnUserList, params })
@@ -236,38 +237,36 @@ export const NoticeTransfer = (params?) =>
 export const DelNotice = (params?) =>
   realHttp.delete(
     {
-      url: `${Api.DelNotice}?NoticeId=`+params.NoticeId+'&'+'UserId='+params.UserId,
+      url: `${Api.DelNotice}?NoticeId=` + params.NoticeId + '&' + 'UserId=' + params.UserId
     },
-    
+
     {
       isTransformResponse: true
     }
   )
 
-  // 通知编辑
-  export const NoticeEdit = (params?) =>
+// 通知编辑
+export const NoticeEdit = (params?) =>
   realHttp.put(
     {
-      
-      url: Api.NoticeEdit,params
+      url: Api.NoticeEdit,
+      params
     },
-    
+
     {
       isTransformResponse: true
     }
   )
 
-  // 通知已读
-  export const NoticeRead = (params?) =>
+// 通知已读
+export const NoticeRead = (params?) =>
   realHttp.post(
     {
-      
-      url: Api.NoticeRead,params
+      url: Api.NoticeRead,
+      params
     },
-    
+
     {
       isTransformResponse: true
     }
   )
-
-  
