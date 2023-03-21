@@ -50,6 +50,7 @@ export function checkStatus(
       errMessage = t('sys.api.errMsg408')
       break
     case 500:
+      
       // errMessage = t('sys.api.errMsg500')
       // 对错误进行处理
       errMessage = `${msg}`

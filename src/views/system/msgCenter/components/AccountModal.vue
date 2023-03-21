@@ -30,13 +30,15 @@ export default defineComponent({
     function onChange() {
     }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      
       NoticeId.value = data.NoticeId
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
+      clearSelectedRowKeys()
 
     });
 
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getForm }] = useTable({
+    const [registerTable, {clearSelectedRowKeys}] = useTable({
       onChange,
       rowSelection: {
         type: 'checkbox',

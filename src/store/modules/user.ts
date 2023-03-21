@@ -93,13 +93,8 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, mode, ...loginParams } = params
         const data = await loginApi(loginParams, mode)
-        // TODO:token 根据真实接口进行修改
-        // const { token } = data //模拟数据
-        // this.setToken(token) //模拟数据
-        console.log(data,'4as4d6as4d56a1d6a')
-        const { Token } = data //真实数据
-        this.setToken(Token) //真实数据
-
+        const { Token } = data 
+        this.setToken(Token)
         return this.afterLoginAction(goHome)
       } catch (error) {
         return Promise.reject(error)

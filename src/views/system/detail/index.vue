@@ -7,9 +7,6 @@
         <a-button v-if="hasPermission(['AddUserMenu_RoleDetail'])" type="primary" @click="handleCreate">添加用户</a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'DeptName'">
-          {{ record.DeptName }}
-        </template>
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
@@ -114,6 +111,7 @@ export default defineComponent({
       });
     }
     async function roleAccount() {
+      dataSource.value=[];
       searchInfo.RoleId = RoleId.value;
       Object.assign(pagination, searchInfo);
       const { List, Total } = await RoleUserList(pagination);

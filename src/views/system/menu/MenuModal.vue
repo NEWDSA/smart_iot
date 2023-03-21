@@ -1,47 +1,50 @@
 <template>
-  <BasicDrawer v-bind="$attrs" @register="registerDrawer" showFooter :title="getTitle" width="50%" @ok="handleSubmit">
+  <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
     <BasicForm @register="registerForm" />
-  </BasicDrawer>
+  </BasicModal>
 </template>
 <script lang="ts">
 import { defineComponent, ref, computed, unref } from 'vue';
+import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { formSchema } from './menu.data';
-import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
 
 import { getMenTree, editMenuList, createMenuList } from '@/api/demo/system';
-
 export default defineComponent({
-  name: 'MenuDrawer',
-  components: { BasicDrawer, BasicForm },
+  name: 'DeptModal',
+  components: { BasicModal, BasicForm },
   emits: ['success', 'register'],
   setup(_, { emit }) {
     const isUpdate = ref(true);
     const MenuId = ref('');
-    const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
+    const MenuType = ref();
+    const isShow = ref(false);
+    const isModifiy = ref(0);
+    const DeptId = ref('');
+
+    const [registerForm, { resetFields, setFieldsValue, updateSchema, validate,getFieldsValue }] = useForm({
       labelWidth: 100,
       schemas: formSchema,
       showActionButtonGroup: false,
-      baseColProps: { lg: 12, md: 24 },
+      baseColProps: { lg: 12, md: 24 }
     });
 
-    const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
+    const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      console.log(data, '?...data...?');
       resetFields();
-      setDrawerProps({ confirmLoading: false });
+      setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
-
-
       if (unref(isUpdate)) {
         setFieldsValue({
           ...data.record,
         });
+        MenuType.value = data.record.MenuType;
         if (data.record.ParentId == 0) {
           setFieldsValue({
-            ParentId:data.ParentId,
+            ParentId: data.ParentId,
           });
         }
-        MenuId.value = data.record.MenuId
-
+        MenuId.value = data.record.MenuId;
       }
       const treeData = await getMenTree().then((res) => {
         return res.TreeSelect
@@ -51,27 +54,23 @@ export default defineComponent({
         componentProps: { treeData },
       });
     });
-
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增菜单' : '编辑菜单'));
-
+    const getTitle = computed(() => (!unref(isUpdate) ? '新增菜单' : MenuType.value=='M'?  '编辑目录':MenuType.value=='F'?'编辑按钮':MenuType.value=='C'?'编辑菜单':''));
     async function handleSubmit() {
       try {
         const values = await validate();
-        setDrawerProps({ confirmLoading: true });
-        // TODO custom api
-        console.log(values, '...values...')
+        setModalProps({ confirmLoading: true });
         if (!values.ParentId) {
           values.ParentId = 0;
         }
         !unref(isUpdate) ? await createMenuList(values) : await editMenuList({ ...values, MenuId: MenuId.value })
-        closeDrawer();
+        closeModal();
         emit('success');
       } finally {
-        setDrawerProps({ confirmLoading: false });
+        setModalProps({ confirmLoading: false });
       }
     }
 
-    return { registerDrawer, registerForm, getTitle, handleSubmit };
+    return { registerModal, registerForm, getTitle, isShow, isUpdate, MenuType, isModifiy, DeptId, handleSubmit };
   },
 });
 </script>

@@ -44,7 +44,8 @@ enum Api {
   NoticeTransfer = '/notice/forward',
   DelNotice = '/notice/delete',
   NoticeEdit = '/notice/edit',
-  NoticeRead = '/notice/is-read'
+  NoticeRead = '/notice/is-read',
+  IsRead = '/notice/list-is-read'
 }
 
 // 获取用户列表
@@ -176,9 +177,9 @@ export const CreateRole = (params?: RoleParams) =>
   realHttp.post<RolePageListGetResultModel>({ url: Api.createRole, params }) //后端接口
 
 // 删除角色
-export const DelRole = (params?: RoleParams) => {
-  realHttp.delete<RolePageListGetResultModel>({ url: Api.DelRole, params }) //后端接口
-}
+
+export const DelRole = (params?: RoleParams) =>
+  realHttp.delete({ url: Api.DelRole, params })
 // 修改角色
 export const ModifiRole = (params?: RoleParams) => {
   realHttp.put<RolePageListGetResultModel>({ url: Api.createRole, params }) //后端接口
@@ -237,9 +238,9 @@ export const NoticeTransfer = (params?) =>
 export const DelNotice = (params?) =>
   realHttp.delete(
     {
-      url: `${Api.DelNotice}?NoticeId=` + params.NoticeId + '&' + 'UserId=' + params.UserId
+      url: Api.DelNotice,
+      params
     },
-
     {
       isTransformResponse: true
     }
@@ -263,6 +264,19 @@ export const NoticeRead = (params?) =>
   realHttp.post(
     {
       url: Api.NoticeRead,
+      params
+    },
+
+    {
+      isTransformResponse: true
+    }
+  )
+
+// 接入用户isRead 接口
+export const isRead = (params?) =>
+  realHttp.get(
+    {
+      url: Api.IsRead,
       params
     },
 

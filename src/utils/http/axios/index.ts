@@ -49,7 +49,7 @@ const transform: AxiosTransform = {
       // return '[HTTP] Request has no return value';
       throw new Error(t('sys.api.apiRequestFailed'))
     }
-
+    debugger
     const { Code, Data, Msg } = data
 
     // 这里逻辑可以根据项目进行修改
@@ -152,8 +152,13 @@ const transform: AxiosTransform = {
           config.params = params
         } else {
           // 非GET请求如果没有提供data，则将params视为data
-          config.data = params
-          config.params = undefined
+          // if (config.method?.toUpperCase() == RequestEnum.DELETE) {
+          //   config.data = data
+          //   config.params = params
+          // } else {
+            config.data = params
+            config.params = undefined
+          // }
         }
         if (joinParamsToUrl) {
           config.url = setObjToUrlParams(

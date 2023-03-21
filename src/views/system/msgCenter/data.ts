@@ -19,27 +19,29 @@ export interface TabItem {
   name: string
   component: string,
   total:string,
+  current:string,
   unreadlist?: ListItem[]
   list: []
 }
 import { useUserStore } from '@/store/modules/user'
 const userStore = await useUserStore()
-import { isRead } from '@/api/demo/system'
+import { NoticeList } from '@/api/demo/system'
 const myTabList:any=[];
 export const tabListData: TabItem[] = myTabList
 
 
 async function getData(type) {
-  const data = await isRead({
+  const data = await NoticeList({
     Token: userStore.getToken,
     PageNum: 1,
-    PageSize: 10,
+    PageSize: 9,
     Type: type
   })
   myTabList.push({
     key: type,
     name: type == 0 ? '全部' : type == 1 ? '设备告警' : type == 2 ? '工单' : '',
     component: '',
+    current:1,
     list: data.Detail,
     total:data.Total
   })

@@ -71,28 +71,6 @@ export const columns: BasicColumn[] = [
     width:180
   },
 ];
-
-export const searchFormSchema: FormSchema[] = [
-  {
-    field: 'roleNme',
-    label: '角色名称',
-    component: 'Input',
-    colProps: { span: 8 },
-  },
-  {
-    field: 'Status',
-    label: '状态',
-    component: 'Select',
-    componentProps: {
-      options: [
-        { label: '启用', value: '0' },
-        { label: '停用', value: '1' },
-      ],
-    },
-    colProps: { span: 8 },
-  },
-];
-
 export const formSchema: FormSchema[] = [
   {
     field: 'RoleName',

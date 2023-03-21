@@ -1,27 +1,26 @@
 <template>
   <div :class="prefixCls">
-    <Popover title="" trigger="click" :overlayClassName="`${prefixCls}__overlay`">
+    <Popover id="mypopup" title="" trigger="click" :overlayClassName="`${prefixCls}__overlay`">
       <Badge :count="count" dot :numberStyle="numberStyle">
         <BellOutlined />
       </Badge>
       <template #content>
         <Tabs @change="Tab_Click">
-          <template v-for="item in listData" :key="item.key">
+          <template v-for="item, index in listData" :key="item.key">
             <TabPane>
               <template #tab>
                 {{ item.name }}
+                <span v-if="item.list">({{ item.total }})</span>
               </template>
-              <component ref="ListRef" :Datalist="Datalist" :params="params" :Total="myTotal" @changePage="changePage"
-                :is="item.component" @title-click="onNoticeClick" />
+              <NoticeLists :Datalist="item.list" :params="params" :Total="myTotal" @changePage="changePage"
+                @title-click="onNoticeClick" />
             </TabPane>
           </template>
         </Tabs>
-        <div style="border: 1px solid #ebe8e8;display: flex;">
-          <div @click="AllRead"
-            style=" display: flex;  cursor: pointer; justify-content: center; align-items: center; text-align: center; flex:1;border:1px solid #ebe8e8;text-align: center;height: 40px;">
+        <div class="btn_container">
+          <div class="btn_1" @click="AllRead">
             全部已读</div>
-          <div @click="SeeMore"
-            style="display: flex;  cursor: pointer;justify-content: center; align-items: center; text-align: center; flex:1;border: 1px solid #ebe8e8;text-align: center;height: 40px;;">
+          <div class="btn_2" @click="SeeMore">
             查看更多</div>
         </div>
       </template>
@@ -37,46 +36,38 @@ import { tabListData } from './data'
 import NoticeLists from './NoticeList.vue'
 import { NoticeList, NoticeRead } from '@/api/demo/system';
 import { useDesign } from '@/hooks/web/useDesign'
-// import { useMessage } from '@/hooks/web/useMessage'
 import { useUserStore } from '@/store/modules/user'
 import { useGo } from '@/hooks/web/usePage';
-// import { NoticeInfo } from '@/api/demo/system';
+import { useLoading } from '@/components/Loading';
+import emitter from '@/utils/mybus'
 export default defineComponent({
   components: { Popover, BellOutlined, Tabs, TabPane: Tabs.TabPane, Badge, NoticeLists },
   setup() {
     const { prefixCls } = useDesign('header-notify')
     const go = useGo();
-    // const { createMessage } = useMessage()
     const listData = ref(tabListData);
     const Datalist: any = ref([]);
     const tabIndex = ref(0);
     const PageNum = ref(1);
     const params = ref({});
     const myTotal = ref(0);
+    const [openFullLoading, closeFullLoading] = useLoading({
+      tip: '加载中...',
+    });
     const count = computed(() => {
-
       return params.value?.Total;
-
-
     })
     onMounted(async () => {
-      const userStore = await useUserStore()
-      const { Detail, Total } = await NoticeList({
-        Token: userStore.getToken,
-        PageNum: PageNum.value,
-        PageSize: 4
-      })
-      Datalist.value = Detail;
-      myTotal.value = Total;
-      params.value = {
-        PageNum: PageNum.value,
-        Total: myTotal.value
-      }
+      console.log(listData.value, '?...listData...?');
+
     })
     function onNoticeClick(record) {
       // createMessage.success('你点击了通知，ID=' + record.id)
       // 可以直接将其标记为已读（为标题添加删除线）,此处演示的代码会切换删除线状态
       // record.titleDelete = !record.titleDelete
+    }
+    function handleClickChange() {
+      // clicked.value = !clicked.value;
     }
     function AllRead() {
       var NoticeId: any = [];
@@ -84,16 +75,29 @@ export default defineComponent({
         NoticeId.push(item.NoticeId)
       })
       const userStore = useUserStore()
-      NoticeRead({
-        NoticeId: NoticeId,
-        Token: userStore.getToken
-      })
+      try {
+        NoticeRead({
+          NoticeId: NoticeId,
+          Token: userStore.getToken
+        })
+      } finally {
+        // emit('getData');
+        emitter.emit('getData');
+        // location.reload();
+        //调用页面的刷新方法
+
+      }
     }
     function SeeMore() {
-      // 页面跳转
-      // messagecenter/msgCenter
-      // /facilityset/facilitylist/detail
-      go('/messagecenter/msgCenter'); // 设备详情设备
+
+      let mydiv = document.getElementsByClassName('vben-header-notify__overlay').item(0);
+      mydiv.style.display = 'none';
+      openFullLoading();
+      setTimeout(() => {
+        closeFullLoading();
+        go('/messagecenter/msgCenter'); // 设备详情设备
+      }, 2000)
+
 
     }
     async function changePage(index) {
@@ -137,29 +141,58 @@ export default defineComponent({
       count,
       PageNum,
       params,
+      handleClickChange,
       Tab_Click,
       AllRead,
       SeeMore,
       changePage,
       onNoticeClick,
+      openFullLoading,
+      closeFullLoading,
       numberStyle: {}
     }
   }
 })
 </script>
+<style lang="less" scoped>
+.ant-tabs-tabpane {
+  height: 400px;
+  overflow-y: scroll;
+}
+</style>
 <style lang="less">
 @prefix-cls: ~'@{namespace}-header-notify';
+
 
 .@{prefix-cls} {
   padding-top: 2px;
 
   &__overlay {
-    max-width: 360px;
+    top: 90px !important;
+    width: 350px;
+    max-width: 350px;
+
+    .ant-popover-inner-content {
+      // padding: 16px 16px 0 16px;
+      padding: 0;
+    }
+
+    .ant-tabs-nav-wrap {
+      padding: 16px 16px 0 16px;
+
+    }
+
+    .ant-list-item-meta {
+      padding: 16px 16px 0 16px;
+    }
+
   }
 
   .ant-tabs-content {
     width: 300px;
   }
+
+
 
   .ant-badge {
     font-size: 18px;
@@ -172,6 +205,37 @@ export default defineComponent({
     svg {
       width: 0.9em;
     }
+  }
+
+
+}
+
+.btn_container {
+  display: flex;
+
+  .btn_1 {
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    text-align: center;
+    height: 40px;
+    border-right: 1px solid #ece9e9;
+    color: rgb(22, 93, 255);
+  }
+
+  .btn_2 {
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    text-align: center;
+    height: 40px;
+    color: rgb(22, 93, 255);
   }
 }
 </style>

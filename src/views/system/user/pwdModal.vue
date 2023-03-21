@@ -35,7 +35,6 @@ export default defineComponent({
     });
 
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-      console.log(data, '???datapwd???')
       resetFields();
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;

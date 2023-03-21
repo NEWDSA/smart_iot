@@ -34,11 +34,6 @@ export const columns: BasicColumn[] = [
     dataIndex: 'PhoneNumber',
     width: 120
   },
-  // 需对部门信息进行处理
-  {
-    title: '部门',
-    dataIndex: 'DeptName'
-  },
   {
     title: '状态',
     dataIndex: 'Status',
@@ -156,8 +151,6 @@ export const accountFormSchema: FormSchema[] = [
         trigger: 'blur'
       }
     ]
-    // rules:[],
-    // required: true
   },
   // 状态设置
   {
