@@ -30,7 +30,7 @@
 </template>
 <script lang="ts">
 import { Progress, Row, Col } from 'ant-design-vue';
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent,ref } from 'vue'
 import Icon from '@/components/Icon/index';
 import { Button } from '@/components/Button'
 import { useDesign } from '@/hooks/web/useDesign';

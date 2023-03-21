@@ -34,7 +34,7 @@ import { Popover, Tabs, Badge } from 'ant-design-vue'
 import { BellOutlined } from '@ant-design/icons-vue'
 import { tabListData } from './data'
 import NoticeLists from './NoticeList.vue'
-import { NoticeList, NoticeRead } from '@/api/demo/system';
+import { NoticeList, NoticeAllRead } from '@/api/demo/system';
 import { useDesign } from '@/hooks/web/useDesign'
 import { useUserStore } from '@/store/modules/user'
 import { useGo } from '@/hooks/web/usePage';
@@ -76,8 +76,7 @@ export default defineComponent({
       })
       const userStore = useUserStore()
       try {
-        NoticeRead({
-          NoticeId: NoticeId,
+        NoticeAllRead({
           Token: userStore.getToken
         })
       } finally {

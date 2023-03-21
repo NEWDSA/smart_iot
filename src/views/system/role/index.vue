@@ -79,7 +79,7 @@ export default defineComponent({
     }
 
     function handleEdit(record: Recordable) {
-      
+
       openDrawer(true, {
         record,
         isUpdate: true,
@@ -90,12 +90,12 @@ export default defineComponent({
       await deleteTableDataRecord(record.RoleId);
 
       try {
-        const {Data,Msg}= await DelRole({
-          RoleId: await record.RoleId 
+        const { Data, Msg } = await DelRole({
+          RoleId: await record.RoleId
         })
-  
+
         // 弹窗提示
-        Msg=='fail'? createMessage.error(Data):createMessage.success('删除角色成功');
+        Msg == 'fail' ? createMessage.error(Data) : createMessage.success('删除角色成功');
       } finally {
         reload();
       }
@@ -103,8 +103,8 @@ export default defineComponent({
     function handleDetail(record) {
       go(`/system/detail/${record.RoleId}`)
     }
-    function handleSuccess() {
-      reload();
+    async function handleSuccess() {
+      await reload();
     }
 
     return {

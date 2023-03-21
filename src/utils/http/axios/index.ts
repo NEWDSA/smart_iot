@@ -49,7 +49,7 @@ const transform: AxiosTransform = {
       // return '[HTTP] Request has no return value';
       throw new Error(t('sys.api.apiRequestFailed'))
     }
-    debugger
+
     const { Code, Data, Msg } = data
 
     // 这里逻辑可以根据项目进行修改

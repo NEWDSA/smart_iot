@@ -45,7 +45,8 @@ enum Api {
   DelNotice = '/notice/delete',
   NoticeEdit = '/notice/edit',
   NoticeRead = '/notice/is-read',
-  IsRead = '/notice/list-is-read'
+  IsRead = '/notice/list-unread',
+  AllRead='/notice/whole-is-read'
 }
 
 // 获取用户列表
@@ -69,7 +70,6 @@ export const updatePwd = (params?) =>
       isTransformResponse: true
     }
   )
-// /system/user/updatePwd
 // 根据编号获取详细信息
 export const getUserRole = (params?) =>
   realHttp.get({ url: `${Api.AccountList}/${params}` }, { isTransformResponse: true })
@@ -271,6 +271,13 @@ export const NoticeRead = (params?) =>
       isTransformResponse: true
     }
   )
+
+  // 全部已读
+export const NoticeAllRead=(params?)=>
+realHttp.post({
+  url:Api.AllRead,
+  params
+})
 
 // 接入用户isRead 接口
 export const isRead = (params?) =>

@@ -2,7 +2,7 @@
   <BasicDrawer v-bind="$attrs" @register="registerDrawer" showFooter :title="getTitle" width="500px" @ok="handleSubmit">
     <BasicForm @register="registerForm">
       <template #menuIds="{ model, field }">
-        <BasicTree v-model:value="model[field]" :checkedKeys="checkedMenu"  :treeData="treeData"
+        <BasicTree v-model:value="model[field]"  :checkedKeys="checkedMenu"  :treeData="treeData"
           :fieldNames="{ title: 'Name', key: 'Id' }" checkable  title="菜单分配" />
       </template>
     </BasicForm>
@@ -21,6 +21,7 @@ export default defineComponent({
   emits: ['success', 'register'],
   setup(_, { emit }) {
     const isUpdate = ref(true);
+    const isTrue=ref(true);
     const treeData = ref<TreeItem[]>([]);
     const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
       labelWidth: 90,
@@ -39,25 +40,20 @@ export default defineComponent({
         setFieldsValue({
           ...data.record,
         });
-        // if (unref(treeData).length === 0) {
         RoleId.value = data.record.RoleId;
         const { TreeSelect, checkedKeys
         } = await geRoletMenTree(data.record.RoleId);
         checkedMenu.value = checkedKeys;
         treeData.value = (TreeSelect) as any as TreeItem[];
-        // }
       }
     });
     const getTitle = computed(() => (!unref(isUpdate) ? '新增角色' : '编辑角色'));
     async function handleSubmit() {
       try {
         const values = await validate();
-        console.log(values.menu
-          , 'value')
-        debugger;
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
-        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: values.menuIds.checked })
+        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: values.menuIds })
         emit('success');
 
       } finally {
@@ -69,6 +65,7 @@ export default defineComponent({
       registerForm,
       getTitle,
       RoleId,
+      isTrue,
       checkedMenu,
       handleSubmit,
       treeData,

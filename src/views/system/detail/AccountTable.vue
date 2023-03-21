@@ -9,7 +9,6 @@
 import { defineComponent, ref, computed, unref, onMounted } from 'vue';
 import { useMessage } from '@/hooks/web/useMessage';
 import { BasicModal, useModalInner } from '@/components/Modal';
-// import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { BasicTree, TreeItem,TreeActionType } from '@/components/Tree/index';
 import { getDeptList } from '@/api/demo/system';
 export default defineComponent({
