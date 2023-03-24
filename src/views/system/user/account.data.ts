@@ -35,10 +35,10 @@ export const columns: BasicColumn[] = [
     width: 120
   },
   // 需对部门信息进行处理
-  // {
-  //   title: '部门',
-  //   dataIndex: 'DeptName'
-  // },
+  {
+    title: '部门',
+    dataIndex: 'DeptName'
+  },
   {
     title: '状态',
     dataIndex: 'Status',
@@ -96,7 +96,7 @@ export const searchFormSchema: FormSchema[] = [
 export const accountFormSchema: FormSchema[] = [
   {
     field: 'NickName',
-    label: '',
+    label: '昵称',
     component: 'Input',
     rules: [
       {
@@ -107,7 +107,7 @@ export const accountFormSchema: FormSchema[] = [
   },
   {
     field: 'DeptId',
-    label: '',
+    label: '所属部门',
     component: 'TreeSelect',
 
     componentProps: {
@@ -141,11 +141,9 @@ export const accountFormSchema: FormSchema[] = [
         label: 'RoleName',
         key: 'RoleId',
         value: 'RoleId'
-      },
-      getPopupContainer: () => document.body
+      }
     },
-    required: true,
-    
+    required: true
   },
   {
     label: '邮箱',
@@ -155,7 +153,8 @@ export const accountFormSchema: FormSchema[] = [
     rules: [
       {
         required: true,
-        validator: validateEmail()
+        validator: validateEmail(),
+        trigger: 'blur'
       }
     ]
     // rules:[],
