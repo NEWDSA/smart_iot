@@ -1,6 +1,11 @@
 <template>
-  <div class="text-lg font-bold">告警类别占比</div>
-  <div ref="chartRef" :style="{ height, width }"></div>
+  <div v-if="show == false">
+    <div class="text-lg font-bold">告警类别占比</div>
+    <div ref="chartRef" :style="{ height, width }"></div>
+  </div>
+  <!-- <div > -->
+  <div v-else class=" text-2xl text-red-600 font-bold flex justify-center pt-1/2">暂无告警</div>
+  <!-- </div> -->
 </template>
 <script lang="ts">
 import { basicProps } from './props'
@@ -14,20 +19,22 @@ defineProps({
 })
 const chartRef = ref<HTMLDivElement | null>(null)
 const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>)
-
+const show = ref(false)
 onMounted(() => {
   let obj = {
-    AlarmTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000,
+    AlarmTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf() / 1000,
     // AlarmTime: 1673366400,
   }
 
   facilityAlertDataApi(obj).then(res => {
-    if(res.length == 0){
+    if (res.length == 0) {
       console.log(456456)
     }
     console.log(res)
-    var num = res?.ExceptionAlertTotal||0 + res?.FaultAlertTotal||0 + res?.OtherAlertTotal||0
-
+    var num = res?.ExceptionAlertTotal || 0 + res?.FaultAlertTotal || 0 + res?.OtherAlertTotal || 0
+    if (num == 0) {
+      show.value = true
+    }
     setOptions({
       title: {
         text: num,
@@ -64,7 +71,7 @@ onMounted(() => {
       series: [
         {
           color: ['#5ab1ef', '#b6a2de', '#67e0e3'],
-          name: '设备告警',
+          name: '',
           type: 'pie',
           radius: ['40%', '70%'],
           // avoidLabelOverlap: false,

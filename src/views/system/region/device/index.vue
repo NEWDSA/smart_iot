@@ -205,8 +205,29 @@ export default defineComponent({
       }
 
     }
-    async function handleSuccess() {
-      await reload();
+    // 获取table数据
+    async function getData() {
+      //  获取区域设备
+      dataSource.value = [];
+      const { Detail,Total } = await getReginDevice(pagination)
+      const result = Detail;
+      const TypeList: any = [];
+      setPagination({
+        total: Total
+      })
+      result.map(async (item) => {
+        const DeviceList = await getDeviceType({
+          Id: item.TypeId
+        })
+
+        TypeList.push(...DeviceList)
+        item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
+        dataSource.value.push(item)
+      })
+    }
+    function handleSuccess() {
+      // reload()
+      getData();
     }
     function handleEditPwd(record: Recordable) {
 

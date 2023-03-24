@@ -107,7 +107,7 @@ const sceneList = ref()
 const searchObj = reactive(
     {
         Name: '',
-        DeviceId: '888',
+        DeviceId: '',
         PageNum: 1,
         PageSize: 10
     }

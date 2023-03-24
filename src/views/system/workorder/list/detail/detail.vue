@@ -1,5 +1,5 @@
 <template>
-    <PageWrapper :title="'单号：' + WorkorderId" contentBackground>
+    <PageWrapper contentBackground>
         <!--   
                   <template #footer>
                     <a-tabs default-active-key="1">
@@ -10,10 +10,11 @@
 
         <div class="pt-4 m-4 desc-wrap flex ">
             <div class="w-7/10" style="border-right:1px solid #eeeeee;">
+                <!-- <div > </div> -->
                 <div class="px-5" v-if="editStatus == false">
                     <div class="flex items-center justify-between">
                         <div class="text-xl">{{ WorkorderDetail?.Title }}</div>
-                        <Icon icon="heroicons:pencil-square-solid" :size="20" @click="editStatusFun" />
+                        <Icon icon="heroicons:pencil-square-solid" :size="20" @click="editStatusFun" v-if="WorkorderDetail?.Status == 2"/>
                     </div>
                     <div class="text-gray-400 mt-5">{{ WorkorderDetail?.Content }}</div>
                 </div>
@@ -38,17 +39,20 @@
 
                 </div>
 
-                <div class="my-4">
-                    <a-button type="primary" size="large" @click="openmodal">
+                <div class="my-4" >
+                    <a-button type="primary" size="large" @click="openmodal" :disabled="WorkorderDetail?.Status == 2">
                         转 交
                     </a-button>
-                    <a-button type="primary" size="large" class="ml-4" @click="workOver">
+                    <a-button type="primary" size="large" class="ml-4" @click="workOver" v-if="WorkorderDetail?.Status == 1">
                         完 结
+                    </a-button>
+                    <a-button type="primary" size="large" class="ml-4" v-if="WorkorderDetail?.Status == 2">
+                        重 开 工 单
                     </a-button>
                 </div>
 
-                <div style="width:95%">
-                    <a-textarea v-model:value="value" placeholder="Basic usage" :rows="4" />
+                <div style="width:95%" >
+                    <a-textarea v-model:value="value" placeholder="在这里输入你的跟进结果" :rows="4" :disabled="WorkorderDetail?.Status == 2"/>
                 </div>
 
                 <!-- <div>
@@ -62,10 +66,10 @@
                 </div> -->
 
                 <div class="my-4">
-                    <a-button type="primary" size="large" @click="hadlkOk">
+                    <a-button type="primary" size="large" @click="hadlkOk" :disabled="WorkorderDetail?.Status == 2">
                         保 存
                     </a-button>
-                    <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel" ghost>
+                    <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel" ghost :disabled="WorkorderDetail?.Status == 2">
                         取 消
                     </a-button>
                 </div>
@@ -79,7 +83,7 @@
                                 <div class="flex items-center flex-wrap">
                                     <Tag color="green">{{ item.Remarks }}</Tag>
                                     <div class="mx-5"></div>
-                                    <div class="mr-5 text-gray-500">{{ checkTime(item.Basic.CreatedAt.seconds) }}</div>
+                                    <div class="mr-5 text-gray-500">{{ checkTime(item.Basic?.CreatedAt.seconds) }}</div>
                                     <div class="mr-5 text-gray-500">{{ item.Remarks }}</div>
                                 </div>
                             </template>
@@ -294,6 +298,7 @@ export default defineComponent({
                     WorkorderId.value = ''
                     WorkorderId.value = Id
                     message.success('操作成功')
+                    value.value = ''
                     childHandle()
                     getTaskTicketProgressList(Number(WorkorderId.value))
                 } else {
@@ -320,20 +325,18 @@ export default defineComponent({
             }
             if (value.value != '') {
                 obj.Detail.Operation = value.value
-            } else {
-                message.error('请输入内容')
-                return;
             }
 
             TaskTicketCloseApi(obj).then(res => {
                 if (res == 0) {
                     var Id = WorkorderId.value
-                    WorkorderId.value = 33
+                    // WorkorderId.value = 33
                     WorkorderId.value = Id
                     message.success('操作成功')
                     sceneStopModal.value = false
                     childHandle()
                     getTaskTicketProgressList(Number(WorkorderId.value))
+                    WorkorderDetail.value.Status = 2
                 } else {
                     message.error('操作失败')
                 }

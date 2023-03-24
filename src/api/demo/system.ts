@@ -91,6 +91,10 @@ export const delAccount = (params) =>
 export const getDeptList = (params?: DeptParams) =>
   realHttp.get({ url: Api.DeptReal, params }, { isTransformResponse: true })
 
+  // 获取部门详情
+export const getDeptInfoList = (params) =>
+realHttp.get({ url: Api.DeptReal + '/' + params}, { isTransformResponse: true })
+
 // 部门下拉列表
 export const getDeptDrop = (params?: DeptParams) =>
   realHttp.get<TreeListItem>({ url: Api.Depttree, params }, { isTransformResponse: true })

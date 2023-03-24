@@ -17,8 +17,8 @@ const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>)
 
 onMounted(() => {
   let obj = {
-    BeginTime: 1676476800,//new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000,
-    EndTime:1676646000
+    BeginTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000,
+    EndTime: new Date(new Date().getTime()).valueOf(),
     // AlarmTime: 1673366400,
   }
 
@@ -75,7 +75,7 @@ onMounted(() => {
           },
           label: {
             show: true,
-            formatter: "{d0}%",
+            formatter: "{c}%",
           },
           labelLine: {
             length: 5

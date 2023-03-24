@@ -14,6 +14,21 @@
     </div>
 
   </div>
+
+  <div>
+    <div>今日工单量</div>
+    <div class="text-3xl">{{ todayData.value }}</div>
+    <div class="flex items-center mt-3">
+
+      环比 
+       <div class="ml-4" v-if="Number(todayData.ratio) != 0">
+        <Icon icon="mdi:triangle" color="red" v-if="Number(todayData.ratio) > 0"></Icon>
+        <Icon icon="mdi:triangle-down" color="green" v-if="Number(todayData.ratio) < 0"></Icon>
+      </div>
+      <div class="ml-2" :class="Number(todayData.ratio) > 0 ? 'text-red-500' : Number(todayData.ratio) < 0 ? 'text-green-500' : ''">{{ todayData.ratio }} %</div> 
+     
+    </div>
+  </div>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
 <script lang="ts">
@@ -23,7 +38,7 @@ import { basicProps } from './props'
 import { onMounted, ref, Ref } from 'vue'
 import { useECharts } from '@/hooks/web/useECharts'
 import { TaskTicketCountTrendApi } from '@/api/sys/workorder'
-
+import Icon from '@/components/Icon'
 const props = defineProps({
   ...basicProps,
 })
@@ -36,12 +51,20 @@ onMounted(() => {
 
 const type = ref(1)
 
+const todayData = ref({
+  value: '',
+  ratio: ''
+})
+
 function getTrendRatio() {
   let obj = {
     TypeForTrend: type.value,
   }
   TaskTicketCountTrendApi(obj).then(res => {
     // if (res.Code == 200) {
+
+    todayData.value.value = res.LatelyData
+    todayData.value.ratio = res.RingGrowth
     let xAxisdata: any = []
     let seriesdata: any = []
 
@@ -65,7 +88,7 @@ function getTrendRatio() {
       }
     }
 
-    setOptions({ 
+    setOptions({
       // title: {
       //   text: '用电数据趋势图',
       // },
@@ -153,19 +176,6 @@ function getTrendRatio() {
 function changeCharTime(ctype: Number) {
   type.value = ctype
   getTrendRatio()
-}
-
-function changeData(time: number) {
-  var date = new Date(time * 1000);
-  // var Y = date.getFullYear() + '-';
-  var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
-  var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
-
-  // var h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
-  // var m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
-  // var s = (date.getSeconds() < 10 ? '0' + (date.getSeconds()) : date.getSeconds());
-  var strDate = M + D;
-  return strDate
 }
 
 const height = ref('400px')

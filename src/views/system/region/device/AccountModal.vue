@@ -91,10 +91,31 @@ export default defineComponent({
     function onSelectChange(selectedRowKeys: []) {
       checkedKeys.value = selectedRowKeys;
     }
-    function ModelStatus(isOpen) {
-      //  isOpen?getData():''
-      return isOpen
+    function ModelStatus(isOpen){
+       isOpen?getData():''
     }
+    // onMounted(() => {
+    // })
+    // 获取table数据
+    async function getData() {
+      //  获取区域设备
+      dataSource.value = [];
+      const { Detail,Total } = await getReginDevice(pagination)
+      const result = Detail;
+      const TypeList: any = [];
+      result.map(async (item) => {
+        const DeviceList = await getDeviceType({
+          Id: item.TypeId
+        })
+        TypeList.push(...DeviceList)
+        item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
+        dataSource.value.push(item)
+      })
+      setPagination({
+        total: Total
+      })
+    }
+
     async function handleSubmit() {
       try {
         const params = {

@@ -7,6 +7,7 @@ export function usePermission() {
   /**
    * Determine whether there is permission
    */
+  // debugger
   function hasPermission(value?: any[], def = true): boolean {
     // Visible by default
     if (!value) {

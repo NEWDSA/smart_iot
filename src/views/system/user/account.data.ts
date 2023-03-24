@@ -35,10 +35,10 @@ export const columns: BasicColumn[] = [
     width: 120
   },
   // 需对部门信息进行处理
-  {
-    title: '部门',
-    dataIndex: 'DeptName'
-  },
+  // {
+  //   title: '部门',
+  //   dataIndex: 'DeptName'
+  // },
   {
     title: '状态',
     dataIndex: 'Status',
@@ -96,7 +96,7 @@ export const searchFormSchema: FormSchema[] = [
 export const accountFormSchema: FormSchema[] = [
   {
     field: 'NickName',
-    label: '昵称',
+    label: '',
     component: 'Input',
     rules: [
       {
@@ -107,7 +107,7 @@ export const accountFormSchema: FormSchema[] = [
   },
   {
     field: 'DeptId',
-    label: '所属部门',
+    label: '',
     component: 'TreeSelect',
 
     componentProps: {

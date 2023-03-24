@@ -1,13 +1,11 @@
 <template>
     <PageWrapper contentFullHeight title="工单列表">
         <div class="bg-white">
-            <div class="p-2 flex justify-between items-center">
+            <!-- <div class="p-2 flex justify-between items-center">
                 <div>
-                    <a-button v-if="hasPermission(['addWorkOder_workorderList'])" type="primary" preIcon="ic:baseline-plus" @click="addWorkOder()">
-                        创建工单
-                    </a-button>
+                    
                 </div>
-            </div>
+            </div> -->
             <BasicTable @register="registertab">
                 <template #bodyCell="{ column, record }">
                     <template v-if="column.key === 'action'">
@@ -31,6 +29,16 @@
                             {{ item.label }}
                         </div>
                     </div>
+                </template>
+
+                <template #form-advanceBefore>
+            
+                        <a-button v-if="hasPermission(['addWorkOder_workorderList'])" type="primary" preIcon="ic:baseline-plus" class="ml-5" @click="addWorkOder()">
+                        创建工单
+                    </a-button>
+
+                    
+
                 </template>
             </BasicTable>
 
@@ -244,6 +252,13 @@ export default defineComponent({
 body {
     font-family: 'Alibaba PuHuiTi';
 }
+
+.ant-row .ant-col-24{
+    // display: flex;
+    margin-left:50px;
+  flex: none;
+}
+
 
 .sp-blue-text {
     color: rgb(22, 100, 255);

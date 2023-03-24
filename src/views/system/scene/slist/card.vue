@@ -1,10 +1,10 @@
 <template>
   <List :class="prefixCls">
     <a-row :gutter="16">
-      <template v-for="item in list" :key="item.title">
+      <template v-for="item in list" :key="item.title" >
         <a-col :span="6">
           <ListItem>
-            <Card :hoverable="true" :class="`${prefixCls}__card`">
+            <Card :hoverable="true" :class="`${prefixCls}__card`" @click="pathDetail(item.RuleId)">
               <div :class="`${prefixCls}__card-title`">
                 <Icon class="icon" icon="clarity:star-line" />
                 {{ item.Name }}
@@ -32,7 +32,8 @@
     </a-row>
   </List>
   <a-row :class="`${prefixCls}`">
-    <Pagination v-model:current="current" :total="toTal" show-less-items />
+    <Pagination v-model:current="params.PageNum" 
+    v-model:pageSize="params.PageSize" :total="toTal" show-less-items @change="cutPage" />
   </a-row>
 </template>
 <script lang="ts">
@@ -40,6 +41,7 @@ import { defineComponent, onMounted, reactive, ref, watch } from 'vue';
 import { List, Card, Row, Col, Pagination, Tag } from 'ant-design-vue';
 import Icon from '@/components/Icon/index';
 import { deviceList, scenceList, regionDetail } from '@/api/demo/scence';
+import { useGo } from '@/hooks/web/usePage';
 export default defineComponent({
   props: ['id', 'set'],
   components: {
@@ -53,13 +55,14 @@ export default defineComponent({
     [Col.name]: Col,
   },
   setup(props, { slots }) {
+    const go = useGo();
     // 定义常量
-    const current = ref(2);
+    // const current = ref(1);
     const tagColor = ref('#f50');
     const toTal = ref(0);
     const params = reactive({
       PageNum: 1,
-      PageSize: 20,
+      PageSize: 6,
     })
     const dataList = ref('');
     let param2 = {
@@ -69,20 +72,20 @@ export default defineComponent({
     watch(
       () => props.set,
       (value, oldValue) => {
-        console.log(value,oldValue,'...打印参数...?')
-        if(value!==oldValue){
+        console.log(value, oldValue, '...打印参数...?')
+        if (value !== oldValue) {
           getData(value)
         }
-        
+
       }, { immediate: true }
     )
 
     async function getData(value) {
       // 场景
       // console.log(value,'..ddd?')
-      
-      Object.assign(params,{
-        Name:value
+
+      Object.assign(params, {
+        Name: value
       })
       const { List, Total } = await scenceList({
         ...params
@@ -135,6 +138,17 @@ export default defineComponent({
 
       dataList.value = List;
     }
+    function cutPage(e) {
+      // console.log(e)
+      // seachObj.PageNum = count
+      params.PageNum = e
+      getData()
+    }
+
+     // 详情
+     function pathDetail(id) {
+      go('/scene/linkage/' + id )
+    }
     // 调用接口获取数据
     onMounted(async () => {
       await getData()
@@ -146,9 +160,11 @@ export default defineComponent({
       getData,
       toTal,
       params,
-      current,
+      // current,
       tagColor,
-      slots
+      slots,
+      cutPage,
+      pathDetail
     };
   },
 });

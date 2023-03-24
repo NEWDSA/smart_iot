@@ -9,23 +9,28 @@
           <Icon icon="carbon:3d-cursor" color="#888888" size="30" />
           <span class="text-lg ml-4">场景名称</span>
         </span>
-        <a-input class="" placeholder="会议室温控场景应用" />
+        <a-input class="" placeholder="会议室温控场景应用" v-model:value="SceneName" />
         <span class="flex mt-4 mb-4">
           <Icon icon="carbon:3d-cursor" color="#888888" size="30" />
           <span class="text-lg ml-4">触发方式</span>
         </span>
         <!-- 卡片 -->
 
-        <ProjectCard @mychange="myevent" :loading="loading" class="enter-y" />
+        <ProjectCard @mychange="myevent" :loading="loading" class="enter-y" :selectedIndexPo="CardType" />
         <!-- 条件触发 -->
         <template v-if="CardType == 0">
           <!-- <evenTrigger/> -->
-          <even-trigger ref="child" />
+          <even-trigger ref="child" :InfoObj="InfoObj.Content" />
         </template>
         <!-- 定时触发 -->
         <template v-if="CardType == 1">
-          <timing-trigger />
+          <timing-trigger ref="setTime" :InfoObj="InfoObj.Content" />
         </template>
+        <!-- 手动触发 -->
+        <template v-if="CardType == 2">
+          <hand-trigger ref="hand" :InfoObj="InfoObj.Content" />
+        </template>
+
       </div>
       <div class="lg:w-3/10 w-full enter-y">
         <div class="scroll-wrap">
@@ -58,18 +63,22 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, ref, toRaw } from 'vue';
+import { defineComponent, ref, toRaw, onMounted, nextTick } from 'vue';
 import { Description } from '@/components/Description/index';
 import { Button } from 'ant-design-vue';
 import ProjectCard from './components/ProjectCard.vue';
 import evenTrigger from './components/evenTrigger.vue';
 import timingTrigger from './components/timingTrigger/index.vue';
+import handTrigger from './components/handTrigger/index.vue';
 import { Icon } from '@/components/Icon';
 import { ScrollContainer } from '@/components/Container/index';
 import { BasicTable, useTable } from '@/components/Table';
 import { PageWrapper } from '@/components/Page';
 import { Divider } from 'ant-design-vue';
+import { RuleSaveApi, RuleInfoApi, RuleEditApi } from '@/api/sys/scene';
 import { BasicForm, useForm } from '@/components/Form/index';
+import { useRoute, onBeforeRouteLeave } from 'vue-router';
+
 import {
   refundSchema,
   refundData,
@@ -77,13 +86,19 @@ import {
   personData,
 } from './data';
 export default defineComponent({
-  components: { Description, BasicTable, PageWrapper, [Divider.name]: Divider, ScrollContainer, Icon, ProjectCard, BasicForm, useForm, Button, evenTrigger, timingTrigger },
+  components: { Description, BasicTable, PageWrapper, [Divider.name]: Divider, ScrollContainer, Icon, ProjectCard, BasicForm, useForm, Button, evenTrigger, timingTrigger, handTrigger },
   setup() {
+    const route = useRoute();
+    const InfoObj = ref('');
     const resultList: any = ref(null);
+    const resultListAct: any = ref(null);
     const top = ref<number>(10);
     const loading = ref(true);
     const CardType = ref(0);
     const child: any = ref(null);
+    const setTime: any = ref(null);
+    const hand: any = ref(null);
+    const SceneName = ref()
     function dd(value) {
       console.log(value, '?...value...?')
     }
@@ -136,13 +151,95 @@ export default defineComponent({
       n.value--;
     }
     function saveThings() {
-      console.log(child.value.myData.add
-        , '..dfdrerer...')
+      // console.log(setTime.value.myData.EndData())
+      // return;
+
+      // console.log(mergedData, 'mergedDatamergedDatamergedData')
+      let EndDD: any = {}
+      EndDD.Name = SceneName.value
+      // EndDD.TriggerMode = 
+      let mergedData: any = {};
+      console.log(CardType.value)
+      if (CardType.value == 0) {
+
+        mergedData.ConditionItems = child.value.myData.EndData()
+        mergedData.ConditionItems.ConditionType = Number(mergedData.ConditionItems.ConditionType)
+        mergedData.EchoItems = child.value.myData.EndData()
+        mergedData.OperationItems = child.value.actionData.EndData()
+        mergedData.OperationItems.OperationType = Number(mergedData.OperationItems.OperationType)
+        //   console.log(child.value.myData.EndData()
+        //     , '..dfdrererEndData()EndData()EndData()...')
+        // console.log(child.value.actionData.EndData()
+        //   , '..dfdrererEndData()EndData()EndData()...')
+        mergedData.TriggerType = child.value.myData.isShake == false ? 1 : 0
+
+        mergedData.OperationMode = child.value.actionData.bcIndex
+
+        mergedData.EntryType = 'trigger'
+        EndDD.Content = JSON.stringify(mergedData)
+        EndDD.DeviceIds = unique(child.value.myData.DeviceIdArr)
+      }
+      if (CardType.value == 1) {
+        let obj = setTime.value.myData.EndData()
+        console.log(obj)
+        mergedData.ConditionItems = null
+        mergedData.EchoItems = setTime.value.myData.EndData()
+        mergedData.OperationItems = setTime.value.actionData.EndData()
+        mergedData.OperationItems.OperationType = Number(mergedData.OperationItems.OperationType)
+        if (obj.circulationNum == '2') {
+          mergedData.CronDay = obj.ExecuteDateWeek
+        } else {
+          mergedData.CronDay = obj.ExecuteDate
+        }
+
+        mergedData.CronType = Number(obj.ExecuteNum)
+
+        if (obj.ExecuteNum == '1') {
+          mergedData.CronTime = obj.ExecuteTime
+        } else {
+          mergedData.CronTimeBegin = obj.StartTime
+          mergedData.CronTimeEnd = obj.EndTime
+
+          if (obj.circulationUnit == '1') {
+            mergedData.CronInterval = Number(obj.circulationTime) * 3600
+          } else {
+            mergedData.CronInterval = Number(obj.circulationTime) * 60
+          }
+        }
+
+        mergedData.OperationMode = setTime.value.actionData.bcIndex
+
+        mergedData.EntryType = 'cron'
+        EndDD.Content = JSON.stringify(mergedData)
+        EndDD.DeviceIds = unique(setTime.value.actionData.DeviceIdArr)
+      }
+      if (CardType.value == 2) {
+        EndDD.Content = JSON.stringify(mergedData)
+        EndDD.DeviceIds = unique(child.value.myData.DeviceIdArr)
+      }
+
+
+      EndDD.RegionIds = []
+      EndDD.VisitorTypeId = CardType.value
+      // console.log(InfoObj.value)
+      // if (InfoObj.value != '' && InfoObj.value != 'I') {
+      //   EndDD.RuleId = InfoObj.value.RuleId
+
+      //   RuleEditApi(EndDD).then(res => {
+      //     console.log(res)
+      //   })
+      // } else {
+        RuleSaveApi(EndDD).then(res => {
+          console.log(res)
+        })
+      // }
+
+
       // let mergedData = {};
-      resultList.value = child.value.myData.resultList
+      // resultList.value = child.value.myData.resultList
       // 获取子组件的方法
-      console.log(child.value.myData.getForm
-        (), '...myson...方法...');
+      // console.log(child.value.actionData.getForm
+      //   (), '...myson...方法...');
       // resultList.value.forEach((item) => {
       //   Object.keys(item).forEach((key) => {
       //     const result = item[key].result;
@@ -159,39 +256,152 @@ export default defineComponent({
       // })
       // mergedData = Object.entries(mergedData).map(([key, value]) => ({ [key]: value }));
       // Object.assign(resultList.value,child.value.myData.add);
-      
-      console.log(child.value.myData.add, '....rrrrr....')
-      let result = resultList.value.reduce((acc, cur) => {
-        Object.keys(cur).forEach(key => {
-          if (!acc.hasOwnProperty(key)) {
-            acc[key] = {};
-          }
-          Object.keys(cur[key]).forEach(subKey => {
-            if (subKey === 'result2') {
-              if (!Array.isArray(cur[key][subKey])) {
-                cur[key][subKey] = [cur[key][subKey]];
-              }
-              if (!acc[key].hasOwnProperty(subKey)) {
-                acc[key][subKey] = [];
-              }
-              acc[key][subKey] = acc[key][subKey].concat(cur[key][subKey]);
-            } else {
-              acc[key][subKey] = cur[key][subKey];
-            }
-          });
-        });
-        return acc;
-      }, {});
-      var res = child.value.myData.add
-      Object.keys(result).forEach((key, i, v) => {
-        res.forEach((item, index) => {
-          if (key == index && item.hasOwnProperty('checked1')) {
-            result[key].add = true;
-            result[key].checked1 = item.checked1;
-          }
+
+      //   console.log(child.value.myData.add, '....rrrrr....')
+      //   // debugger
+      //   let result = resultList.value.reduce((acc, cur) => {
+      //     Object.keys(cur).forEach(key => {
+      //       if (!acc.hasOwnProperty(key)) {
+      //         acc[key] = {};
+      //       }
+      //       Object.keys(cur[key]).forEach(subKey => {
+      //         if (subKey === 'result2') {
+      //           if (!Array.isArray(cur[key][subKey])) {
+      //             cur[key][subKey] = [cur[key][subKey]];
+      //           }
+      //           if (!acc[key].hasOwnProperty(subKey)) {
+      //             acc[key][subKey] = [];
+      //           }
+      //           acc[key][subKey] = acc[key][subKey].concat(cur[key][subKey]);
+      //         } else {
+      //           acc[key][subKey] = cur[key][subKey];
+      //         }
+      //       });
+      //     });
+      //     return acc;
+      //   }, {});
+      //   var res = child.value.myData.add
+      //   Object.keys(result).forEach((key, i, v) => {
+      //     res.forEach((item, index) => {
+      //       if (key == index && item.hasOwnProperty('checked1')) {
+      //         result[key].add = true;
+      //         result[key].checked1 = item.checked1;
+      //       }
+      //     })
+      //   })
+      //   console.log(result, '...rsult...?')
+      //   saveThingsAct()
+    }
+
+    // function saveThingsAct() {
+    //   console.log(child.value.actionData.setData
+    //     , '..dfdrerer...')
+    //   // let mergedData = {};
+    //   resultListAct.value = child.value.actionData.setData
+    //   // 获取子组件的方法
+    //   // console.log(child.value.myData.getForm
+    //   //   (), '...myson...方法...');
+    //   // resultListAct.value.forEach((item) => {
+    //   //   Object.keys(item).forEach((key) => {
+    //   //     const result = item[key].result;
+    //   //     const result2 = item[key].result2;
+    //   //     if (!mergedData[key]) {
+    //   //       mergedData[key] = [result];
+    //   //     } else {
+    //   //       mergedData[key].push(result);
+    //   //     }
+    //   //     if (result2) {
+    //   //       mergedData[key] = mergedData[key].concat(result2);
+    //   //     }
+    //   //   });
+    //   // })
+    //   // mergedData = Object.entries(mergedData).map(([key, value]) => ({ [key]: value }));
+    //   // Object.assign(resultListAct.value,child.value.myData.add);
+
+    //   console.log(child.value.myData.add, '....rrrrr....')
+    //   let result = resultListAct.value.reduce((acc, cur) => {
+    //     Object.keys(cur).forEach(key => {
+    //       if (!acc.hasOwnProperty(key)) {
+    //         acc[key] = {};
+    //       }
+    //       Object.keys(cur[key]).forEach(subKey => {
+    //         if (subKey === 'result2') {
+    //           if (!Array.isArray(cur[key][subKey])) {
+    //             cur[key][subKey] = [cur[key][subKey]];
+    //           }
+    //           if (!acc[key].hasOwnProperty(subKey)) {
+    //             acc[key][subKey] = [];
+    //           }
+    //           acc[key][subKey] = acc[key][subKey].concat(cur[key][subKey]);
+    //         } else {
+    //           acc[key][subKey] = cur[key][subKey];
+    //         }
+    //       });
+    //     });
+    //     return acc;
+    //   }, {});
+    //   var res = child.value.actionData.add
+    //   Object.keys(result).forEach((key, i, v) => {
+    //     res.forEach((item, index) => {
+    //       if (key == index && item.hasOwnProperty('checked1')) {
+    //         result[key].add = true;
+    //         result[key].checked1 = item.checked1;
+    //       }
+    //     })
+    //   })
+    //   console.log(result,'16515156156156')
+    //   for (let o in result) {
+    //     // if (result[o].OperationItems[result[o].OperationItems['DeviceField']] == true || result[o].OperationItems[result[o].OperationItems['DeviceField']] == false) {
+    //       result[o].OperationItems.DeviceOperation = 'set-' + result[o].OperationItems.DeviceId + '-' + result[o].OperationItems.DeviceField
+
+    //       result[o].OperationItems.DeviceParams = {}
+    //       result[o].OperationItems.DeviceParams[result[o].OperationItems.DeviceField] = result[o].OperationItems[result[o].OperationItems.DeviceField]
+    //       // result[o].OperationItems.DeviceParams[result[o].OperationItems.DeviceField] = result[o].OperationItems[result[o].OperationItems.DeviceField]
+    //     // } else if (result[o].OperationItems['DeviceField'] == 'switch' && !result[o].OperationItems[result[o].OperationItems['DeviceField']]) {
+    //     //   result[o].OperationItems.DeviceOperation = 'set-false'
+    //     // } else if (!result[o].OperationItems.equation) {
+    //     //   result[o].OperationItems.DeviceOperation = 'set-' + result[o].OperationItems.DeviceId + result[o].OperationItems[result[o].OperationItems['DeviceField']]
+    //     // } else {
+    //     //   result[o].OperationItems.DeviceOperation = 'value' + result[o].OperationItems.equation + result[o].OperationItems[result[o].OperationItems['DeviceField']]
+    //     // }
+    //   }
+
+    //     console.log(result, '...Actrsasdasdasdasdasdasdasdasdasdasdult...?')
+    // }
+
+    function unique(arr) {
+      console.log(arr)
+      var newArr = [];
+      for (var i = 0; i < arr.length; i++) {
+        if (newArr.indexOf(arr[i]) === -1) {
+          newArr.push(arr[i]);
+        }
+      }
+      return newArr;
+    }
+    onMounted(() => {
+      // 此处可以得到用户ID
+      const sceneId = ref(route.params?.id);
+      console.log(sceneId)
+      if (sceneId.value) {
+        getRuleInfo(sceneId.value);
+
+      }
+    })
+
+    async function getRuleInfo(id) {
+      await RuleInfoApi({ 'Id': Number(id) }).then(res => {
+        // debugger;
+        CardType.value = res[0].VisitorTypeId
+        SceneName.value = res[0].Name
+        
+        nextTick(() => {
+         
+          InfoObj.value = res[0]
+          console.log(InfoObj.value)
         })
+
       })
-      console.log(result,'...rsult...?')
     }
     setTimeout(() => {
       loading.value = false;
@@ -203,6 +413,8 @@ export default defineComponent({
       myevent,
       saveThings,
       child,
+      setTime,
+      hand,
       loading,
       refundSchema,
       resultList,
@@ -211,6 +423,12 @@ export default defineComponent({
       refundData,
       personSchema,
       personData,
+      // saveThingsAct,
+      resultListAct,
+      SceneName,
+      unique,
+      getRuleInfo,
+      InfoObj
     };
   },
 });

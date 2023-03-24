@@ -23,13 +23,13 @@
         <div class="w-3/10 text-gray-400">所在区域：</div>
         <div class="w-6/10 text-gray-400">{{ RegionDataName || '暂无' }}</div>
       </div>
-      <div class="flex items-center my-5">
+      <!-- <div class="flex items-center my-5">
         <div class="w-3/10 text-gray-400">说明：</div>
         <div class="w-6/10 text-gray-400">{{ infoFacility?.Explain || '暂无' }}</div>
-      </div>
+      </div> -->
       <div class="flex items-center my-5">
         <div class="w-3/10 text-gray-400">创建时间：</div>
-        <div class="w-6/10 text-gray-400">{{ timeZ(infoFacility?.Basic.UpdatedAt.seconds) }}</div>
+        <div class="w-6/10 text-gray-400">{{ infoFacility?.Basic?.CreatedAt.seconds ? dayjs.unix(infoFacility?.Basic.CreatedAt.seconds).format('YYYY-MM-DD HH:mm:ss') : '暂无' }}</div>
       </div>
       <div class="flex items-center my-5">
         <div class="w-3/10 text-gray-400">设备位置：</div>
@@ -53,6 +53,7 @@
 import Icon from '@/components/Icon';
 import { ref, onMounted, watch } from 'vue';
 import { facilityDetailApi, facilityRegionInfoApi, facilityTypeInfoApi } from '@/api/facility/facility'
+import dayjs from 'dayjs'
 
 const props = defineProps({
   // 工单ID
@@ -72,12 +73,15 @@ watch(() => props.DeviceId, () => {
 })
 
 onMounted(() => {
-  getTaskTicketInfo()
+  if (props.DeviceId != null) {
+    getTaskTicketInfo()
+  }
+  // getTaskTicketInfo()
 })
 
 const getTaskTicketInfo = () => {
   console.log('dev')
-  facilityDetailApi({ Id: props.DeviceId }).then(res => {
+  facilityDetailApi({ Id: Number(props.DeviceId) }).then(res => {
     infoFacility.value = res[0]
     // console.og
     GetfacilityRegioninfo()
