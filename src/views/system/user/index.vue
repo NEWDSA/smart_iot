@@ -1,8 +1,8 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
-    <BasicTable :dataSource="dataSource" @register="registerTable" :clickToRowSelect="clickToRowSelect"
-      class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+    <BasicTable @register="registerTable" :clickToRowSelect="clickToRowSelect" class="w-3/4 xl:w-4/5"
+      :searchInfo="searchInfo">
       <template #toolbar>
         <a-button type="primary" @click="handleBulk">批量调动</a-button>
         <a-button type="primary" @click="handleCreate">新增账号</a-button>
@@ -37,17 +37,17 @@
         </template>
       </template>
     </BasicTable>
-    <component :is="currentModal" v-model:visible="modalVisible" :data="myData" @success="Dat" :isUpdate="true" />
+
     <AccountModal @register="registerModal" @success="handleSuccess" />
-    <AccountTable @register="registerMyTable" @success="Dat" />
+    <AccountTable @register="registerMyTable" @success="handleSuccess" />
     <pwdModal @register="registerpwdModal" @success="pwdSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
-import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
+import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
-import { getAccountList, getDeptList, BulkDept, delAccount } from '@/api/demo/system';
+import { getAccountList, getDeptList, delAccount } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
 
@@ -62,7 +62,6 @@ export default defineComponent({
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction, pwdModal },
   setup() {
     const go = useGo();
-    const dataSource: any = ref([]);
     const myData: any = ref('');
     const update = getCurrentInstance() as ComponentInternalInstance | null
     const [registerModal, { openModal }] = useModal();
@@ -71,7 +70,6 @@ export default defineComponent({
     const searchInfo = reactive<Recordable>({});
     const checkedKeys = ref<Array<string | number>>([]);
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
-    const basicData: any = ref('');
     const modalVisible = ref<Boolean>(false);
     const clickToRowSelect = ref(false);
     const {
@@ -81,7 +79,7 @@ export default defineComponent({
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
@@ -140,9 +138,9 @@ export default defineComponent({
     }
     function handleBulk(record: Recordable) {
       if (getSelectRowKeys().length > 0) {
-        currentModal.value = AccountTable;
-        nextTick(() => {
-          modalVisible.value = true;
+        openModal2(true, {
+          user: toRaw(checkedKeys.value),
+          isUpdate: true
         })
       } else {
         createConfirm({
@@ -171,38 +169,8 @@ export default defineComponent({
       }
 
     }
-    onMounted(() => {
-      // getData()
-    })
-    function Dat(values) {
-      if (values) {
-        let Detp = toRaw(values).join();
-        let user = toRaw(checkedKeys.value)
-        try {
-          BulkDept({
-            UserIds: user,
-            DeptId: Number(Detp)
-          })
-        } finally {
-          reload();
-        }
-      } else {
-        reload();
-      }
-
-
-
-
-    }
-
-    async function handleSuccess({ isUpdate, values }) {
-      if (isUpdate) {
-        // 演示不刷新表格直接更新内部数据。
-        // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-        await updateTableDataRecord(values.RoleId, values);
-      } else {
-        await reload();
-      }
+    function handleSuccess() {
+      reload();
     }
     function handleEditPwd(record: Recordable) {
       // 弹出修改用户密码框
@@ -232,7 +200,6 @@ export default defineComponent({
       onChange,
       openModal2,
       openModal3,
-      Dat,
       pwdSuccess,
       clickToRowSelect,
       pagination,
@@ -241,8 +208,6 @@ export default defineComponent({
       currentModal,
       checkedKeys,
       searchInfo,
-      basicData,
-      dataSource,
       myData,
       update
     };

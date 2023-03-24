@@ -62,7 +62,7 @@ export default defineComponent({
       });
 
     });
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增账号' : '编辑账号'));
+    const getTitle = computed(() => (!unref(isUpdate) ? '新增账号2' : '编辑账号'));
     async function handleSubmit() {
       try {
         const values = await validate();
@@ -74,7 +74,7 @@ export default defineComponent({
         }
         !unref(isUpdate) ? await createAccountList(values) : await modifiAccountList({ ...values, UserId: UserId.value })
         closeModal();
-        emit('success', { isUpdate: unref(isUpdate), values: { ...values, UserId: UserId.value } });
+        emit('success');
       } finally {
         setModalProps({ confirmLoading: false });
       }

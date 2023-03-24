@@ -1,6 +1,6 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
-    <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
+    <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect"  />
     <BasicTable class="w-3/4 xl:w-4/5" :dataSource="dataSource" :clickToRowSelect="clickToRowSelect"
       @register="registerTable" :searchInfo="searchInfo">
       <template #toolbar>
@@ -34,7 +34,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, onMounted } from 'vue';
+import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
 import { getReginDevice, getDeviceType, bulkDeviceOut } from '@/api/demo/region';
@@ -72,12 +72,8 @@ export default defineComponent({
       createMessage
     } = useMessage();
     function onChange() {
-      pagination.PageNum = arguments[0].current;
-      getData()
-
-
     }
-    const [registerTable, { reload, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord }] = useTable({
       title: '区域设备管理',
       onChange,
       rowSelection: {
@@ -89,41 +85,21 @@ export default defineComponent({
       rowKey: 'DeviceId',
       columns,
       api: async (p) => {
-        const { Page } = await getReginDevice(p);
-        setPagination({
-          total: Page.Total
-        })
-        return new Promise((resolve) => {
-
-          resolve([...Page.List]);
-        })
-
+        const { Detail, Total } = await getReginDevice(p);
+        return {
+          Detail,
+          Total
+        }
       },
-      afterFetch: async (data) => {
-        console.log(data, '123...?')
-        const TypeList: any = [];
-
-        const result = data.forEach(async (item) => {
-          const DeviceList = await getDeviceType({
-            Id: item.TypeId
-          })
-
-          TypeList.push(...DeviceList)
-          item.typeName = '323232'
-          item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
-          // dataSource.value = result;
-        })
-        return result;
+      fetchSetting: {
+        pageField: 'PageNum',
+        // 传给后台的每页显示多少条的字段
+        sizeField: 'PageSize',
+        // 接口返回表格数据的字段
+        listField: 'Detail',
+        // 接口返回表格总数的字段
+        totalField: 'Total'
       },
-      // fetchSetting: {
-      //   pageField: 'PageNum',
-      //   // 传给后台的每页显示多少条的字段
-      //   sizeField: 'PageSize',
-      //   // 接口返回表格数据的字段
-      //   listField: 'List',
-      //   // 接口返回表格总数的字段
-      //   totalField: 'Total'
-      // },
       formConfig: {
         layout: 'horizontal',
         labelWidth: 120,
@@ -136,8 +112,7 @@ export default defineComponent({
       showIndexColumn: false,
       bordered: true,
       handleSearchInfoFn(info) {
-        // Object.assign(pagination, info);
-        // getData()
+        return info;
       },
       actionColumn: {
         width: 120,
@@ -175,8 +150,7 @@ export default defineComponent({
         try {
           await bulkDeviceOut(param)
         } finally {
-          // reload()
-          getData()
+          reload()
         }
 
 
@@ -231,30 +205,8 @@ export default defineComponent({
       }
 
     }
-    // 获取table数据
-    async function getData() {
-      //  获取区域设备
-      dataSource.value = [];
-      const { Page } = await getReginDevice(pagination)
-      const result = Page.List;
-      const TypeList: any = [];
-      setPagination({
-        total: Page.Total
-      })
-      result.map(async (item) => {
-        const DeviceList = await getDeviceType({
-          Id: item.TypeId
-        })
-
-        TypeList.push(...DeviceList)
-        item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
-        dataSource.value = result;
-      })
-
-    }
-    function handleSuccess() {
-      reload();
-      // getData();
+    async function handleSuccess() {
+      await reload();
     }
     function handleEditPwd(record: Recordable) {
 
@@ -265,7 +217,7 @@ export default defineComponent({
         })
       } else {
         createMessage.info({
-          content: '最多只能选择一项',
+          content: '请检查是否勾选内容',
         });
 
       }
@@ -273,12 +225,7 @@ export default defineComponent({
     function handleSelect(RegionId = '') {
 
       // 请选择区域
-      // searchInfo.RegionId = Number(RegionId);
-      // 和并数据处理
-      // Object.assign(pagination, searchInfo);
-
-      // getData()
-      // 通过区域ID显示数据
+      searchInfo.RegionId = Number(RegionId);
       reload();
     }
     return {
@@ -296,7 +243,6 @@ export default defineComponent({
       openModal2,
       handleout,
       bulkPermission,
-      getData,
       hasPermission,
       clickToRowSelect,
       areaId,

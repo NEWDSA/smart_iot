@@ -10,7 +10,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '设备类型',
-    dataIndex: 'typeName',
+    dataIndex: 'DeviceTypeName',
     width: 120
   },
   {

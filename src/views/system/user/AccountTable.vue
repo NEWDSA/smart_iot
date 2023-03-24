@@ -6,12 +6,13 @@
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { useMessage } from '@/hooks/web/useMessage';
 import { BasicModal, useModalInner } from '@/components/Modal';
 // import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
-import { BasicTree, TreeItem,TreeActionType } from '@/components/Tree/index';
-import { getDeptList } from '@/api/demo/system';
+import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
+import { getDeptList, BulkDept } from '@/api/demo/system';
+
 export default defineComponent({
   name: 'AccountModal',
   components: { BasicModal, BasicTree },
@@ -23,8 +24,10 @@ export default defineComponent({
     const {
       createConfirm
     } = useMessage();
-    const checkData=ref('');
+    const user = ref();
+    const checkData = ref('');
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      user.value = data.user;
     });
     async function fetch() {
       treeData.value = (await getDeptList()) as unknown as TreeItem[];
@@ -56,20 +59,23 @@ export default defineComponent({
 
     }
     function handleSelect(keys) {
-      checkData.value=keys.checked;
+      checkData.value = keys.checked;
       keys.checked.length > 1 ? createConfirm({
         iconType: 'info',
         title: '提示',
         content: '只能选择一项',
       }) : ''
-      console.log(keys.checked, '...keys...')
     }
     async function handleSubmit() {
       try {
         // 将数据传递给接口
+        await BulkDept({
+          UserIds: user.value,
+          DeptId: Number(checkData.value)
+        })
         setModalProps({ confirmLoading: true });
         closeModal();
-        emit('success',checkData.value);
+        emit('success');
       } finally {
         setModalProps({ confirmLoading: false });
       }
@@ -77,7 +83,7 @@ export default defineComponent({
     onMounted(() => {
       fetch();
     });
-    return { treeData, treeRef,checkData, registerModal, onSelectChange, handleSubmit, handleSelect };
+    return { treeData, treeRef, checkData, user, registerModal, onSelectChange, handleSubmit, handleSelect };
   },
 });
 </script>
