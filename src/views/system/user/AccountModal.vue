@@ -8,7 +8,7 @@ import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { accountFormSchema } from './account.data';
-import {getAllRoleList, getUserRole, getDeptDrop, modifiAccountList, createAccountList } from '@/api/demo/system';
+import { getAllRoleList, getUserRole, getDeptDrop, modifiAccountList, createAccountList } from '@/api/demo/system';
 export default defineComponent({
   name: 'AccountModal',
   components: { BasicModal, BasicForm },
@@ -39,14 +39,16 @@ export default defineComponent({
             return item
           }
         })
+        console.log()
         updateSchema({
           field: 'RoleIds',
           defaultValue: Object.keys(resd).length > 0 ? result.RoleIds : '',
           componentProps: { treeData: result.Roles }
         })
       } else {
-        const {List} = await getAllRoleList()
+        const { List } = await getAllRoleList()
         updateSchema({
+          defaultValue: {},
           field: 'RoleIds',
           componentProps: { treeData: List }
         })
@@ -66,10 +68,10 @@ export default defineComponent({
         const values = await validate();
         setModalProps({ confirmLoading: true });
         // 判断是为数组
-       if(values.RoleIds instanceof Array ) {Object.assign(values, { RoleIds: values.RoleIds });}
-       else{
-        Object.assign(values, { RoleIds: [values.RoleIds] })
-       }
+        if (values.RoleIds instanceof Array) { Object.assign(values, { RoleIds: values.RoleIds }); }
+        else {
+          Object.assign(values, { RoleIds: [values.RoleIds] })
+        }
         !unref(isUpdate) ? await createAccountList(values) : await modifiAccountList({ ...values, UserId: UserId.value })
         closeModal();
         emit('success', { isUpdate: unref(isUpdate), values: { ...values, UserId: UserId.value } });

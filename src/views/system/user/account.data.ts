@@ -141,9 +141,11 @@ export const accountFormSchema: FormSchema[] = [
         label: 'RoleName',
         key: 'RoleId',
         value: 'RoleId'
-      }
+      },
+      getPopupContainer: () => document.body
     },
-    required: true
+    required: true,
+    
   },
   {
     label: '邮箱',
@@ -153,8 +155,7 @@ export const accountFormSchema: FormSchema[] = [
     rules: [
       {
         required: true,
-        validator: validateEmail(),
-        trigger: 'blur'
+        validator: validateEmail()
       }
     ]
     // rules:[],

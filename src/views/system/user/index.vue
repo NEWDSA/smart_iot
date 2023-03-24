@@ -1,7 +1,8 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
-    <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+    <BasicTable :dataSource="dataSource" @register="registerTable" :clickToRowSelect="clickToRowSelect"
+      class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
       <template #toolbar>
         <a-button type="primary" @click="handleBulk">批量调动</a-button>
         <a-button type="primary" @click="handleCreate">新增账号</a-button>
@@ -72,21 +73,29 @@ export default defineComponent({
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
     const basicData: any = ref('');
     const modalVisible = ref<Boolean>(false);
+    const clickToRowSelect = ref(false);
     const {
       createConfirm
     } = useMessage();
     function onChange() {
-      pagination.PageNum = arguments[0].current;
-      getData()
-
-
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, deleteTableDataRecord }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
+      api: async (p) => {
+        const { List, Total } = await getAccountList(p);
+        List?.map(async item => {
+          const result = await getDeptList();
+          item.DeptName = result.List.find(item1 => item1.DeptId == item.DeptId).DeptName
+        })
+        return {
+          Total,
+          List
+        }
+      },
       rowSelection: {
         type: 'checkbox',
         selectedRowKeys: checkedKeys,
@@ -111,10 +120,6 @@ export default defineComponent({
       showTableSetting: true,
       bordered: true,
       handleSearchInfoFn(info) {
-        // 接入接口进行数据查询
-        Object.assign(pagination, info)
-        getData();
-        return info;
       },
       actionColumn: {
         width: 120,
@@ -129,26 +134,6 @@ export default defineComponent({
     }
     function pwdSuccess() {
       reload();
-      // currentModal.value = pwdModal;
-      //   nextTick(() => {
-      //     modalVisible.value = true;
-      //   })
-    }
-    async function getData() {
-
-      dataSource.value = [];
-      const { List, Total } = await getAccountList(pagination);
-      setPagination({
-        total: Total
-      })
-      const accountList = List;
-      accountList?.map(async item => {
-        const { List } = await getDeptList();
-        item.DeptName = List.find(async item1 => await item1.DeptId == await item.DeptId)?.DeptName
-        dataSource.value.push(item);
-      })
-
-
     }
     function onSelectChange(selectedRowKeys: (string | number)[]) {
       checkedKeys.value = selectedRowKeys;
@@ -187,7 +172,7 @@ export default defineComponent({
 
     }
     onMounted(() => {
-      getData()
+      // getData()
     })
     function Dat(values) {
       if (values) {
@@ -201,7 +186,7 @@ export default defineComponent({
         } finally {
           reload();
         }
-      }else{
+      } else {
         reload();
       }
 
@@ -229,8 +214,6 @@ export default defineComponent({
     }
     function handleSelect(DeptId = '') {
       searchInfo.DeptId = DeptId;
-      Object.assign(pagination, searchInfo);
-      getData()
       reload();
     }
     return {
@@ -251,7 +234,7 @@ export default defineComponent({
       openModal3,
       Dat,
       pwdSuccess,
-      getData,
+      clickToRowSelect,
       pagination,
       internalInstance,
       modalVisible,

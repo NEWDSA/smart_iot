@@ -76,7 +76,6 @@ export default defineComponent({
   emits: ['changePage'],
   setup(props, { emit }) {
     const { selectedIndex, params } = props;
-    console.log(params, '99e0rererwer')
     const myselectedIndex = ref(null);
     const pagenation = reactive({
       current: params.current,

@@ -8,7 +8,6 @@ import { useAppStoreWithOut } from './app'
 import { toRaw } from 'vue'
 import { transformObjToRoute, flatMultiLevelRoutes } from '@/router/helper/routeHelper'
 import { transformRouteToMenu } from '@/router/helper/menuHelper'
-
 import projectSetting from '@/settings/projectSetting'
 
 import { PermissionModeEnum } from '@/enums/appEnum'
@@ -231,6 +230,9 @@ export const usePermissionStore = defineStore({
           try {
             // await this.changePerm/*  */issionCode()
             routeList = (await getMenuList()) as AppRouteRecordRaw[]
+            if(routeList.buildMenus==null){
+              createMessage.info('请检查菜单权限')
+            }
           } catch (error) {
             console.error(error)
           }

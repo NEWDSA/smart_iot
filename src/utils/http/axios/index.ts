@@ -211,7 +211,7 @@ const transform: AxiosTransform = {
     let msg: string = response?.data?.Error ?? ''
     msg = msg.replace('rpc error: code = Unknown desc =', '')
     // 去掉字符串中的多余参数
-    console.log(code, '...code...?')
+    console.log(msg, '...code...?')
     const err: string = error?.toString?.() ?? ''
     let errMessage = ''
 
@@ -228,11 +228,11 @@ const transform: AxiosTransform = {
       }
 
       if (errMessage) {
+
         if (errorMessageMode === 'modal') {
           createErrorModal({ title: t('sys.api.errorTip'), content: errMessage })
         } else if (errorMessageMode === 'message') {
           createMessage.error(errMessage)
-          console.log(code, '?...code...?')
           if (code == 30001 && msg == 'Token鉴权失败') {
             const userStore = useUserStoreWithOut()
             userStore.logout(true)

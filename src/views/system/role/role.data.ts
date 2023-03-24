@@ -14,11 +14,6 @@ export const columns: BasicColumn[] = [
     width: 200
   },
   {
-    title: '角色值',
-    dataIndex: 'RoleKey',
-    width: 180
-  },
-  {
     title: '排序',
     dataIndex: 'RoleSort',
     width: 50
@@ -64,11 +59,6 @@ export const columns: BasicColumn[] = [
     format(text, record, index) {
       return dayjs.unix(record.Basic.CreatedAt.seconds).format('YYYY-MM-DD HH:mm:ss')
     }
-  },
-  {
-    title: '备注',
-    dataIndex: 'Remark',
-    width: 180
   }
 ]
 export const formSchema: FormSchema[] = [

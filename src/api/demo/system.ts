@@ -46,7 +46,8 @@ enum Api {
   NoticeEdit = '/notice/edit',
   NoticeRead = '/notice/is-read',
   IsRead = '/notice/list-unread',
-  AllRead='/notice/whole-is-read'
+  AllRead='/notice/whole-is-read',
+  DeviceDepartment='/device-department/list-device-id'
 }
 
 // 获取用户列表
@@ -291,3 +292,16 @@ export const isRead = (params?) =>
       isTransformResponse: true
     }
   )
+
+// 设备ID查询关联部门
+export const DeviceIdDepartMent=(params?)=>
+realHttp.get(
+  {
+    url: Api.DeviceDepartment,
+    params
+  },
+
+  {
+    isTransformResponse: true
+  }
+)

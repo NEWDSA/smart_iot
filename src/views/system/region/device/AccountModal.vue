@@ -1,6 +1,6 @@
 <template>
   <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
-    <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+    <BasicTable :dataSource="dataSource" @register="registerTable"  :searchInfo="searchInfo">
     </BasicTable>
   </BasicModal>
 </template>
@@ -23,12 +23,13 @@ export default defineComponent({
     const TreeTableData: any = reactive([]);
     const dataSource: any = ref([]);
     const checkedKeys = ref<Array<string | number>>([]);
-    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 2 })
+    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 2 });
     const paramList: any = ref();
     function onChange() {
     }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       paramList.value = data.params
+      checkedKeys.value=[];
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
       // 获取设备分类
@@ -58,8 +59,8 @@ export default defineComponent({
 
     });
 
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getForm }] = useTable({
-      title: '区域设备管理',
+    const [registerTable, { setPagination, getForm }] = useTable({
+      title: '',
       onChange,
       rowSelection: {
         type: 'checkbox',
@@ -90,8 +91,6 @@ export default defineComponent({
     function ModelStatus(isOpen){
        isOpen?getData():''
     }
-    // onMounted(() => {
-    // })
     // 获取table数据
     async function getData() {
       //  获取区域设备
