@@ -37,7 +37,7 @@
 
       <ErrorAction v-if="getUseErrorHandle" :class="`${prefixCls}-action__item error-action`" />
 
-      <Notify v-if="getShowNotice" :class="`${prefixCls}-action__item notify-item`" />
+      <Notify v-if="getShowNotice" @click="openModel" :class="`${prefixCls}-action__item notify-item`" />
 
       <FullScreen v-if="getShowFullScreen" :class="`${prefixCls}-action__item fullscreen-item`" />
 
@@ -55,7 +55,7 @@
   </Header>
 </template>
 <script lang="ts">
-import { defineComponent, unref, computed } from 'vue'
+import { defineComponent, unref, computed,ref } from 'vue'
 
 import { propTypes } from '@/utils/propTypes'
 
@@ -112,6 +112,7 @@ export default defineComponent({
       getMenuWidth,
       getIsMixSidebar
     } = useMenuSetting()
+    // const visible=ref();
     const { getUseErrorHandle, getShowSettingButton, getSettingButtonPosition } = useRootSetting()
 
     const {
@@ -168,8 +169,12 @@ export default defineComponent({
     const getMenuMode = computed(() => {
       return unref(getSplit) ? MenuModeEnum.HORIZONTAL : null
     })
-
+    function openModel(){
+      //  console.log(visible.value,'?...2333...?');
+    }
     return {
+      openModel,
+      // visible,
       prefixCls,
       getHeaderClass,
       getShowHeaderLogo,

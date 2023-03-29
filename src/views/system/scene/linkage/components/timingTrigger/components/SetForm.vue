@@ -109,37 +109,11 @@ const schemas_normal: FormSchema[] = [
     component: 'Input',
     slot: 'customSlot',
     colProps: {
-      span: 8
+      span: 4,
     },
     // 判断显示隐藏
-    ifShow: ({ values }) => {
-      return false
-    }
-  },
-  {
-    field: 'DeviceName',
-    label: '',
-    component: 'Input',
-    slot: 'customSlot',
-    colProps: {
-      span: 8
-    },
-    // 判断显示隐藏
-    ifShow: ({ values }) => {
-      return values.OperationType == '1'
-    }
-  },
-  {
-    field: 'DeviceSerial',
-    label: '',
-    component: 'Input',
-    slot: 'customSlot',
-    colProps: {
-      span: 8
-    },
-    // 判断显示隐藏
-    ifShow: ({ values }) => {
-      return false
+    show: ({ values }) => {
+      return values.OperationType == '1';
     }
   },
   // 设备参数
@@ -521,14 +495,12 @@ export default defineComponent({
       const obj = { ...params }
       // 根据所选择的设备进行设备id查询
       const result = await deviceInfo({
-        Id: obj[0][0].DeviceId
+        Id: obj[0].DeviceId
       })
 
       let FormSchema = JSON.parse(result[0]?.DeviceModel)
       xformElRef.value[Number(TIndex.value)].setFieldsValue({
-        DeviceName: obj[0][0].DeviceName,
-        DeviceId: obj[0][0].DeviceId,
-        DeviceSerial: obj[0][0].DeviceSerial,
+        DeviceId: obj[0].DeviceId,
       })
       let myobj: any = [];
       FormSchema.forEach(async (item, index) => {
@@ -555,7 +527,7 @@ export default defineComponent({
         ifShow: ({ values }) => {
           return values.OperationType == '1'
         }
-      }, 'DeviceName')
+      }, 'DeviceId')
       FormSchema.forEach((item, index) => {
         // 使用updateSchema添加
 
@@ -606,7 +578,7 @@ export default defineComponent({
           //     // console.log(values,'DeviceFieldDeviceFieldDeviceField')
           //     return values.DeviceField == item.model.field && values.OperationType == '1'
           //   }
-          // }, 'DeviceName')
+          // }, 'DeviceField')
 
 
         } else {
@@ -755,6 +727,7 @@ export default defineComponent({
           if (xformElRef.value[i].getFieldsValue().OperationType == '1') {
             DeviceIdArr.value.push(Number(xformElRef.value[i].getFieldsValue().DeviceId))
           }
+          console.log(DeviceIdArr.value)
           fromArr.push(xformElRef.value[i].getFieldsValue())
         }
       }
@@ -771,7 +744,7 @@ export default defineComponent({
 
     }
 
-    onMounted(() => {
+    onMounted(()=>{
       add.value = []
     })
 
@@ -795,7 +768,7 @@ export default defineComponent({
       // ]
 
       let aobj: any = props.setObj
-      // console.log(aobj[k])
+      // console.log(aobj)
       let a: any = []
       for (let k in aobj) {
         console.log(aobj[k])
@@ -822,11 +795,11 @@ export default defineComponent({
 
           // debugger
           let obj = [
-            [
+            // [
               {
                 DeviceId: a[i].DeviceId
               }
-            ]
+            // ]
           ]
           TIndex.value = i
           await handleSuccess(obj)
@@ -839,7 +812,7 @@ export default defineComponent({
 
     }
 
-    defineExpose({ EndData, bcIndex });
+    defineExpose({ EndData, bcIndex, DeviceIdArr });
 
     return {
       register,

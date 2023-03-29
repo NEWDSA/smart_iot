@@ -1,143 +1,295 @@
 <template>
-  <PageWrapper title="触发条件">
-    <template #extra>
-      <Form :model="RuleForm">
-        <Row class="enter-x col_flex">
-          <Col :span="4">
-          <FormItem name="switch" class="enter-x">
-            <Switch v-model:checked="isShake" checked-children="边缘触发" un-checked-children="水平触发" />
-          </FormItem>
-          </Col>
-        </Row>
-      </Form>
-    </template>
-    <div class="rounded-md pt-5 pl-5 border">
-      <template v-for="(item, index) in add" :key="index">
-        <div class="flex justify-center items-center lc_liner" v-if="index > 0 && item.hasOwnProperty('checked1')">
-          <div
-            style="position: relative;display:flex;height: 35px;align-items: center;justify-content: center;width: 50px;">
-            <svg style="position:absolute;" width="50" height="35">
-              <line x1="50" y1="50" x2="50" y2="0" style="stroke:rgb(0,155,5);stroke-width:3" />
-            </svg>
-            <Switch style="position:absolute;left:50%;" checkedChildren="AND" v-model:checked="item.checked1"
-              unCheckedChildren="OR"></Switch>
-          </div>
-        </div>
-        <div v-if="item && item.schemas_normal.length > 0" id="schemas" class="border bg-light-100 p-4 lc_liner">
-          <BasicForm v-if="item && item.schemas_normal.length > 0" :schemas="item.schemas_normal" @register="register"
-            ref="FformElRef" @get-form="formvalueFF(arg, index)">
-            <template #customSlot="{ model, field }">
-              <a-input @click="e_Device(index)" placeholder="请选择设备" v-model:value="model[field]">
-                <template #suffix>
-                  <Icon icon="carbon:logo-github" />
-                </template>
-              </a-input>
-            </template>
-          </BasicForm>
-          <template v-if="Object.keys(item.FormAdd) && item">
-            <BasicForm v-for="(itemr, cindex) in item.FormAdd" id="filter_form" @get-form="formvalue(arg, index, cindex)"
-              ref="formElRef" :schemas="itemr.schemas_normal" :key="itemr" @register="registerForm">
-              <template #customSlot2="{ model, field }">
-                <a-input @click="filter_Device(item, index, cindex)" placehol der="请选择设备" v-model:value="model[field]">
-                  <template #suffix>
-                    <Icon icon="carbon:logo-github" />
-                  </template>
-                </a-input>
-              </template>
-              <!-- 显示删除按钮 -->
-              <template v-if="item.FormAdd.length > 0" #deleteSlot="{ model, field }">
-                <Icon @click="delete_rule_zi(index, cindex)"  class="ml-2" icon="ant-design:delete-outlined" />
-              </template>
-            </BasicForm>
-          </template>
-          <!-- 添加过滤条件 -->
-          <div v-if="item && item.schemas_normal.length > 0" class="p-1 relative flex items-center justify-between" @click="addRule(index)">
-            <div><Icon icon="bi:plus" size="14" />
-            添加过滤条件</div>
-            
-            <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" color="red" size="20px"/>
-          </div>
-        </div>
-
-      </template>
-      <!-- 引入模态框 -->
-      <AccountTable @register="registerMyTable" @success="handleSuccess" />
-      <a-button type="primary" class="my-4" @click="handel_Add"> 添加条件 </a-button>
-    </div>
+  <PageWrapper>
+    <BasicForm @register="register">
+    </BasicForm>
   </PageWrapper>
 </template>
 <script lang="tsx">
-import { defineComponent, reactive, onMounted, onUpdated, ref, unref, nextTick, toRaw, watch, defineExpose } from 'vue'
-import { Switch, Form, Input, Row, Col, InputNumber, Select, message } from 'ant-design-vue'
-import { BasicForm, FormSchema, useForm, FormActionType } from '@/components/Form/index'
-import { CollapseContainer } from '@/components/Container/index'
-import { PageWrapper } from '@/components/Page'
-import { Icon } from '@/components/Icon'
-import AccountTable from './AccountTable.vue'
-import { useModal } from '@/components/Modal'
-import SelectItem from '@/layouts/default/setting/components/SelectItem.vue'
-import { deviceInfo } from '@/api/demo/scence'
-const [registerMyTable, { openModal }] = useModal()
-import { error } from '@/utils/log'
-import { on } from 'events'
-import { Item } from 'ant-design-vue/lib/menu'
-const schemas: FormSchema[] = []
-const FformArr: any = ref([])
-const formArr: any = ref([])
-const add: any = ref([])
-const params: any = ref([])
-const result1: any = ref([])
-const FIndex = ref()
-const ZIndex = ref()
-const DeviceIdArr: any = ref([])
+import { defineComponent, defineExpose, watch, onMounted } from 'vue';
 
-
-const schemas_normal: FormSchema[] = [
-  {
-    field: 'ConditionType',
-    component: 'Select',
-    label: '',
-    colProps: {
-      span: 5
+import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
+import { CollapseContainer } from '@/components/Container/index';
+import { PageWrapper } from '@/components/Page';
+import { Icon } from '@/components/Icon';
+import AccountTable from './AccountTable.vue';
+const schemas: FormSchema[] = [{
+  field: 'ConditionItems',
+  component: 'Select',
+  label: '',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    placeholder: '请选择',
+    options: [{
+      label: '按周',
+      value: 1,
+      key: 1
+    }, {
+      label: '按月',
+      value: 2,
+      key: 2
+    }]
+  }
+},
+{
+  field: 'ExecuteDate',
+  label: ' ',
+  labelWidth: '10px',
+  component: 'Select',
+  componentProps: {
+    mode: 'multiple',
+    placeholder: '请选择时间',
+    options: [
+      // {
+      //   label: '每天',
+      //   value: '7',
+      // },
+      {
+        label: '周一',
+        value: '1',
+      },
+      {
+        label: '周二',
+        value: '2',
+      },
+      {
+        label: '周三',
+        value: '3',
+      },
+      {
+        label: '周四',
+        value: '4',
+      },
+      {
+        label: '周五',
+        value: '5',
+      },
+      {
+        label: '周六',
+        value: '6',
+      },
+      {
+        label: '周日',
+        value: '0',
+      }
+    ]
+  },
+  colProps: { span: 4 },
+  ifShow: ({ values }) => {
+    return values.ConditionItems == 1;
+  }
+},
+{
+  field: 'ExecuteDateWeek',
+  label: ' ',
+  labelWidth: '10px',
+  // component: 'DatePicker',
+  // componentProps: {
+  //   format: 'DD',
+  //   valueFormat: 'DD',
+  //   // placeholder: ['开始时间', '结束时间'],
+  //   // showTime: { format: 'HH:mm:ss' },
+  //   placeholder: '请选择时间',
+  // },
+  component: 'Select',
+  componentProps: {
+    placeholder: '请选择时间',
+    mode: 'multiple',
+    // options: [
+    //   {
+    //     label: '1',
+    //     value: '1',
+    //   },
+    //   {
+    //     label: '2',
+    //     value: '2',
+    //   },
+    //   {
+    //     label: '3',
+    //     value: '3',
+    //   },
+    // ]
+  },
+  colProps: { span: 4 },
+  ifShow: ({ values }) => {
+    return values.ConditionItems == 2;
+  }
+},
+{
+  field: 'ExecuteNum',
+  component: 'Select',
+  label: ' ',
+  labelWidth: '10px',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    placeholder: '请选择',
+    options: [{
+      label: '执行一次',
+      value: '1'
+    }, {
+      label: '周期执行',
+      value: '2'
+    }]
+  },
+  show: ({ values }) => {
+    return values.ConditionItems == 2 || values.ConditionItems == 1;
+  }
+},
+{
+  field: 'ExecuteTime',
+  component: 'TimePicker',
+  label: ' ',
+  labelWidth: '10px',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    format: 'HH:mm',
+    valueFormat: 'HH:mm',
+    placeholder: '请选择时间',
+  },
+  show: ({ values }) => {
+    return (values.ConditionItems == 2 || values.ConditionItems == 1) && values.ExecuteNum == 1;
+  }
+},
+{
+  field: 'StartTime',
+  component: 'TimePicker',
+  label: ' ',
+  labelWidth: '10px',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    format: 'HH:mm',
+    valueFormat: 'HH:mm',
+    placeholder: '请选择开始时间',
+  },
+  show: ({ values }) => {
+    return (values.ConditionItems == 2 || values.ConditionItems == 1) && values.ExecuteNum == 2;
+  }
+},
+{
+  field: 'EndTime',
+  component: 'TimePicker',
+  label: '~',
+  labelWidth: '10px',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    format: 'HH:mm',
+    valueFormat: 'HH:mm',
+    placeholder: '请选择结束时间',
+  },
+  show: ({ values }) => {
+    return (values.ConditionItems == 2 || values.ConditionItems == 1) && values.ExecuteNum == 2;
+  }
+},
+{
+  field: 'circulationTime',
+  component: 'Input',
+  label: '每',
+  labelWidth: '20px',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    placeholder: '请输入时间',
+  },
+  show: ({ values }) => {
+    return (values.ConditionItems == 2 || values.ConditionItems == 1) && values.ExecuteNum == 2;
+  }
+},
+{
+  field: 'circulationUnit',
+  component: 'Select',
+  label: ' ',
+  labelWidth: '10px',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    placeholder: '请选择',
+    options: [{
+      label: '时',
+      value: '1',
+      key: '1'
+    }, {
+      label: '分',
+      value: '2',
+      key: '2'
+    }]
+  },
+  show: ({ values }) => {
+    return (values.ConditionItems == 2 || values.ConditionItems == 1) && values.ExecuteNum == 2;
+  }
+},
+{
+  field: 'circulationNum',
+  component: 'Select',
+  label: ' ',
+  labelWidth: '10px',
+  defaultValue:'1',
+  colProps: {
+    span: 3
+  },
+  componentProps: {
+    placeholder: '请选择',
+    options: [{
+      label: '执行一次',
+      value: '1',
+      key: '1'
+    }, {
+      label: '执行两次',
+      value: '2',
+      key: '2'
     },
-    componentProps: {
-      options: [
-        {
-          label: '设备',
-          value: 1,
-          key: '1'
+    {
+      label: '执行三次',
+      value: '3',
+      key: '3'
+    }]
+  },
+  show: ({ values }) => {
+    return (values.ConditionItems == 2 || values.ConditionItems == 1) && values.ExecuteNum == 2;
+  }
+},
+
+];
+
+export default defineComponent({
+  components: { BasicForm, CollapseContainer, PageWrapper, Icon, AccountTable },
+  props: {
+    CompObj: {
+      type: Object,
+      default: []
+    }
+  },
+  setup(props) {
+    const [register, { setProps, getFieldsValue, setFieldsValue, updateSchema }] =
+      useForm({
+        labelWidth: 0,
+        schemas: schemas,
+        showActionButtonGroup: false,
+        actionColOptions: {
+          span: 6,
         },
-        {
-          label: '访客类型',
-          value: 2,
-          key: '2'
-        },
-        {
-          label: '参数',
-          value: 3,
-          key: '3'
-        },
-        {
-          label: '日期',
-          value: 4,
-          key: '4'
-        },
-        {
-          label: '时间',
-          value: 5,
-          key: '5'
-        },
-        {
-          label: '工单创建',
-          value: 6,
-          key: '6'
-        },
-        {
-          label: '工单更新',
-          value: 7,
-          key: '7'
-        }
-      ]
+      });
+    watch(() => props.CompObj, (newValue, oldValue) => {
+
+      if (props.CompObj.length != 0) {
+        console.log(props.CompObj, "4546as4d6as4d65as4d5a4s5d5a6sd")
+
+        // debugger;
+        huix()
+        // bcIndex.value = props.OperationMode
+      }
+    }, { deep: true }) // 开启深度监视才行
+    function appendField() {
     }
   },
   // 设备
@@ -1585,6 +1737,70 @@ export default defineComponent({
         isUpdate: true
       })
     }
+    // onMounted(() => {
+    //   huix()
+    // })
+    function huix() {
+      console.log(props.CompObj,'props.setObjprops.setObjprops.setObj')
+      let arr: any = []
+      for (let i = 1; i <= 31; i++) {
+        let obj = {
+          label: i,
+          value: i
+        }
+        arr.push(obj)
+      }
+      updateSchema({
+        field: 'ExecuteDateWeek',
+        componentProps: { options: arr },
+      });
+      // var a = { "ConditionItems": "2", "ExecuteDate": "1", "ExecuteNum": "2", "ExecuteTime": "00:05", "ExecuteDateWeek": 8, "StartTime": "14:00", "EndTime": "14:00", "circulationTime": "10", "circulationUnit": "1", "circulationNum": "2" }
+      var a = props.CompObj
+      setFieldsValue({
+        ...a
+      });
+    }
+    function EndData() {
+      const values = getFieldsValue()
+      return values
+      // let Str: String;
+      // if (values.ConditionItems == 1) {
+
+      //   if (values.ExecuteDate) {
+      //     if (values.ExecuteDate == 7) {
+      //       Str = "*"
+      //     } else {
+      //       Str = values.ExecuteDate
+      //     }
+      //   }
+
+      //   if (values.ExecuteNum) {
+      //     if (values.ExecuteNum == 1) {
+      //       if (values.ExecuteTime) {
+      //         let arr = values.ExecuteTime.split(':')
+      //         Str = arr[0] + ' ' + arr[1] + ' ' + '*' + ' ' + '*' + ' ' + Str
+      //       }
+      //     }
+      //   }
+
+      // } else {
+
+      //   if (values.ExecuteDateWeek) {
+      //     Str = values.ExecuteDateWeek
+      //   }
+
+      //   if (values.ExecuteTime) {
+      //     let arr = values.ExecuteTime.split(':')
+      //     Str = arr[0] + ' ' + arr[1] + ' ' + Str + ' ' + '*' + ' ' + '*'
+      //   }
+      // }
+
+
+      // console.log(values, Str)
+
+    }
+
+    defineExpose({ EndData });
     // 添加规则
     async function addRule(index1) {
       add.value.map((item, index) => {
@@ -1897,26 +2113,10 @@ export default defineComponent({
       changeLabel34,
       appendField,
       deleteField,
-      e_Device,
-      addRule,
-      resultList,
-      result1,
-      params,
-      remove_attach,
-      handleSubmit,
-      registerMyTable,
-      handel_Add,
       handleSuccess,
-      delete_rule_zi,
-      formvalueFF,
       EndData,
-      FIndex,
-      ZIndex,
-      DeviceIdArr,
-      FformArr,
-      formArr,
       huix
-    }
+    };
   }
 
 })
@@ -1942,8 +2142,8 @@ export default defineComponent({
   align-items: flex-end;
 }
 
-.lc_liner {
-  position: relative;
-  width: 95%;
-}
+// .overflow-hidden
+// ::v-deep(.overflow-hidden) {
+//   overflow: inherit;
+// }
 </style>
