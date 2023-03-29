@@ -88,6 +88,7 @@ export default defineComponent({
         onChange: onSelectChange,
       },
       rowKey: 'DeviceId',
+      api:getReginDevice,
       formConfig: {
         labelWidth: 100,
         schemas: searchFormSchema,
@@ -103,8 +104,7 @@ export default defineComponent({
       showIndexColumn: false,
       bordered: true,
       handleSearchInfoFn(info) {
-        Object.assign(pagination, info);
-        getData()
+        return info;
       }
     });
     const getTitle = computed(() => (!unref(isUpdate) ? '' : '选择设备'));

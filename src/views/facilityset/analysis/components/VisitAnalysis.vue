@@ -1,10 +1,13 @@
 <template>
+  <div style="position: absolute;right:30px;">
+    <DatePicker v-model:value="value1" @change="changeData"></DatePicker>
+  </div>
   <div v-if="show == false">
     <div class="text-lg font-bold">告警类别占比</div>
     <div ref="chartRef" :style="{ height, width }"></div>
   </div>
   <!-- <div > -->
-  <div v-else class=" text-2xl text-red-600 font-bold flex justify-center pt-1/2">暂无告警</div>
+  <div v-else class=" text-2xl text-red-600 font-bold flex justify-center pt-1/2">当日暂无告警</div>
   <!-- </div> -->
 </template>
 <script lang="ts">
@@ -12,19 +15,37 @@ import { basicProps } from './props'
 </script>
 <script lang="ts" setup>
 import { onMounted, ref, Ref } from 'vue'
+import {DatePicker} from 'ant-design-vue'
 import { useECharts } from '@/hooks/web/useECharts'
 import { facilityAlertDataApi } from '@/api/facility/facility'
+import dayjs, { Dayjs } from 'dayjs'
+
 defineProps({
   ...basicProps
 })
 const chartRef = ref<HTMLDivElement | null>(null)
 const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>)
 const show = ref(false)
+const value1 = ref<Dayjs>()
+
 onMounted(() => {
-  let obj = {
-    AlarmTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf() / 1000,
-    // AlarmTime: 1673366400,
+value1.value = dayjs(new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf())
+  getBarData()
+})
+
+function getBarData(time) {
+  if (time) {
+    var obj = {
+      AlarmTime:time,
+      // AlarmTime: 1673366400,
+    }
+  } else {
+    var obj = {
+      AlarmTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf() / 1000,
+      // AlarmTime: 1673366400,
+    }
   }
+
 
   facilityAlertDataApi(obj).then(res => {
     if (res.length == 0) {
@@ -32,8 +53,11 @@ onMounted(() => {
     }
     console.log(res)
     var num = res?.ExceptionAlertTotal || 0 + res?.FaultAlertTotal || 0 + res?.OtherAlertTotal || 0
+    // console.log(num)
     if (num == 0) {
       show.value = true
+    }else{
+      show.value = false
     }
     setOptions({
       title: {
@@ -110,8 +134,13 @@ onMounted(() => {
 
 
   })
+}
 
+function changeData(e, key) {
 
-})
+  getBarData(new Date(key).valueOf() / 1000)
+
+}
+
 const height = ref('400px')
 </script>

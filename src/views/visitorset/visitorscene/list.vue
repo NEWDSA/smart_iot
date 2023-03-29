@@ -53,9 +53,10 @@
                                         @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
                                         <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
                                     </Modal> -->
+                                    
                                         <div v-if="hasPermission(['Delete_visitorsceneList'])"
                                             class="bg-gray-100 py-2 px-4 mr-3 rounded"
-                                            @click.stop="showModalClick(Scene.RuleId, index)">
+                                            @click.stop="showModalClick(index)">
                                             删除
                                         </div>
 
@@ -193,9 +194,9 @@ export default defineComponent({
 
         }
 
-        function showModalClick(index: string) {
+        function showModalClick(index) {
 
-            ModalObj.Name = visitorSceneList.value[index].Name
+            ModalObj.Name = visitorSceneList.value[Number(index)].Name
             ModalObj.RuleId = visitorSceneList.value[index].RuleId
             ModalObj.index = index
             ModalShow.value = true
@@ -207,7 +208,7 @@ export default defineComponent({
                 if (res == 0) {
                     visitorSceneList.value.splice(ModalObj.index, 1)
                     ModalShow.value = false
-                    message.error('操作成功')
+                    message.success('操作成功')
                     cleanModal()
                 } else {
                     message.error('操作失败')

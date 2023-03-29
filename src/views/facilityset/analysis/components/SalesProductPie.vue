@@ -3,7 +3,7 @@
     <Card size="default" :loading="loading" title="" class=" w-full !md:mt-0">
 
       <div class="flex items-center" style="justify-content: end;">
-        <DatePicker v-model:value="value1"></DatePicker>
+        <DatePicker v-model:value="value1" @change="changeData"></DatePicker>
         <!-- <Tag color="#222222">{{ 1 }}</Tag> -->
       </div>
 
@@ -21,15 +21,18 @@
         <div class="w-3/4 pl-5 flex items-center">
           <div class="w-1/3 pl-5 flex items-center" v-for="(item) in deviceList" :key="item.title">
             <!-- :format="(percent) => percent == 100 ? '100%' : `${percent} %`" -->
-            <Progress :percent="Number.isNaN(item.value / deviceRef.value) ? 0 : ((item.value / deviceRef.value) * 100).toFixed(2)" type="circle" :show-info="false"
-              stroke-linecap="square" :strokeWidth="12" :width="80" :strokeColor="item.color" />
+            <Progress
+              :percent="Number.isNaN(item.value / deviceRef.value) ? 0 : ((item.value / deviceRef.value) * 100).toFixed(2)"
+              type="circle" :show-info="false" stroke-linecap="square" :strokeWidth="12" :width="80"
+              :strokeColor="item.color" />
             <div class="pl-5">
               <div class="text-lg text-gray-500">{{ item.title }}</div>
               <div>
                 <CountTo :decimals="1" :startVal="1" :endVal="item.value" class="text-3xl" />
                 <span class="text-2xl"> Kw/h</span>
               </div>
-              <div class="text-gray-400">占比 {{ Number.isNaN(item.value / deviceRef.value) ? 0 : ((item.value / deviceRef.value) * 100).toFixed(2) }} %</div>
+              <div class="text-gray-400">占比 {{ Number.isNaN(item.value / deviceRef.value) ? 0 : ((item.value /
+                deviceRef.value) * 100).toFixed(2) }} %</div>
             </div>
           </div>
 
@@ -46,9 +49,9 @@
 import { ref, onMounted, reactive } from 'vue';
 import { CountTo } from '@/components/CountTo/index'
 // import { Icon } from '@/components/Icon
-import { Tag, Card, Progress,DatePicker } from 'ant-design-vue'
+import { Tag, Card, Progress, DatePicker } from 'ant-design-vue'
 
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { facilityBoardNumApi } from '@/api/facility/facility'
 
 defineProps({
@@ -58,19 +61,32 @@ defineProps({
 })
 
 onMounted(() => {
+  value1.value = dayjs(new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf())
+
   getBoardNum(null, null)
   getBoardNum(-2, '0')
   getBoardNum(-3, '1')
 })
 
-function getBoardNum(type, index) {
-
-  let obj: any = {
-    StartTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf(),
-    EndTime: new Date(new Date().getTime()).valueOf(),
-    Field: 'electricityConsumption',
-    // TypeId: 1
+function getBoardNum(type, index, pp) {
+  console.log(pp)
+  var obj
+  if (pp) {
+    obj = {
+      StartTime: pp,
+      EndTime: pp +86400,
+      Field: 'electricityConsumption',
+      // TypeId: 1
+    }
+  } else {
+    obj = {
+      StartTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000,
+      EndTime: (new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000)+86400,
+      Field: 'electricityConsumption',
+      // TypeId: 1
+    }
   }
+
 
   if (type) {
     obj.TypeId = type
@@ -92,6 +108,13 @@ function getBoardNum(type, index) {
 
     }
   })
+}
+
+function changeData(e, key) {
+  getBoardNum(null, null,new Date(key+' 00:00').valueOf() / 1000)
+  getBoardNum(-2, '0',new Date(key+' 00:00').valueOf() / 1000)
+  getBoardNum(-3, '1',new Date(key+' 00:00').valueOf() / 1000)
+
 }
 
 const deviceRef = reactive({

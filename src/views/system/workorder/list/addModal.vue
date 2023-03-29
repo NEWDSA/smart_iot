@@ -100,7 +100,7 @@ import { message, Select, Button } from 'ant-design-vue';
 import Icon from '@/components/Icon';
 import {getDeptInfoList} from '@/api/demo/system'
 
-import AccountTable from '@/views/system/region/device/AccountTable.vue';
+import AccountTable from './AccountTable.vue';
 import userDrawer from '@/views/facilityset/facilitylist/components/userDrawer.vue';
 import deviceModal from './deviceModal.vue';
 const [registerMyTable, { openModal }] = useModal();
@@ -150,7 +150,7 @@ export default defineComponent({
             setModalProps({ confirmLoading: false });
             console.log(data, '...data.record...')
 
-            warnId.value = data?.record.Id;
+            warnId.value = data.record?.Id;
 
             console.log(data.record)
             setFieldsValue({

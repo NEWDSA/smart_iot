@@ -14,7 +14,7 @@
                 <div class="px-5" v-if="editStatus == false">
                     <div class="flex items-center justify-between">
                         <div class="text-xl">{{ WorkorderDetail?.Title }}</div>
-                        <Icon icon="heroicons:pencil-square-solid" :size="20" @click="editStatusFun" v-if="WorkorderDetail?.Status == 2"/>
+                        <Icon icon="heroicons:pencil-square-solid" :size="20" @click="editStatusFun" v-if="WorkorderDetail?.Status == 1"/>
                     </div>
                     <div class="text-gray-400 mt-5">{{ WorkorderDetail?.Content }}</div>
                 </div>

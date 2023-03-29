@@ -2,7 +2,7 @@
   <div class="md:flex">
     <Card size="default" style="" :loading="loading" title="设备数据" class=" w-full !md:mt-0">
       <template #extra>
-        <DatePicker v-model:value="value1"></DatePicker>
+        <DatePicker v-model:value="value1" @change="changeData"></DatePicker>
         <!-- <Tag color="#222222">{{ 1 }}</Tag> -->
       </template>
 
@@ -36,8 +36,12 @@ import { ref, onMounted } from 'vue';
 import { CountTo } from '@/components/CountTo/index'
 import { facilityDataApi } from '@/api/facility/facility'
 // import { Icon } from '@/components/Icon'
+import dayjs, { Dayjs } from 'dayjs'
 import { Tag, Card, DatePicker } from 'ant-design-vue'
 // import { TreeSelect,  } from 'ant-design-vue';
+
+
+const value1 = ref<Dayjs>()
 
 defineProps({
   loading: {
@@ -46,14 +50,21 @@ defineProps({
 })
 
 onMounted(() => {
+  value1.value = dayjs(new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf())
+
   getfacilityData()
 })
 
 // StartTime:new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf(),
 //     EndTime:new Date(new Date().getTime()).valueOf(),
 
-function getfacilityData() {
-  var AlarmTime = new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf();
+function getfacilityData(time) {
+  var AlarmTime
+  if (time) {
+    AlarmTime = time
+  } else {
+    AlarmTime = new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000;
+  }
   facilityDataApi({ 'AlarmTime': AlarmTime }).then(res => {
     deviceList.value[0].value = res?.DeviceTotal || 0
     deviceList.value[0].fuValue = res?.OffLineDeviceTotal || 0
@@ -67,6 +78,12 @@ function getfacilityData() {
     deviceList.value[3].fuValue = res?.AlertGrowthRate || 0
 
   })
+}
+
+function changeData(e, key) {
+
+  getfacilityData(new Date(key).valueOf()/1000)
+
 }
 
 const deviceList = ref([
@@ -93,7 +110,5 @@ const deviceList = ref([
     fuValue: 0,
   }
 ])
-
-const value1 = ref('')
 
 </script>

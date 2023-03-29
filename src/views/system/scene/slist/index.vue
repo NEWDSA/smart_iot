@@ -7,7 +7,7 @@
         <Button @click="searchScence" type="primary">搜索</Button>
       </a-col>
       <Tabs>
-        <template v-for="item in achieveList" :k  ey="item.key">
+        <template v-for="item in achieveList" :key="item.key">
           <TabPane :tab="item.name">
             <component :is="item.component" :id="item.key" :set="Name2" />
           </TabPane>

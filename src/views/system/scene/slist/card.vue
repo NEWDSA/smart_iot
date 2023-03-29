@@ -1,7 +1,7 @@
 <template>
   <List :class="prefixCls">
     <a-row :gutter="16">
-      <template v-for="item in list" :key="item.title" >
+      <template v-for="(item, index) in dataList" :key="item.title">
         <a-col :span="6">
           <ListItem>
             <Card :hoverable="true" :class="`${prefixCls}__card`" @click="pathDetail(item.RuleId)">
@@ -9,8 +9,8 @@
                 <Icon class="icon" icon="clarity:star-line" />
                 {{ item.Name }}
                 <Tag
-                  :color="item.Status == 1 ? tagColor = '#f50' : item.Status == 2 ? tagColor = '#87d068' : tagColor = ''"
-                  class="status_icon">{{ item.Status == 1 ? '离线' : item.Status == 2 ? '在线' : '' }}</Tag>
+                  :color="item.Status == 1 ? tagColor = '#87d068' : item.Status == 2 ? tagColor = '#f50' : tagColor = ''"
+                  class="status_icon">{{ item.Status == 1 ? '在线' : item.Status == 2 ? '离线' : '' }}</Tag>
               </div>
               <div :class="`${prefixCls}__card-num`">
                 <span>{{
@@ -18,30 +18,52 @@
                     '手动触发' : '全部'
                 }}</span>
               </div>
-              <div v-if="item?.DeviceName.lenght > 0" :class="`${prefixCls}__card-num`">
-                关联设备：<span>{{ item.DeviceName }}</span>
+              <div v-if="item?.DeviceIds" :class="`${prefixCls}__card-num`">
+                关联设备：<div class="w-full truncate ...">{{ item.DeviceNames }}</div>
               </div>
               <div v-if="item?.RegionName" :class="`${prefixCls}__card-num`">
                 关联区域：<span>{{ item.RegionName }}</span>
               </div>
+              <div class="bottom-but flex items-center mt-2 justify-end">
+
+                <Popconfirm title="确认删除此场景？" ok-text="确认" cancel-text="取消"
+                  @confirm="confirm(index)" @cancel="cancel">
+                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="">
+                    删除
+                  </div>
+                </Popconfirm>
+
+                <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="pathDetail(index, index2)">
+                  编辑</div>
+                <div class=" bg-blue-600 text-white py-2 px-4 mr-3 rounded" v-if="item.Status == 2"
+                  @click.stop="enableDevice(item.RuleId, index)">启用
+                </div>
+                <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded" v-if="item.Status == 1"
+                  @click.stop="disableDevice(item.RuleId, index)">
+                  禁用</div>
+              </div>
               <Icon :class="`${prefixCls}__card-download`" v-if="item.download" :icon="item.download" />
+
+
             </Card>
           </ListItem>
         </a-col>
       </template>
     </a-row>
   </List>
-  <a-row :class="`${prefixCls}`">
-    <Pagination v-model:current="params.PageNum" 
-    v-model:pageSize="params.PageSize" :total="toTal" show-less-items @change="cutPage" />
+  <a-row :class="`${prefixCls}`" class="mt-4">
+    <Pagination v-model:current="params.PageNum" v-model:pageSize="params.PageSize" :total="toTal" show-less-items
+      @change="cutPage" />
   </a-row>
 </template>
 <script lang="ts">
 import { defineComponent, onMounted, reactive, ref, watch } from 'vue';
-import { List, Card, Row, Col, Pagination, Tag } from 'ant-design-vue';
+import { List, Card, Row, Col, Pagination, Tag, message, Popconfirm } from 'ant-design-vue';
 import Icon from '@/components/Icon/index';
 import { deviceList, scenceList, regionDetail } from '@/api/demo/scence';
 import { useGo } from '@/hooks/web/usePage';
+import { ruleDeleteApi } from '@/api/visitor/visitor'
+import { facilityRuleListApi, ruleEnableApi, ruleDisableApi } from '@/api/facility/facility'
 export default defineComponent({
   props: ['id', 'set'],
   components: {
@@ -53,6 +75,7 @@ export default defineComponent({
     Pagination,
     [Row.name]: Row,
     [Col.name]: Col,
+    Popconfirm
   },
   setup(props, { slots }) {
     const go = useGo();
@@ -64,7 +87,7 @@ export default defineComponent({
       PageNum: 1,
       PageSize: 6,
     })
-    const dataList = ref('');
+    const dataList = ref([]);
     let param2 = {
       TriggerMode: props.id,
     }
@@ -93,48 +116,49 @@ export default defineComponent({
       toTal.value = Total;
       const para: any = [];
       const para3: any = [];
-      List.map(async (item) => {
-        item.DeviceName = []
-        // 调用接口获取区域列表
-        if (item?.DeviceIds && item.DeviceIds.length > 0) {
-          item.DeviceIds.forEach(async (item2) => {
-            // 设备接口
-            await deviceList({
-              Id: item2
-            }).then((res) => {
-              para.push(...res.List);
-            })
+      console.log(List)
+      // List.map(async (item) => {
+      //   item.DeviceName = []
+      //   // 调用接口获取区域列表
+      //   if (item?.DeviceIds && item.DeviceIds.length > 0) {
+      //     item.DeviceIds.forEach(async (item2) => {
+      //       // 设备接口
+      //       await deviceList({
+      //         Id: item2
+      //       }).then((res) => {
+      //         para.push(...res.List);
+      //       })
 
-            // 设备
-            para.map((parm2) => {
-              if (parm2.DeviceId == item2) {
-                item.DeviceName.push(parm2.DeviceName);
-              }
-            })
+      //       // 设备
+      //       para.map((parm2) => {
+      //         if (parm2.DeviceId == item2) {
+      //           item.DeviceName.push(parm2.DeviceName);
+      //         }
+      //       })
 
-          })
-          //区域
-          if (item?.RegionIds && item.RegionIds.lenght > 0) {
-            item.RegionName = [];
-            item.RegionIds.forEach(async (item3) => {
-              // 调用接口获取区域列表
-              await regionDetail({
-                RegionId: item3
-              }).then((res) => {
-                para3.push(...res.Detail)
-              })
+      //     })
+      //     //区域
+      //     if (item?.RegionIds && item.RegionIds.lenght > 0) {
+      //       item.RegionName = [];
+      //       item.RegionIds.forEach(async (item3) => {
+      //         // 调用接口获取区域列表
+      //         await regionDetail({
+      //           RegionId: item3
+      //         }).then((res) => {
+      //           para3.push(...res.Detail)
+      //         })
 
-              para3.map((para) => {
-                if (para.RegionId == item3) {
-                  item.RegionName.push(para.RegionName);
-                }
-              })
-            })
+      //         para3.map((para) => {
+      //           if (para.RegionId == item3) {
+      //             item.RegionName.push(para.RegionName);
+      //           }
+      //         })
+      //       })
 
-          }
+      //     }
 
-        }
-      })
+      //   }
+      // })
 
       dataList.value = List;
     }
@@ -145,9 +169,51 @@ export default defineComponent({
       getData()
     }
 
-     // 详情、编辑
-     function pathDetail(id) {
-      go('/scene/linkage/' + id )
+    function enableDevice(id, index) {
+      console.log(dataList.value)
+      ruleEnableApi({ Id: id }).then(res => {
+        if (res == 0) {
+          message.success('操作成功')
+          dataList.value[index].Status = 1
+          console.log(dataList.value)
+        } else {
+          message.error('操作失败')
+
+        }
+      })
+    }
+
+    function disableDevice(id, index) {
+      ruleDisableApi({ Id: id }).then(res => {
+        if (res == 0) {
+          message.success('操作成功')
+          dataList.value[index].Status = 2
+        } else {
+          message.error('操作失败')
+
+        }
+      })
+    }
+
+    const confirm = (index) => {
+      ruleDeleteApi({Ids:[dataList.value[index].RuleId]}).then(res=>{
+        if(res==0){
+          message.success('删除成功');
+          dataList.value.splice(index,1)
+        }else{
+          message.error(res)
+        }
+      })
+    };
+
+    const cancel = (e: MouseEvent) => {
+      // console.log(e);
+      // message.error('Click on No');
+    };
+
+    // 详情、编辑
+    function pathDetail(id) {
+      go('/scene/linkage/' + id)
     }
     // 调用接口获取数据
     onMounted(async () => {
@@ -156,7 +222,7 @@ export default defineComponent({
     return {
       props,
       prefixCls: 'account-center-application',
-      list: dataList,
+      dataList,
       getData,
       toTal,
       params,
@@ -164,7 +230,11 @@ export default defineComponent({
       tagColor,
       slots,
       cutPage,
-      pathDetail
+      pathDetail,
+      enableDevice,
+      disableDevice,
+      confirm,
+      cancel
     };
   },
 });

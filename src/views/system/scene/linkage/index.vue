@@ -65,7 +65,7 @@
 <script lang="ts">
 import { defineComponent, ref, toRaw, onMounted, nextTick } from 'vue';
 import { Description } from '@/components/Description/index';
-import { Button } from 'ant-design-vue';
+import { Button, message } from 'ant-design-vue';
 import ProjectCard from './components/ProjectCard.vue';
 import evenTrigger from './components/evenTrigger.vue';
 import timingTrigger from './components/timingTrigger/index.vue';
@@ -78,6 +78,7 @@ import { Divider } from 'ant-design-vue';
 import { RuleSaveApi, RuleInfoApi, RuleEditApi } from '@/api/sys/scene';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { useRoute, onBeforeRouteLeave } from 'vue-router';
+import { useGo } from '@/hooks/web/usePage';
 
 import {
   refundSchema,
@@ -88,6 +89,7 @@ import {
 export default defineComponent({
   components: { Description, BasicTable, PageWrapper, [Divider.name]: Divider, ScrollContainer, Icon, ProjectCard, BasicForm, useForm, Button, evenTrigger, timingTrigger, handTrigger },
   setup() {
+    const go = useGo();
     const route = useRoute();
     const InfoObj = ref('');
     const resultList: any = ref(null);
@@ -161,7 +163,14 @@ export default defineComponent({
       let mergedData: any = {};
       console.log(CardType.value)
       if (CardType.value == 0) {
-
+        if (child.value.myData.EndData().length == 0) {
+          message.warn('请选择触发条件');
+          return;
+        }
+        if (child.value.actionData.EndData().length == 0) {
+          message.warn('请选择执行动作');
+          return;
+        }
         mergedData.ConditionItems = child.value.myData.EndData()
         mergedData.ConditionItems.ConditionType = Number(mergedData.ConditionItems.ConditionType)
         mergedData.EchoItems = child.value.myData.EndData()
@@ -188,6 +197,15 @@ export default defineComponent({
         EndDD.DeviceIds = unique(child.value.myData.DeviceIdArr)
       }
       if (CardType.value == 1) {
+        if (setTime.value.myData.EndData().length == 0) {
+          message.warn('请选择定时条件');
+          return;
+        }
+        if (setTime.value.actionData.EndData().length == 0) {
+          message.warn('请选择执行动作');
+          return;
+        }
+
         let obj = setTime.value.myData.EndData()
         console.log(obj)
         mergedData.ConditionItems = null
@@ -232,7 +250,7 @@ export default defineComponent({
         EndDD.DeviceIds = unique(child.value.myData.DeviceIdArr)
       }
 
-
+      EndDD.VisitorTypeId = 1
       EndDD.RegionIds = []
       EndDD.TriggerMode = CardType.value
       // console.log(InfoObj.value)
@@ -240,11 +258,28 @@ export default defineComponent({
         EndDD.RuleId = InfoObj.value.RuleId
 
         RuleEditApi(EndDD).then(res => {
-          console.log(res)
+          if (res == 0) {
+            message.success('修改成功')
+            go('/scene/slist')
+          } else {
+            var a = res.split('=')
+            // console.log(a)
+            message.error(a[2])
+            // message.error()
+          }
         })
       } else {
         RuleSaveApi(EndDD).then(res => {
-          console.log(res)
+          if (Array.isArray(res)) {
+            message.success('新增成功')
+            go('/scene/slist')
+          } else {
+            var a = res.split('=')
+            // console.log(a)
+            message.error(a[2])
+            // message.error()
+          }
+
         })
       }
 

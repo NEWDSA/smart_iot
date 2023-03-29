@@ -17,7 +17,7 @@
 
         <div class="flex items-center flex-wrap" v-if="sceneList?.length > 0">
 
-            <div v-for="(Scene, index) in sceneList" :key="Scene.RuleId" class="w-100 mb-5">
+            <div v-for="(Scene, index) in sceneList" :key="Scene.RuleId" class="w-100 mb-5 mt-3">
 
                 <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5">
                     <div class="flex items-center justify-between">
@@ -33,10 +33,13 @@
                         </div>
                     </div>
                     <!-- <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div> -->
-                    <!-- <div class="text-gray-500">关联设备 <span class="text-black">{{
-                        checkVisitorType(Scene.VisitorTypeId)
+                    <div class="text-gray-500">关联设备 <span class="text-black">{{
+                        Scene.DeviceNames
                     }}</span></div>
-                    <div class="text-gray-500">关联区域 <span class="text-black">{{
+                    <div class="text-gray-500">触发方式 <span class="text-black">{{
+                        Scene.TriggerMode == 1 ? '设备触发' : Scene.TriggerMode == 2 ? '定时触发' : '手动触发'
+                    }}</span></div>
+                    <!-- <div class="text-gray-500">关联区域 <span class="text-black">{{
                         checkVisitorType(Scene.VisitorTypeId)
                     }}</span></div> -->
 
