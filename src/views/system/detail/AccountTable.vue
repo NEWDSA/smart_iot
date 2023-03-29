@@ -9,7 +9,6 @@
 import { defineComponent, ref, computed, unref, onMounted } from 'vue';
 import { useMessage } from '@/hooks/web/useMessage';
 import { BasicModal, useModalInner } from '@/components/Modal';
-// import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { BasicTree, TreeItem,TreeActionType } from '@/components/Tree/index';
 import { getDeptList } from '@/api/demo/system';
 export default defineComponent({
@@ -17,7 +16,6 @@ export default defineComponent({
   components: { BasicModal, BasicTree },
   emits: ['success', 'register', 'select'],
   setup(_, { emit }) {
-    // const isUpdate = ref(true);
     const treeRef = ref<Nullable<TreeActionType>>(null);
     const treeData = ref<TreeItem[]>([]);
     const {
@@ -28,8 +26,6 @@ export default defineComponent({
     });
     async function fetch() {
       treeData.value = (await getDeptList()) as unknown as TreeItem[];
-
-      // (await getTree()).setSelectedKeys([]);
       // 组装后端数据
       function listToTreeSimple(data) {
         const res: any = [];
@@ -62,7 +58,6 @@ export default defineComponent({
         title: '提示',
         content: '只能选择一项',
       }) : ''
-      console.log(keys.checked, '...keys...')
     }
     async function handleSubmit() {
       try {

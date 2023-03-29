@@ -521,14 +521,14 @@ export default defineComponent({
       const obj = { ...params }
       // 根据所选择的设备进行设备id查询
       const result = await deviceInfo({
-        Id: obj[0][0].DeviceId
+        Id: obj[0].DeviceId
       })
 
       let FormSchema = JSON.parse(result[0]?.DeviceModel)
       xformElRef.value[Number(TIndex.value)].setFieldsValue({
-        DeviceName: obj[0][0].DeviceName,
-        DeviceId: obj[0][0].DeviceId,
-        DeviceSerial: obj[0][0].DeviceSerial,
+        DeviceName: obj[0].DeviceName,
+        DeviceId: obj[0].DeviceId,
+        DeviceSerial: obj[0].DeviceSerial,
       })
       let myobj: any = [];
       FormSchema.forEach(async (item, index) => {
@@ -882,7 +882,7 @@ export default defineComponent({
       TIndex,
       bcIndex,
       delete_rule,
-      huix,
+      huix,          
       DeviceIdArr
       // getForm
     };

@@ -1,7 +1,7 @@
 <template>
-  <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle"
+  <BasicModal @visible-change="ModelStatus" width="48%" v-bind="$attrs" @register="registerModal" :title="getTitle"
     @ok="handleSubmit">
-    <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+    <BasicTable  @register="registerTable"  :searchInfo="searchInfo">
     </BasicTable>
   </BasicModal>
 </template>
@@ -20,23 +20,20 @@ export default defineComponent({
   setup(_, { emit }) {
     const isUpdate = ref(true);
     const searchInfo = reactive<Recordable>({});
-    const TreeTableData: any = reactive([]);
-    const dataSource: any = ref([]);
     const checkedKeys = ref<Array<string | number>>([]);
-    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 2 })
     const RoleId: any = ref();
     function onChange() {
     }
-    const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-      console.log(data, '大于')
+    const [registerModal, {setModalProps, closeModal }] = useModalInner(async (data) => {
       RoleId.value = data.RoleId;
-      // paramList.value = data.params
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
-
+      checkedKeys.value=[];
+      // 清空Table分页信息
+      
     });
 
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getForm }] = useTable({
+    const [registerTable, { reload }] = useTable({
       title: '',
       onChange,
       rowSelection: {
@@ -50,36 +47,38 @@ export default defineComponent({
         schemas: searchFormSchema,
         autoSubmitOnEnter: true,
       },
+      api:RoleUnUserList,
+      beforeFetch:(p)=>{
+         p.RoleId=RoleId.value
+         return p
+      },
+      fetchSetting: {
+        // 传给后台的当前页字段
+        pageField: 'PageNum',
+        // 传给后台的每页显示多少条的字段
+        sizeField: 'PageSize',
+        // 接口返回表格数据的字段
+        listField: 'List',
+        // 接口返回表格总数的字段
+        totalField: 'Total'
+      },
       columns,
       pagination: true,
       useSearchForm: true,
       showTableSetting: true,
       showIndexColumn: false,
-      bordered: true,
       handleSearchInfoFn(info) {
-        Object.assign(pagination, info);
-        getData()
       }
     });
     const getTitle = computed(() => (!unref(isUpdate) ? '添加角色用户' : '编辑账号'));
     function onSelectChange(selectedRowKeys: []) {
 
       checkedKeys.value = selectedRowKeys;
-      console.log(checkedKeys.value, '选中了多项!!!!')
     }
     function ModelStatus(isOpen) {
-      isOpen ? getData() : ''
+      // isOpen ? getData() : ''
     }
-    // 获取table数据
-    async function getData() {
-      dataSource.value = [];
-      const { List, Total } = await RoleUnUserList(pagination)
-      dataSource.value = List;
 
-      setPagination({
-        total: Total
-      })
-    }
 
     async function handleSubmit() {
       try {
@@ -98,7 +97,7 @@ export default defineComponent({
       }
     }
 
-    return { registerModal, registerTable, handleSubmit, onSelectChange, getData, ModelStatus, RoleId, checkedKeys, getTitle, searchInfo, dataSource };
+    return { registerModal, registerTable, handleSubmit, onSelectChange, ModelStatus, RoleId, checkedKeys, getTitle, searchInfo };
   },
 });
 </script>

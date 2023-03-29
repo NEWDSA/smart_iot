@@ -23,7 +23,7 @@ export function getBasicColumns(): BasicColumn[] {
       width: 80,
       customRender: ({ record }) => {
         const status = record.Status
-        const enable = ~~status === 0
+        const enable = ~~status === 1
         const color = enable ? 'green' : 'red'
         const text = enable ? '正常' : '停用'
         return h(Tag, { color: color }, () => text)
@@ -85,21 +85,22 @@ export const formSchema: FormSchema[] = [
     required: true
   },
   {
+    field: 'Sort',
+    label: '显示排序',
+    component: 'InputNumber'
+  },
+  {
     field: 'Status',
     label: '状态',
     component: 'RadioButtonGroup',
-    defaultValue: 0,
+    defaultValue: 1,
     componentProps: {
       options: [
-        { label: '启用', value: 0 },
-        { label: '停用', value: 1 }
+        { label: '启用', value: 1 },
+        { label: '停用', value: 2 }
       ]
     },
     required: true
-  },{
-    field: 'Sort',
-    label: '排序',
-    component: 'InputNumber'
   }
 ]
 

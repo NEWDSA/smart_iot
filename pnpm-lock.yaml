@@ -56,6 +56,7 @@ specifiers:
   less: ^4.1.3
   lint-staged: ^13.0.4
   lodash-es: ^4.17.21
+  mitt: ^3.0.0
   mockjs: ^1.1.0
   npm-run-all: ^4.1.5
   nprogress: ^0.2.0
@@ -72,6 +73,7 @@ specifiers:
   rimraf: ^3.0.2
   rollup: ^2.56.3
   rollup-plugin-visualizer: ^5.8.3
+  rxjs: ^7.8.0
   sortablejs: 1.15.0
   stylelint: ^14.15.0
   stylelint-config-prettier: ^9.0.4
@@ -120,6 +122,7 @@ dependencies:
   echarts: 5.4.0
   intro.js: 6.0.0
   lodash-es: 4.17.21
+  mitt: registry.npmmirror.com/mitt/3.0.0
   mockjs: 1.1.0
   nprogress: 0.2.0
   path-to-regexp: 6.2.1
@@ -181,6 +184,7 @@ devDependencies:
   rimraf: 3.0.2
   rollup: 2.79.1
   rollup-plugin-visualizer: 5.8.3_rollup@2.79.1
+  rxjs: registry.npmmirror.com/rxjs/7.8.0
   stylelint: registry.npmmirror.com/stylelint/14.15.0
   stylelint-config-prettier: 9.0.4_stylelint@14.15.0
   stylelint-config-recommended: 9.0.0_stylelint@14.15.0
@@ -1878,7 +1882,7 @@ packages:
     resolution: {integrity: sha512-CzNkWqQftcmk2jaCWdBTf9Sm7xSw4rkI1zpU/Udw3HX5//adEZUIm9STtoRP1qgWj0CWQtJ9UTvqmO2NNjhMJw==}
     dependencies:
       '@types/through': 0.0.30
-      rxjs: 7.5.7
+      rxjs: registry.npmmirror.com/rxjs/7.8.0
     dev: true
 
   /@types/intro.js/5.1.0:
@@ -2458,7 +2462,7 @@ packages:
       path-case: 3.0.4
       sentence-case: 3.0.4
       snake-case: 3.0.4
-      tslib: 2.4.0
+      tslib: registry.npmmirror.com/tslib/2.4.0
     dev: true
 
   /chardet/0.7.0:
@@ -3970,7 +3974,7 @@ packages:
       mute-stream: 0.0.8
       ora: 6.1.2
       run-async: 2.4.1
-      rxjs: 7.5.7
+      rxjs: registry.npmmirror.com/rxjs/7.8.0
       string-width: 5.1.2
       strip-ansi: 7.0.1
       through: 2.3.8
@@ -5444,12 +5448,6 @@ packages:
     engines: {node: '>=0.12.0'}
     dev: true
 
-  /rxjs/7.5.7:
-    resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
-    dependencies:
-      tslib: 2.4.0
-    dev: true
-
   /safe-regex-test/1.0.0:
     resolution: {integrity: sha512-JBUUzyOgEwXQY1NuPtvcj/qcBDbDmEvWufhlnXZIm75DEHp+afM1r1ujJpJsV/gSM4t59tpDyPi1sd6ZaPFfsA==}
     dependencies:
@@ -6805,7 +6803,7 @@ packages:
   /zrender/5.4.0:
     resolution: {integrity: sha512-rOS09Z2HSVGFs2dn/TuYk5BlCaZcVe8UDLLjj1ySYF828LATKKdxuakSZMvrDz54yiKPDYVfjdKqcX8Jky3BIA==}
     dependencies:
-      tslib: 2.3.0
+      tslib: registry.npmmirror.com/tslib/2.3.0
     dev: false
 
   registry.npmmirror.com/@babel/code-frame/7.18.6:
@@ -10639,7 +10637,7 @@ packages:
       log-update: registry.npmmirror.com/log-update/4.0.0
       p-map: registry.npmmirror.com/p-map/4.0.0
       rfdc: registry.npmmirror.com/rfdc/1.3.0
-      rxjs: registry.npmmirror.com/rxjs/7.5.7
+      rxjs: registry.npmmirror.com/rxjs/7.8.0
       through: registry.npmmirror.com/through/2.3.8
       wrap-ansi: registry.npmmirror.com/wrap-ansi/7.0.0
     dev: true
@@ -11039,6 +11037,12 @@ packages:
     name: minimist
     version: 1.2.7
     dev: true
+
+  registry.npmmirror.com/mitt/3.0.0:
+    resolution: {integrity: sha512-7dX2/10ITVyqh4aOSVI9gdape+t9l2/8QxHrFmUXu4EEUpdlxl6RudZUPZoc+zuY2hk1j7XxVroIVIan/pD/SQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/mitt/-/mitt-3.0.0.tgz}
+    name: mitt
+    version: 3.0.0
+    dev: false
 
   registry.npmmirror.com/ms/2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/ms/-/ms-2.0.0.tgz}
@@ -11957,10 +11961,10 @@ packages:
       queue-microtask: registry.npmmirror.com/queue-microtask/1.2.3
     dev: true
 
-  registry.npmmirror.com/rxjs/7.5.7:
-    resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/rxjs/-/rxjs-7.5.7.tgz}
+  registry.npmmirror.com/rxjs/7.8.0:
+    resolution: {integrity: sha512-F2+gxDshqmIub1KdvZkaEfGDwLNpPvk9Fs6LD/MyQxNgMds/WH9OdDDXOmxUZpME+iSK3rQCctkL0DYyytUqMg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/rxjs/-/rxjs-7.8.0.tgz}
     name: rxjs
-    version: 7.5.7
+    version: 7.8.0
     dependencies:
       tslib: registry.npmmirror.com/tslib/2.4.0
     dev: true
@@ -12634,6 +12638,12 @@ packages:
     name: tslib
     version: 1.14.1
     dev: true
+
+  registry.npmmirror.com/tslib/2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/tslib/-/tslib-2.3.0.tgz}
+    name: tslib
+    version: 2.3.0
+    dev: false
 
   registry.npmmirror.com/tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/tslib/-/tslib-2.4.0.tgz}

@@ -1,57 +1,64 @@
 <template>
   <div :class="`${prefixCls}__content`">
-    <a-list bordered :pagination="pagenation">
-      <template v-for="item, index in Datalist" :key="item.id">
+    <a-list>
+      <template v-for="item, index in Datalist" :key="index">
         <a-list-item @click="handleTitleClick(item, index)" style="position: relative;"
           :class="{ selected: index == myselectedIndex }">
           <a-list-item-meta>
             <template #avatar>
-              <Icon class="icon" icon="ri:message-2-fill" />
+              <SvgIcon :size="40" name="msg" />
             </template>
             <template #title>
-              <span>{{ item.Type == 1 ? '设备告警' : '工单' }}</span>
+              <span>{{ item?.Type == 1 ? '设备告警' : '工单' }}</span>
               <div class="extra">
                 <div class="info">
-                  <div>{{ filterresult(item.Basic.CreatedAt.seconds) }}</div>
+                  <div>{{ filterresult(item?.Basic.CreatedAt.seconds) }}</div>
                   <div style="text-align: right;">
-                    <span :class="item.IsRead == 0 ? 'noread' : 'read'"></span>
-                    {{ item.IsRead == 0 ? '未读' : '已读' }}
+                    <span :class="item?.IsRead == 0 ? 'noread' : 'read'"></span>
+                    {{ item?.IsRead == 0 ? '未读' : '已读' }}
                   </div>
                 </div>
               </div>
             </template>
             <template #description>
               <div class="description">
-                {{ item.Content }}
+                {{ item?.Content }}
               </div>
             </template>
           </a-list-item-meta>
         </a-list-item>
       </template>
     </a-list>
+    <Pagination hideOnSinglePage v-model:current="pagenation.current" v-model:pageSize="pagenation.PageSize"
+      show-less-items :total="pagenation.total" @change="changePage"></Pagination>
   </div>
 </template>
   
 <script  lang='ts'>
 import { Progress, Row, Col } from 'ant-design-vue';
 import { defineComponent, onMounted, ref, reactive, watch } from 'vue';
-import Icon from '@/components/Icon/index';
-import { List } from 'ant-design-vue';
+import { SvgIcon } from '@/components/Icon';
+import { List, Pagination } from 'ant-design-vue';
 import dayjs from 'dayjs';
 export default defineComponent({
   components: {
-    Icon,
+    SvgIcon,
     Progress,
     [List.name]: List,
     [List.Item.name]: List.Item,
     AListItemMeta: List.Item.Meta,
     [Row.name]: Row,
     [Col.name]: Col,
+    Pagination
   },
   props: {
     params: {
       type: Object,
       default: () => ({})
+    },
+    total: {
+      type: Number,
+      default: 0
     },
     selectedIndex: {
       type: Number,
@@ -63,7 +70,7 @@ export default defineComponent({
 
     },
     onTitleClick: {
-      type: Function as PropType<(Recordable) => void>,
+      type: Function,
     }
   },
   emits: ['changePage'],
@@ -71,18 +78,16 @@ export default defineComponent({
     const { selectedIndex, params } = props;
     const myselectedIndex = ref(null);
     const pagenation = reactive({
-      current: 1,
-      total: 15,
-      PageSize: 8,
+      current: params.current,
+      total: params.Total,
+      PageSize: params.PageSize,
       onChange: changePage
     })
 
-    // const selectedIndex = ref(null);
     watch(() => props.params, (newValue, oldValue) => {
-      console.log(newValue, '...newValue...?')
-      pagenation.current = newValue.PageNum;
+      pagenation.current = newValue.current;
+      pagenation.PageSize=newValue.PageSize;
       pagenation.total = newValue.Total;
-      console.log(oldValue, '...dfdfdf')
     })
     function changePage(e) {
       emit('changePage', e);
@@ -91,7 +96,7 @@ export default defineComponent({
     function handleTitleClick(item, index) {
 
       myselectedIndex.value = index;
-      props.onTitleClick && props.onTitleClick(item);
+      props.onTitleClick && props.onTitleClick(item,index);
     }
     onMounted(async () => {
 
@@ -115,6 +120,8 @@ export default defineComponent({
   
 <style lang="less" scoped>
 .list-basic {
+  cursor: pointer;
+
   &__top {
     padding: 24px;
     text-align: center;
@@ -143,8 +150,6 @@ export default defineComponent({
 
   &__content {
     padding: 24px;
-    // margin-top: 12px;
-    // background-color: @component-background;
 
     .list {
       position: relative;
@@ -173,6 +178,7 @@ export default defineComponent({
       display: flex;
       flex-direction: column;
       text-align: center;
+      color: rgb(51, 51, 51);
 
       .point {
         position: relative;
@@ -181,7 +187,6 @@ export default defineComponent({
 
       div {
         display: inline-block;
-        // padding: 0 20px;
 
         span {
           display: block;
@@ -204,6 +209,12 @@ export default defineComponent({
 
 ::v-deep(.ant-list-item) {
   border-bottom: 1px solid #dfcfcf;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: 1px solid #dfcfcf;
+
+  }
 }
 
 .noread {
@@ -211,7 +222,7 @@ export default defineComponent({
   top: 5px;
   width: 10px;
   height: 10px;
-  background: #dbf306;
+  background: rgb(255, 205, 45);
   border-radius: 100%;
   float: right;
   left: -50px;
@@ -222,8 +233,16 @@ export default defineComponent({
   top: 5px;
   width: 10px;
   height: 10px;
-  background: #51f306;
+  background: rgb(82, 196, 26);
   border-radius: 100%;
   float: right;
   left: -50px;
-}</style>
+}
+
+::v-deep(.ant-pagination) {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translate(-800px);
+}
+</style>

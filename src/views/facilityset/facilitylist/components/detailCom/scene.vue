@@ -32,13 +32,13 @@
                             }}
                         </div>
                     </div>
-                    <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div>
-                    <div class="text-gray-500">关联设备 <span class="text-black">{{
+                    <!-- <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div> -->
+                    <!-- <div class="text-gray-500">关联设备 <span class="text-black">{{
                         checkVisitorType(Scene.VisitorTypeId)
                     }}</span></div>
                     <div class="text-gray-500">关联区域 <span class="text-black">{{
                         checkVisitorType(Scene.VisitorTypeId)
-                    }}</span></div>
+                    }}</span></div> -->
 
                     <div class="bottom-but flex items-center mt-2 justify-end">
                         <!-- <Modal
@@ -107,7 +107,7 @@ const sceneList = ref()
 const searchObj = reactive(
     {
         Name: '',
-        DeviceId: '888',
+        DeviceId: '',
         PageNum: 1,
         PageSize: 10
     }
@@ -117,6 +117,7 @@ const total = ref()
 
 // 获取列表
 function getSceneList(type,name) {
+    searchObj.DeviceId = props.DeviceId
     if (type) {
         searchObj.PageNum = 1
     }
@@ -167,7 +168,16 @@ function disableDevice(id, index) {
         }
     })
 }
+// function checkVisitorType(id) {
 
+// for (let i = 0; i < visitorSceneTab.value.length; i++) {
+//     if (id == visitorSceneTab.value[i].VisitorTypeId) {
+//         // console.log(id)
+//         return visitorSceneTab.value[i].VisitorTypeName
+//     }
+
+// }
+// }
 function search() {
     if (searchValue.value == '') {
         getSceneList(true)

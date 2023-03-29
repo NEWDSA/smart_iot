@@ -1,6 +1,7 @@
 <template>
-  <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
-    <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+  <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle"
+    @ok="handleSubmit">
+    <BasicTable :dataSource="dataSource" @register="registerTable" :searchInfo="searchInfo">
     </BasicTable>
   </BasicModal>
 </template>
@@ -9,7 +10,7 @@ import { defineComponent, ref, computed, unref, reactive, toRaw } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { editDeviceArea } from '@/api/demo/region';
-import { deviceTree, getReginDevice, getDeviceType } from '@/api/demo/region'
+import { deviceTree, getReginDevice } from '@/api/demo/region'
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { columns, searchFormSchema } from './accountModel.data';
 export default defineComponent({
@@ -23,12 +24,12 @@ export default defineComponent({
     const TreeTableData: any = reactive([]);
     const dataSource: any = ref([]);
     const checkedKeys = ref<Array<string | number>>([]);
-    var pagination = reactive({ PageNum: 1, PageSize: 10, Sort: 2 })
     const paramList: any = ref();
     function onChange() {
     }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       paramList.value = data.params
+      checkedKeys.value = [];
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
       // 获取设备分类
@@ -58,8 +59,8 @@ export default defineComponent({
 
     });
 
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getForm }] = useTable({
-      title: '区域设备管理',
+    const [registerTable, { getForm }] = useTable({
+      title: '',
       onChange,
       rowSelection: {
         type: 'checkbox',
@@ -67,6 +68,10 @@ export default defineComponent({
         onChange: onSelectChange,
       },
       rowKey: 'DeviceId',
+      api:getReginDevice,
+      beforeFetch:(p)=>{
+         p.Sort=2;
+      },
       formConfig: {
         labelWidth: 100,
         schemas: searchFormSchema,
@@ -79,8 +84,7 @@ export default defineComponent({
       showIndexColumn: false,
       bordered: true,
       handleSearchInfoFn(info) {
-        Object.assign(pagination, info);
-        getData()
+        return info;
       }
     });
     const getTitle = computed(() => (!unref(isUpdate) ? '选择添加设备' : '编辑账号'));
@@ -96,8 +100,8 @@ export default defineComponent({
     async function getData() {
       //  获取区域设备
       dataSource.value = [];
-      const { Page } = await getReginDevice(pagination)
-      const result = Page.List;
+      const { Detail,Total } = await getReginDevice(pagination)
+      const result = Detail;
       const TypeList: any = [];
       result.map(async (item) => {
         const DeviceList = await getDeviceType({
@@ -108,13 +112,12 @@ export default defineComponent({
         dataSource.value.push(item)
       })
       setPagination({
-        total: Page.Total
+        total: Total
       })
     }
 
     async function handleSubmit() {
       try {
-        // const values = await validate();
         const params = {
           DeviceId: toRaw(checkedKeys.value),
           RegionId: paramList.value
@@ -129,7 +132,7 @@ export default defineComponent({
       }
     }
 
-    return { registerModal, registerTable, handleSubmit, onSelectChange, getData,ModelStatus, paramList, checkedKeys, getTitle, searchInfo, dataSource };
+    return { registerModal, registerTable, handleSubmit, onSelectChange, ModelStatus, paramList, checkedKeys, getTitle, searchInfo, dataSource };
   },
 });
 </script>

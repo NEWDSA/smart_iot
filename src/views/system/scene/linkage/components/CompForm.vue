@@ -24,23 +24,21 @@
           </div>
         </div>
         <div v-if="item && item.schemas_normal.length > 0" id="schemas" class="border bg-light-100 p-4 lc_liner">
-          <BasicForm v-if="item && item.schemas_normal.length > 0" :schemas="item.schemas_normal" @register="register">
+          <BasicForm v-if="item && item.schemas_normal.length > 0" :schemas="item.schemas_normal" @register="register"
+            ref="FformElRef" @get-form="formvalueFF(arg, index)">
             <template #customSlot="{ model, field }">
-              <a-input @click="e_Device" placeholder="请选择设备" v-model:value="model[field]">
+              <a-input @click="e_Device(index)" placeholder="请选择设备" v-model:value="model[field]">
                 <template #suffix>
                   <Icon icon="carbon:logo-github" />
                 </template>
               </a-input>
-            </template>
-            <template v-if="item.FormAdd.length <= 0" #deleteSlot="{ model, field }">
-              <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" />
             </template>
           </BasicForm>
           <template v-if="Object.keys(item.FormAdd) && item">
             <BasicForm v-for="(itemr, cindex) in item.FormAdd" id="filter_form" @get-form="formvalue(arg, index, cindex)"
               ref="formElRef" :schemas="itemr.schemas_normal" :key="itemr" @register="registerForm">
               <template #customSlot2="{ model, field }">
-                <a-input @click="filter_Device(item, index)" placeholder="请选择设备" v-model:value="model[field]">
+                <a-input @click="filter_Device(item, index, cindex)" placehol der="请选择设备" v-model:value="model[field]">
                   <template #suffix>
                     <Icon icon="carbon:logo-github" />
                   </template>
@@ -48,16 +46,19 @@
               </template>
               <!-- 显示删除按钮 -->
               <template v-if="item.FormAdd.length > 0" #deleteSlot="{ model, field }">
-                <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" />
+                <Icon @click="delete_rule_zi(index, cindex)"  class="ml-2" icon="ant-design:delete-outlined" />
               </template>
             </BasicForm>
           </template>
           <!-- 添加过滤条件 -->
-          <div v-if="item && item.schemas_normal.length > 0" class="p-1 relative" @click="addRule(index)">
-            <Icon icon="bi:plus" size="14" />
-            添加过滤条件
+          <div v-if="item && item.schemas_normal.length > 0" class="p-1 relative flex items-center justify-between" @click="addRule(index)">
+            <div><Icon icon="bi:plus" size="14" />
+            添加过滤条件</div>
+            
+            <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" color="red" size="20px"/>
           </div>
         </div>
+
       </template>
       <!-- 引入模态框 -->
       <AccountTable @register="registerMyTable" @success="handleSuccess" />
@@ -66,8 +67,8 @@
   </PageWrapper>
 </template>
 <script lang="tsx">
-import { defineComponent, reactive, ref, unref, nextTick, toRaw, watch } from 'vue'
-import { Switch, Form, Input, Row, Col, InputNumber, Select } from 'ant-design-vue'
+import { defineComponent, reactive, onMounted, onUpdated, ref, unref, nextTick, toRaw, watch, defineExpose } from 'vue'
+import { Switch, Form, Input, Row, Col, InputNumber, Select, message } from 'ant-design-vue'
 import { BasicForm, FormSchema, useForm, FormActionType } from '@/components/Form/index'
 import { CollapseContainer } from '@/components/Container/index'
 import { PageWrapper } from '@/components/Page'
@@ -78,17 +79,26 @@ import SelectItem from '@/layouts/default/setting/components/SelectItem.vue'
 import { deviceInfo } from '@/api/demo/scence'
 const [registerMyTable, { openModal }] = useModal()
 import { error } from '@/utils/log'
+import { on } from 'events'
+import { Item } from 'ant-design-vue/lib/menu'
 const schemas: FormSchema[] = []
+const FformArr: any = ref([])
+const formArr: any = ref([])
 const add: any = ref([])
 const params: any = ref([])
 const result1: any = ref([])
+const FIndex = ref()
+const ZIndex = ref()
+const DeviceIdArr: any = ref([])
+
+
 const schemas_normal: FormSchema[] = [
   {
-    field: 'ConditionItems',
+    field: 'ConditionType',
     component: 'Select',
     label: '',
     colProps: {
-      span: 3
+      span: 5
     },
     componentProps: {
       options: [
@@ -113,7 +123,7 @@ const schemas_normal: FormSchema[] = [
           key: '4'
         },
         {
-          label: '系统时间',
+          label: '时间',
           value: '5',
           key: '5'
         },
@@ -132,16 +142,16 @@ const schemas_normal: FormSchema[] = [
   },
   // 设备
   {
-    field: 'device',
+    field: 'DeviceId',
     label: '',
     component: 'Input',
     slot: 'customSlot',
     colProps: {
-      span: 3
+      span: 8
     },
     // 判断显示隐藏
-    show: ({ values }) => {
-      return values.ConditionItems == '1'
+    ifShow: ({ values }) => {
+      return values.ConditionType == '1'
     }
   },
   // 工单
@@ -152,7 +162,7 @@ const schemas_normal: FormSchema[] = [
     colProps: {
       span: 3
     },
-    show: ({ values }) => {
+    ifShow: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7'
     },
     componentProps: {
@@ -188,7 +198,7 @@ const schemas_normal: FormSchema[] = [
     colProps: {
       span: 8
     },
-    show: ({ values }) => {
+    ifShow: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7'
     },
     componentProps: {
@@ -224,7 +234,7 @@ const schemas_normal: FormSchema[] = [
     colProps: {
       span: 3
     },
-    show: ({ values }) => {
+    ifShow: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7'
     },
     componentProps: {
@@ -246,13 +256,403 @@ const schemas_normal: FormSchema[] = [
         }
       ]
     }
-  }
+  },
+  // {
+  //   field: 'delete',
+  //   label: '',
+  //   component: 'Input',
+  //   slot: 'deleteSlot',
+  //   colProps: {
+  //     span: 3
+  //   }
+  // },
+  // 时间5
+  {
+    field: 'checkTime',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          label: '上报时间',
+          value: '1',
+          key: '1'
+        },
+        {
+          label: '系统时间',
+          value: '2',
+          key: '2'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '5'
+    }
+  },
+  {
+    field: 'checkTimeSymbol',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: '=',
+          label: '等于'
+        },
+        {
+          value: '>',
+          label: '大于'
+        },
+        {
+          value: '>=',
+          label: '大于等于'
+        },
+        {
+          value: '<',
+          label: '小于'
+        },
+        {
+          value: '<=',
+          label: '小于等于'
+        },
+        {
+          value: 'between',
+          label: '在...之间'
+        }
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '5'
+    }
+  },
+  {
+    field: 'ExecuteTime',
+    component: 'TimePicker',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 5
+    },
+    componentProps: {
+      format: 'HH:mm',
+      valueFormat: 'HH:mm',
+      placeholder: '请选择时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '5' && values.checkTimeSymbol != 'between';
+    }
+  },
+  {
+    field: 'StartTime',
+    component: 'TimePicker',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 5
+    },
+    componentProps: {
+      format: 'HH:mm',
+      valueFormat: 'HH:mm',
+      placeholder: '请选择开始时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '5' && values.checkTimeSymbol == 'between';
+    }
+  },
+  {
+    field: 'EndTime',
+    component: 'TimePicker',
+    label: '~',
+    labelWidth: '10px',
+    colProps: {
+      span: 5
+    },
+    componentProps: {
+      format: 'HH:mm',
+      valueFormat: 'HH:mm',
+      placeholder: '请选择结束时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '5' && values.checkTimeSymbol == 'between';
+    }
+  },
+  // 日期4
+  {
+    field: 'checkTime',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          label: '按周',
+          value: '1',
+          key: '1'
+        },
+        {
+          label: '按月',
+          value: '2',
+          key: '2'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '4'
+    }
+  },
+  {
+    field: 'checkTimeSymbol',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 5,
+    },
+    componentProps: {
+      options: [
+        {
+          value: '=',
+          label: '等于'
+        },
+        {
+          value: '>',
+          label: '大于'
+        },
+        {
+          value: '>=',
+          label: '大于等于'
+        },
+        {
+          value: '<',
+          label: '小于'
+        },
+        {
+          value: '<=',
+          label: '小于等于'
+        },
+        {
+          value: 'between',
+          label: '在...之间'
+        }
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '4'
+    }
+  },
+  {
+    field: 'checkDate',
+    component: 'Select',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 5
+    },
+    componentProps: {
+      mode: 'multiple',
+      placeholder: '请选择日期',
+      options:[
+        {
+          label:'星期一',
+          value:1
+        },
+        {
+          label:'星期二',
+          value:2
+        },
+        {
+          label:'星期三',
+          value:3
+        },
+        {
+          label:'星期四',
+          value:4
+        },
+        {
+          label:'星期五',
+          value:5
+        },
+        {
+          label:'星期六',
+          value:6
+        },
+        {
+          label:'星期日',
+          value:7
+        }
+      ]
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '4' && values.checkTimeSymbol == 'between';
+    }
+  },
+  // 工单创建 6
+  {
+    field: 'workOrderSet',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: 'status',
+          label: '工单状态'
+        },
+        {
+          value: 'priority',
+          label: '优先级'
+        },
+        {
+          value: 'AcceptanceGroup',
+          label: '受理组'
+        },
+        {
+          value: 'Acceptor',
+          label: '受理人'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '6'
+    }
+  },
+  {
+    field: 'workOrderStatus',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: '1',
+          label: '已完结'
+        },
+        {
+          value: '2',
+          label: '受理中'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '6' && values.workOrderSet == 'status'
+    }
+  },
+  {
+    field: 'workOrderPriority',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: '1',
+          label: '底'
+        },
+        {
+          value: '2',
+          label: '一般'
+        },
+        {
+          value: '3',
+          label: '紧急'
+        },
+        {
+          value: '4',
+          label: '非常紧急'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '6' && values.workOrderSet == 'priority'
+    }
+  },
+  {
+    field: 'workOrderPriority',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      mode: 'multiple',
+      options: [
+        {
+          value: '1',
+          label: '底'
+        },
+        {
+          value: '2',
+          label: '一般'
+        },
+        {
+          value: '3',
+          label: '紧急'
+        },
+        {
+          value: '4',
+          label: '非常紧急'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '6' && values.workOrderSet == 'priority'
+    }
+  },
+  {
+    field: 'workOrderAcceptanceGroup',
+    label: '',
+    component: 'Input',
+    slot: 'customSlotAcceptanceGroup',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '6' && values.workOrderSet == 'AcceptanceGroup'
+    }
+  },
+  {
+    field: 'workOrderAcceptor',
+    label: '',
+    component: 'Input',
+    slot: 'customSlotAcceptor',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '6' && values.workOrderSet == 'Acceptor'
+    }
+  },
 ]
 const resultList: any = ref([]);
-const formElRef = ref<Nullable<FormActionType>>(null);
+const formElRef: any = ref<Nullable<FormActionType>>(null);
+const FformElRef: any = ref<Nullable<FormActionType>>(null);
+
 const schemas_normal2: FormSchema[] = [
   {
-    field: 'Op',
+    field: 'Option',
     component: 'Switch',
     defaultValue: false,
     label: '',
@@ -266,7 +666,7 @@ const schemas_normal2: FormSchema[] = [
     }
   },
   {
-    field: 'ConditionItems',
+    field: 'ConditionType',
     component: 'Select',
     label: '',
     colProps: {
@@ -317,16 +717,16 @@ const schemas_normal2: FormSchema[] = [
   },
   // 设备
   {
-    field: 'device',
+    field: 'DeviceId',
     label: '',
     component: 'Input',
     slot: 'customSlot2',
     colProps: {
-      span: 3
+      span: 8
     },
     // 判断显示隐藏
-    show: ({ values }) => {
-      return values.ConditionItems == '1'
+    ifShow: ({ values }) => {
+      return values.ConditionType == '1'
     }
   },
   // 工单
@@ -337,7 +737,7 @@ const schemas_normal2: FormSchema[] = [
     colProps: {
       span: 3
     },
-    show: ({ values }) => {
+    ifShow: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7'
     },
     componentProps: {
@@ -373,7 +773,7 @@ const schemas_normal2: FormSchema[] = [
     colProps: {
       span: 8
     },
-    show: ({ values }) => {
+    ifShow: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7'
     },
     componentProps: {
@@ -409,7 +809,7 @@ const schemas_normal2: FormSchema[] = [
     colProps: {
       span: 3
     },
-    show: ({ values }) => {
+    ifShow: ({ values }) => {
       return values.field1 == '6' || values.field1 == '7'
     },
     componentProps: {
@@ -616,10 +1016,21 @@ export default defineComponent({
     Select,
     SelectItem
   },
-  setup(_, { emit }) {
+  props: {
+    CompObj: {
+      type: Object,
+      default: []
+    },
+    TriggerType: {
+      type: Number,
+      default: 0
+    },
+  },
+  setup(props, { emit }) {
+    // const { CompObj } = props;
     const [
       register,
-      { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue, validate: validateTaskForm }
+      { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue, validate: validateTaskForm, removeSchemaByFiled }
     ] = useForm({
       labelWidth: 0,
       showActionButtonGroup: false,
@@ -633,13 +1044,27 @@ export default defineComponent({
 
       }
     }, { deep: true }) // 开启深度监视才行
+
+    watch(() => props.CompObj, (newValue, oldValue) => {
+
+      if (props.CompObj.length != 0) {
+        console.log(props.CompObj, "4546as4d6as4d65as4d5a4s5d5a6sd")
+
+        // debugger;
+        huix()
+        console.log(props.TriggerType, 'props.TriggerType')
+        isShake.value = props.TriggerType == 1 ? false : true
+      }
+    }, { deep: true }) // 开启深度监视才行
+
     const [
       registerForm,
       {
         validate,
         appendSchemaByField: appendMySchemaByField,
         setFieldsValue: setMyFieldsValue,
-        getFieldsValue: getMyFieldsValue
+        getFieldsValue: getMyFieldsValue,
+        removeSchemaByFiled: removeMySchemaByFiled
       }
     ] = useForm({
       labelWidth: 0,
@@ -648,6 +1073,34 @@ export default defineComponent({
         span: 6
       }
     })
+    async function formvalueFF(arg, index) {
+      // debugger
+      // console.log(cindex, 'eeee')
+      // console.log(arg, index, cindex, '...value..232.?');
+      console.log('cindex', index, 'index', resultList.value, 'rrrr')
+      // const result = getFieldsValue();
+      const result = getFieldsValue();
+      // var index=index+1;
+      console.log(result, 'resultresultresultresultresultresult')
+      if (resultList.value.length == 0) {
+        resultList.value.push({
+          [index]: {
+            result
+          }
+        })
+      } else {
+        resultList.value[index][0].result = {
+          ...result
+        }
+      }
+
+      // 如果不存在这个属性则
+      console.log(result, '...dfdfdfdf')
+      // }
+
+
+
+    }
     async function formvalue(arg, index, cindex) {
       console.log(cindex, 'eeee')
       console.log(arg, index, cindex, '...value..232.?');
@@ -655,7 +1108,7 @@ export default defineComponent({
       // const result = getFieldsValue();
       const result2 = getMyFieldsValue();
       // var index=index+1;
-      resultList.value[cindex][index].result2 = {
+      resultList.value[index][cindex].result2 = {
         ...result2
       }
 
@@ -663,8 +1116,6 @@ export default defineComponent({
       // 如果不存在这个属性则
       console.log(resultList.value[index], '...dfdfdfdf')
       // }
-
-
 
     }
     async function getForm() {
@@ -677,7 +1128,22 @@ export default defineComponent({
       await nextTick()
       return form as FormActionType
     }
-    async function filter_Device(item, index) {
+    async function filter_Device(item, index, cindex) {
+      FIndex.value = index
+      let m = 0
+      for (let i = 0; i < add.value.length; i++) {
+        // m += 1
+        if (add.value[i].FormAdd.length > 0) {
+          for (let x = 0; x < add.value[i].FormAdd.length; x++) {
+            m += 1
+            if (index == i && cindex == x) {
+              ZIndex.value = m - 1
+            }
+
+          }
+        }
+      }
+      console.log(ZIndex.value, FIndex.value)
       openModal(true, {
         item: item,
         itemindex: index,
@@ -686,7 +1152,14 @@ export default defineComponent({
     }
 
     function handel_Add() {
+      // const form = unref(FformElRef)
+      // console.log(add.value)
+      // if (form != null) {
+      //   for(let i=0;i<FformElRef.value.length;i++){
+      //     console.log(FformElRef.value[i].getFieldsValue())
+      //   }
 
+      // }
       // 
       if (add.value.length > 0) {
         console.log(add.value, '..2223333...?')
@@ -703,57 +1176,100 @@ export default defineComponent({
       }
     }
     async function delete_rule(index) {
-      delete add.value[index].checked1
+      // delete add.value[index].checked1
 
-      add.value[index].schemas_normal = []
-      add.value[index].FormAdd = []
+      // add.value[index].schemas_normal = []
+      // add.value[index].FormAdd = []
+      add.value.splice(index, 1)
     }
+    async function delete_rule_zi(index, index2) {
+      console.log(add.value)
+      // delete add.value[index].checked1.splice(index2,1)
+
+      // add.value[index].schemas_normal.splice(index2,1)
+      add.value[index].FormAdd.splice(index2, 1)
+    }
+    // function callback(id){
+    //   return do(){
+    //     console.log(id)
+    //   }
+    // }
+    // callbackFunc = callback(3)
     async function handleSuccess(params) {
+      console.log(params, 'paramsparamsparamsparams')
+      console.log(resultList.value, '4564575645645645646545')
       const obj = { ...params }
       // 根据所选择的设备进行设备id查询
       const result = await deviceInfo({
         Id: obj[0][0].DeviceId
       })
 
+      if (result[0]?.DeviceModel == 'null') {
+        return;
+      }
       // 判断对象是否包含该属性
       // Reflect.has(obj[1], 'itemindex')
       if (obj[1].hasOwnProperty('itemindex')) {
+        // debugger;
         let FormSchema = JSON.parse(result[0]?.DeviceModel)
         console.log(FormSchema, '?...FormSchema...?')
-        setMyFieldsValue({
-          device: obj[0][0].DeviceName
+        console.log(formElRef)
+        var pp = 0
+        if (formElRef.value[Number(ZIndex.value)].getFieldsValue().DeviceId !== obj[0][0].DeviceId) {
+          pp = 1
+        }
+        if (!formElRef.value[Number(ZIndex.value)].getFieldsValue().DeviceId) {
+          pp = 0
+        }
+
+        formElRef.value[Number(ZIndex.value)].setFieldsValue({
+          DeviceId: obj[0][0].DeviceId,
+          // DeviceId:obj[0][0].DeviceId
         })
         let myobj: any = [];
         FormSchema.forEach(async (item, index) => {
           myobj.push({
             name: item.model.name,
-            value: index
+            value: item.model.field
           })
         })
-        appendMySchemaByField({
-          field: 'myfiled',
-          component: 'Select',
-          label: '',
-          colProps: {
-            span: 3
-          },
-          componentProps: {
-            fieldNames: {
-              label: 'name',
-              key: 'value',
-              value: 'value'
+
+        if (pp == 1) {
+          // debugger;
+          console.log(myobj)
+          formElRef.value[Number(ZIndex.value)].updateSchema({
+            field: 'DeviceField',
+            componentProps: { options: myobj },
+          });
+        } else {
+          formElRef.value[Number(ZIndex.value)].appendSchemaByField({
+            field: 'DeviceField',
+            component: 'Select',
+            label: '',
+            colProps: {
+              span: 3
             },
-            options: myobj
-          },
-          show: ({ values }) => {
-            return values.ConditionItems == '1'
-          }
-        }, 'device')
+            componentProps: {
+              fieldNames: {
+                label: 'name',
+                key: 'value',
+                value: 'value'
+              },
+              options: myobj
+            },
+            ifShow: ({ values }) => {
+              return values.ConditionType == '1'
+            }
+          }, 'DeviceId')
+        }
+
+
         FormSchema.forEach(async (item, index) => {
-          
+
           // slide
           if (item.model.view == 'slide') {
-            appendMySchemaByField({
+
+            formElRef.value[Number(ZIndex.value)].appendSchemaByField({
               field: item.model.field,
               component: 'Slider',
               label: '',
@@ -770,12 +1286,34 @@ export default defineComponent({
                 },
                 options: item.model['select-item']
               },
-              show: ({ values }) => {
-                return values.myfiled == index
+              ifShow: ({ values }) => {
+                return values.DeviceField == item.model.field && values.ConditionType == '1'
               }
-            }, 'myfiled')
+            }, 'DeviceField')
+
+            // 大于小于
+            formElRef.value[Number(ZIndex.value)].appendSchemaByField({
+              field: 'equation',
+              component: 'Select',
+              label: '',
+              colProps: {
+                span: 3
+              },
+              componentProps: {
+                options: [
+                  { label: '>', value: '>' },
+                  { label: '<', value: '<' },
+                  { label: '=', value: '=' },
+                  { label: '<=', value: '<=' },
+                  { label: '>=', value: '>=' }
+                ]
+              },
+              ifShow: ({ values }) => {
+                return values.DeviceField == item.model.field && values.ConditionType == '1'
+              }
+            }, 'DeviceField')
           } else {
-            appendMySchemaByField({
+            formElRef.value[Number(ZIndex.value)].appendSchemaByField({
               field: item.model.field,
               component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
               label: '',
@@ -792,23 +1330,119 @@ export default defineComponent({
                 },
                 options: item.model['select-item']
               },
-              show: ({ values }) => {
-                return values.myfiled == index
+              ifShow: ({ values }) => {
+                return values.DeviceField == item.model.field
               }
-            }, 'myfiled')
+            }, 'DeviceField')
           }
 
         })
       }
       else if (typeof result[0]?.DeviceModel !== 'undefined' && !Reflect.has(obj[1], 'item')) {
         let FormSchema = JSON.parse(result[0]?.DeviceModel)
-        setFieldsValue({
-          device: obj[0][0].DeviceName
+        // console.log(FformElRef.value[Number(FIndex.value)].getFieldsValue().device,obj[0][0].DeviceId)
+        var pp = 0
+        if (FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceId !== obj[0][0].DeviceId) {
+          pp = 1
+        }
+        if (!FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceId) {
+          pp = 0
+        }
+        FformElRef.value[Number(FIndex.value)].setFieldsValue({
+          DeviceId: obj[0][0].DeviceId,
         })
+        let myobj: any = [];
+        FormSchema.forEach(async (item, index) => {
+          myobj.push({
+            name: item.model.name,
+            value: item.model.field,
+          })
+        })
+        console.log(FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceId, 'FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceField')
+        if (pp == 1) {
+          // debugger;
+          console.log(myobj)
+          FformElRef.value[Number(FIndex.value)].updateSchema({
+            field: 'DeviceField',
+            componentProps: { options: myobj },
+          });
+        } else {
+          FformElRef.value[Number(FIndex.value)].appendSchemaByField({
+            field: 'DeviceField',
+            component: 'Select',
+            label: '',
+            colProps: {
+              span: 3
+            },
+            componentProps: {
+              fieldNames: {
+                label: 'name',
+                key: 'value',
+                value: 'value'
+              },
+              options: myobj
+            },
+            ifShow: ({ values }) => {
+              return values.ConditionType == '1'
+            }
+          }, 'DeviceId')
+        }
+
         FormSchema.forEach((item, index) => {
           // 使用updateSchema添加
-          appendSchemaByField(
-            {
+
+          // slide
+          if (item.model.view == 'slide') {
+
+            FformElRef.value[Number(FIndex.value)].appendSchemaByField({
+              field: item.model.field,
+              component: 'Slider',
+              label: '',
+              defaultValue: item.model['default-value'],
+              colProps: {
+                span: 3
+              },
+              componentProps: {
+                placeholder: item.model.name,
+                fieldNames: {
+                  label: 'name',
+                  key: 'value',
+                  value: 'value'
+                },
+                options: item.model['select-item']
+              },
+              ifShow: ({ values }) => {
+                console.log(values)
+                return values.DeviceField == item.model.field && values.ConditionType == '1'
+              }
+            }, 'DeviceField')
+
+            // 大于小于
+            FformElRef.value[Number(FIndex.value)].appendSchemaByField({
+              field: 'equation',
+              component: 'Select',
+              label: '',
+              colProps: {
+                span: 3
+              },
+              componentProps: {
+                options: [
+                  { label: '>', value: '>' },
+                  { label: '<', value: '<' },
+                  { label: '=', value: '=' },
+                  { label: '<=', value: '<=' },
+                  { label: '>=', value: '>=' }
+                ]
+              },
+              ifShow: ({ values }) => {
+                // console.log(values,'DeviceFieldDeviceFieldDeviceField')
+                return values.DeviceField == item.model.field && values.ConditionType == '1'
+              }
+            }, 'DeviceField')
+
+
+          } else {
+            FformElRef.value[Number(FIndex.value)].appendSchemaByField({
               field: item.model.field,
               component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
               label: '',
@@ -825,12 +1459,37 @@ export default defineComponent({
                 },
                 options: item.model['select-item']
               },
-              show: ({ values }) => {
-                return values.ConditionItems == index
+              ifShow: ({ values }) => {
+                return values.DeviceField == item.model.field
               }
-            },
-            'device'
-          )
+            }, 'DeviceField')
+          }
+
+          // appendSchemaByField(
+          //   {
+          //     field: item.model.field,
+          //     component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
+          //     label: '',
+          //     defaultValue: item.model['default-value'],
+          //     colProps: {
+          //       span: 3
+          //     },
+          //     componentProps: {
+          //       placeholder: item.model.name,
+          //       fieldNames: {
+          //         label: 'name',
+          //         key: 'value',
+          //         value: 'value'
+          //       },
+          //       options: item.model['select-item']
+          //     },
+          //     ifShow: ({ values }) => {
+          //       return values.DeviceField == index
+          //       // return values.ConditionType == index
+          //     }
+          //   },
+          //   'DeviceField'
+          // )
         })
       } else {
         console.log('1111')
@@ -862,7 +1521,9 @@ export default defineComponent({
       // removeSchemaByField('field11');
     }
     // 选择设备
-    function e_Device(record) {
+    function e_Device(index) {
+      FIndex.value = index
+      ZIndex.value = ''
       //  打开弹窗
       openModal(true, {
         isUpdate: true
@@ -876,11 +1537,11 @@ export default defineComponent({
         }
         return item
       })
-      const result = getFieldsValue();
+      // const result = getFieldsValue();
       const result2 = getMyFieldsValue();
       resultList.value.push({
         [index1]: {
-          result,
+          // result,
           result2
         }
       }
@@ -902,6 +1563,251 @@ export default defineComponent({
     function handleSubmit(values: any) {
       console.log(values, '?...values...?')
     }
+
+    function EndData() {
+      DeviceIdArr.value = []
+      console.log(FformElRef.value)
+      const Fform = unref(FformElRef)
+      let FfromArr: any = []
+      console.log(FformElRef)
+      if (Fform != null) {
+        for (let i = 0; i < FformElRef.value.length; i++) {
+          if (JSON.stringify(FformElRef.value[i].getFieldsValue()) === '{}') {
+            message.warn('请选择完整条件');
+            return false;
+          }
+          if (FformElRef.value[i].getFieldsValue().ConditionType == '1') {
+            DeviceIdArr.value.push(Number(FformElRef.value[i].getFieldsValue().DeviceId))
+          }
+          FfromArr.push(FformElRef.value[i].getFieldsValue())
+        }
+      }
+
+      const form = unref(formElRef)
+      let fromArr: any = []
+      console.log(add.value)
+      if (form != null) {
+        for (let i = 0; i < formElRef.value.length; i++) {
+          if (JSON.stringify(formElRef.value[i].getFieldsValue()) === '{}') {
+            message.warn('请选择完整条件');
+            return false
+          }
+          if (formElRef.value[i].getFieldsValue().ConditionType == '1') {
+            DeviceIdArr.value.push(Number(formElRef.value[i].getFieldsValue().DeviceId))
+          }
+          fromArr.push(formElRef.value[i].getFieldsValue())
+        }
+      }
+      // console.log(FfromArr, fromArr, 'EndDataEndData')
+      let ziIndex = 0;
+      let enddata: any = []
+      for (let i = 0; i < add.value.length; i++) {
+        enddata.push([])
+        enddata[i].push(FfromArr[i])
+        if (i >= 1) {
+          if (add.value[i].checked1 == true || add.value[i].checked1 == false) {
+            console.log(add.value[i].checked1)
+            enddata[i][0].Op = add.value[i].checked1 == false ? 'or' : 'and'
+          }
+        }
+
+
+        if (add.value[i].FormAdd.length > 0) {
+          for (let x = 0; x < add.value[i].FormAdd.length; x++) {
+            enddata[i].push(fromArr[ziIndex])
+            ziIndex += 1
+          }
+
+        }
+      }
+
+      for (let o = 0; o < enddata.length; o++) {
+        for (let p = 0; p < enddata[o].length; p++) {
+          if (p == 0) {
+
+          } else {
+            console.log(enddata[o][p].Op)
+            enddata[o][p].Op = enddata[o][p].Option == false ? 'or' : 'and'
+          }
+
+          // console.log(enddata[o][p][enddata[o][p]['DeviceField']])
+          if (enddata[o][p][enddata[o][p]['DeviceField']] == true || enddata[o][p][enddata[o][p]['DeviceField']] == false) {
+            enddata[o][p].Gval = 'value==' + enddata[o][p].switch
+          } else if (enddata[o][p]['DeviceField'] == 'switch' && !enddata[o][p][enddata[o][p]['DeviceField']]) {
+            enddata[o][p].Gval = 'value==false'
+          } else if (!enddata[o][p].equation) {
+            enddata[o][p].Gval = 'value==' + enddata[o][p][enddata[o][p]['DeviceField']]
+          } else {
+            enddata[o][p].Gval = 'value' + enddata[o][p].equation + enddata[o][p][enddata[o][p]['DeviceField']]
+          }
+
+          enddata[o][p].ConditionType = Number(enddata[o][p].ConditionType)
+        }
+      }
+
+      console.log(add.value)
+      return enddata
+
+    }
+
+    onMounted(() => {
+      add.value = []
+    })
+
+    // onMounted(() => {
+    function huix() {
+      // setFieldsValue({
+      //   ...data.obj,
+      // });
+      add.value = []
+      // console.log(add.value )
+      // console.log(EndData())
+      // let a = [
+      //   [
+      //     {
+      //       "ConditionType": "1",
+      //       "DeviceId": "1000025128043",
+      //       "DeviceField": "switch",
+      //       "switch": true,
+      //       "Gval": "value=true"
+      //     },
+      //     {
+      //       "ConditionType": "1",
+      //       "DeviceField": "percentage",
+      //       "DeviceId": "1000025128043",
+      //       "Gval": "value<46",
+      //       "Op": false,
+      //       "equation": "<",
+      //       "percentage": 46,
+      //     }
+      //   ],
+      //   [
+      //     {
+      //       "ConditionType": "1",
+      //       "DeviceId": "1000025128043",
+      //       "DeviceField": "switch",
+      //       "Op": "OR",
+      //       "Gval": "value=false"
+      //     }
+      //   ]
+      // ]
+      let aobj: any = props.CompObj
+      // console.log(aobj[k])
+      let a: any = []
+      for (let k in aobj) {
+        console.log(aobj[k])
+
+        a.push(aobj[k])
+      }
+
+      for (let i = 0; i < a.length; i++) {
+        console.log(a, '5465465456456456465')
+        if (a[i].length >= 1) {
+          add.value.push({
+            FormAdd: [],
+            checked1: a[i][0].Op ? a[i][0].Op == "or" ? false : true : false,
+            schemas_normal: schemas_normal
+          })
+          // add.value.push(a[i][0])
+          for (let o = 1; o < a[i].length; o++) {
+            // add.value[i].FormAdd = []
+            // add.value[i].FormAdd.push(a[i][o])
+            add.value[i].FormAdd.push({ schemas_normal: schemas_normal2 })
+          }
+        }
+      }
+
+
+
+      for (let i = 0; i < a.length; i++) {
+        if (a[i].length > 1) {
+          console.log(a[i].length, 'iiiiiiii')
+          FformArr.value.push(a[i][0])
+          // add.value.push(a[i][0])
+          for (let o = 1; o < a[i].length; o++) {
+            // add.value[i].FormAdd = []
+            // add.value[i].FormAdd.push(a[i][o])
+            formArr.value.push(a[i][o])
+            console.log(formArr.value)
+          }
+        } else {
+          FformArr.value.push(a[i][0])
+        }
+      }
+      console.log(FformArr.value, formArr.value, 'FformArrFformArrFformArrFformArr')
+
+      nextTick(async () => {
+        console.log(FformElRef.value, 'FformElRefFformElRefFformElRef')
+
+        for (let i = 0; i < FformElRef.value.length; i++) {
+          FformElRef.value[i].setFieldsValue({
+            ...FformArr.value[i],
+          });
+          let obj = [
+            [
+              {
+                DeviceId: FformArr.value[i].DeviceId
+              }
+            ],
+            [
+              {
+                // itemindex: 0
+              }
+            ]
+          ]
+          FIndex.value = i
+          await handleSuccess(obj)
+
+          FformElRef.value[i].setFieldsValue({
+            ...FformArr.value[i],
+          });
+        }
+
+        for (let o = 0; o < formElRef.value.length; o++) {
+          console.log(formElRef.value)
+          formElRef.value[o].setFieldsValue({
+            ...formArr.value[o],
+          });
+
+          let objj = [
+            [
+              {
+                DeviceId: formArr.value[o].DeviceId
+              }
+            ],
+            {
+              itemindex: 1
+            }
+
+          ]
+          console.log(objj[1].hasOwnProperty('itemindex'), '156456456456')
+          ZIndex.value = o
+          // debugger;
+          await handleSuccess(objj)
+
+          // setTimeout(() => {
+          formElRef.value[o].setFieldsValue({
+            ...formArr.value[o],
+          });
+          // }, 500)
+
+        }
+
+
+      })
+    }
+    // })
+
+
+    // onUpdated(() => {
+    //   console.log(11111)
+
+    // })
+
+
+
+    defineExpose({ EndData, isShake, DeviceIdArr });
+
     return {
       formData,
       formConfig,
@@ -918,6 +1824,7 @@ export default defineComponent({
       showForm,
       FormItem,
       formElRef,
+      FformElRef,
       FormAdd,
       RuleForm,
       options1,
@@ -943,10 +1850,22 @@ export default defineComponent({
       handleSubmit,
       registerMyTable,
       handel_Add,
-      handleSuccess
+      handleSuccess,
+      delete_rule_zi,
+      formvalueFF,
+      EndData,
+      FIndex,
+      ZIndex,
+      DeviceIdArr,
+      FformArr,
+      formArr,
+      huix
     }
   }
+
 })
+
+
 </script>
 
 <style lang="less" scoped>
@@ -969,6 +1888,6 @@ export default defineComponent({
 
 .lc_liner {
   position: relative;
-  width: 85%;
+  width: 95%;
 }
 </style>

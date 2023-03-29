@@ -14,7 +14,7 @@ const validateEmail = () => {
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     var re = new RegExp(regu)
     if (!re.test(value)) {
-      return Promise.reject('请检查输入的邮箱格式是否正确');
+      return Promise.reject('请检查输入的邮箱格式是否正确')
     }
   }
 }
@@ -149,6 +149,7 @@ export const accountFormSchema: FormSchema[] = [
     label: '邮箱',
     field: 'Email',
     component: 'Input',
+    slot: 'customEmail',
     // 使用正则
     rules: [
       {
@@ -157,8 +158,6 @@ export const accountFormSchema: FormSchema[] = [
         trigger: 'blur'
       }
     ]
-    // rules:[],
-    // required: true
   },
   // 状态设置
   {

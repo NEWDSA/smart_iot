@@ -11,7 +11,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '设备类型',
-    dataIndex: 'typeName',
+    dataIndex: 'DeviceTypeName',
     width: 120
   },
   {
@@ -45,7 +45,7 @@ export const searchFormSchema: FormSchema[] = [
     field: 'Sort',
     label: '选择排序',
     component: 'Select',
-    colProps: { span: 8 },
+    colProps: { span: 4 },
     componentProps:{
       options:[{
         label:'按名称排序',value:'1'
@@ -58,7 +58,7 @@ export const searchFormSchema: FormSchema[] = [
     field: 'TypeId',
     label: '设备分类',
     component: 'TreeSelect',
-    colProps: { span: 8 },
+    colProps: { span: 4 },
     componentProps: {
       fieldNames: {
         label: 'TypeName',
@@ -72,7 +72,7 @@ export const searchFormSchema: FormSchema[] = [
     field: 'DeviceName',
     label: '可添加设备',
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 6 },
     componentProps: () => {
       return {
         placeholder: '请输入设备名称',

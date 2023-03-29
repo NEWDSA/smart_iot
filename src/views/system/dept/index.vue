@@ -56,7 +56,6 @@ export default defineComponent({
         labelWidth: 120,
         schemas: searchFormSchema,
       },
-      // api: getDeptList,
       api: async (p) => {
         const { List } = await getDeptList(p);
         return new Promise((resolve) => {

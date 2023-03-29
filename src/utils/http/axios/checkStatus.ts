@@ -19,8 +19,8 @@ export function checkStatus(
   const { t } = useI18n()
   const userStore = useUserStoreWithOut()
   let errMessage = ''
+  console.log(errorMessageMode,'?...创造新的选项...?');
   switch (status) {
-
     case 400:
       errMessage = `${msg}`
       break
@@ -50,8 +50,6 @@ export function checkStatus(
       errMessage = t('sys.api.errMsg408')
       break
     case 500:
-      // errMessage = t('sys.api.errMsg500')
-      // 对错误进行处理
       errMessage = `${msg}`
       break
     case 501:
@@ -73,6 +71,7 @@ export function checkStatus(
   }
 
   if (errMessage) {
+    console.log(errMessage,'rererer')
     if (errorMessageMode === 'modal') {
       createErrorModal({ title: t('sys.api.errorTip'), content: errMessage })
     } else if (errorMessageMode === 'message') {

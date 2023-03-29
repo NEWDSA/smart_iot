@@ -1,16 +1,16 @@
 <template>
-  <PageWrapper :class="prefixCls" dense fixedHeight contentClass="flex">
+  <PageWrapper :class="prefixCls" dense contentFullHeight contentClass="flex">
 
     <Tabs @change="Tab_Click">
       <template v-for="item in settingList" :key="item.key">
         <TabPane :tab="item.name">
-          <component ref="ListRef" :Datalist="Datalist" :params="params" :Total="myTotal" @changePage="changePage"
-            :is="item.component" @title-click="onNoticeClick" />
+          <PageList ref="ListRef" :Datalist="item.list" :params="item.params" :Total="item.total" @changePage="changePage"
+            @title-click="onNoticeClick" />
         </TabPane>
       </template>
     </Tabs>
-    <div style="width: 900px;background:#ffffff">
-      <div style="height:50px;display: flex;justify-content: end;align-items: center;border-bottom: 1px solid #9b9394;">
+    <div class="board">
+      <div class="board_item">
         <div style="padding:10px">
           <Icon @click="SelectUser" icon="ion:ios-share-alt" :size="20" />
           <Icon @click="DelMsg" icon="material-symbols:delete-outline-rounded" :size="20" />
@@ -19,17 +19,25 @@
       <template v-if="infoDetail?.Detail">
         <div class="p-5 text-lg">{{ filterresult(infoDetail?.Detail?.Basic?.CreatedAt?.seconds) }}</div>
         <!-- 主题 -->
-        <div class="p-5 text-xl">{{ infoDetail.Detail?.NoticeTitle }}-{{ infoDetail.Detail?.Content }}</div>
-        <div class="p-5 text-base">{{ infoDetail?.Detail?.RegionalLocation }}-{{ infoDetail.DeviceName }}:<span>{{
-          infoDetail?.Detail?.Content
-        }}</span></div>
+        <div class="p-5 text-xl">{{ infoDetail.Detail?.NoticeTitle }}</div>
+        <div class="p-5 text-base"><span style="color:#2a96f3;">{{ infoDetail?.Detail?.RegionalLocation }}-{{
+          infoDetail.DeviceName }}</span>:<span>{{
+    infoDetail?.Detail?.Content
+  }}</span></div>
         <!-- 报警类型 -->
-        <div class="p-5 text-base">{{ infoDetail?.NoticeType }}<span>{{ infoDetail.DeviceId }}</span></div>
+        <div class="p-5 text-base">{{
+          infoDetail?.AlertType == 1 ? '异常告警' : infoDetail?.AlertType == 2 ? '故障告警' : infoDetail?.AlertType == 3 ? '其他告警'
+            : ''
+        }}<span>设备ID:{{ infoDetail.DeviceId }}</span></div>
         <!-- 告警级别 -->
-        <div class="p-5 text-base">{{ infoDetail.Detail?.Level }}</div>
+        <div class="p-5 text-base">{{
+          infoDetail.Detail?.Level == 1 ? '低,请尽快处理' : infoDetail.Detail?.Level == 2 ? '一般,请尽快处理' :
+          infoDetail.Detail?.Level == 3 ? '紧急,请尽快处理' :
+            infoDetail.Detail?.Level == 4 ? '非常紧急,请尽快处理' : '' }}</div>
         <!-- 跳转按钮 -->
-        <Button @click="goDetail(infoDetail)" class="m-5" type="primary">查看详情</Button>
-        <Button @click="nextItem" class="m-5" type="primary">下一条</Button>
+        <Button style="background:rgb(22, 93, 255);" @click="goDetail(infoDetail)" class="m-5"
+          type="primary">查看详情</Button>
+        <Button style="background:rgb(22, 93, 255);" @click="nextItem" class="m-5" type="primary">下一条</Button>
       </template>
       <template v-else>
         <div class="nobrad">
@@ -43,7 +51,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, onMounted, h } from 'vue';
+import { defineComponent, reactive, ref, onMounted, h, watch } from 'vue';
 import { NoticeList, DelNotice, NoticeRead } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import { Tabs } from 'ant-design-vue';
@@ -57,6 +65,7 @@ import { Divider } from 'ant-design-vue';
 import { useModal } from '@/components/Modal';
 import AccountModal from './components/AccountModal.vue';
 import { useMessage } from '@/hooks/web/useMessage';
+import emitter from '@/utils/mybus';
 import dayjs from 'dayjs';
 // 引入自定义组件
 import PageList from './components/list.vue';
@@ -65,9 +74,11 @@ export default defineComponent({
   components: { PageWrapper, Tabs, TabPane: Tabs.TabPane, PageList, Icon, Divider, Button, AccountModal },
   setup() {
     const ListRef = ref();
+    const itemIndex = ref();
     const go = useGo();
+    const settingList: any = ref([]);
     const userStore = useUserStore();
-    const infoDetail = reactive({
+    const infoDetail: any = reactive({
       Detail: null,
       DeviceName: null,
       DeviceId: null
@@ -79,38 +90,24 @@ export default defineComponent({
       createMessage
     } = useMessage();
     const { info } = createMessage;
+    watch(() => settingList, (newValue, oldValue) => {
+      settingList.value = newValue;
+    })
     onMounted(async () => {
-  
-      const userStore = await useUserStore()
-      const { Detail, Total } = await NoticeList({
-        Token: userStore.getToken,
-        PageNum: PageNum.value,
-        PageSize: 8
+      emitter.on('getData', async () => {
+        // 对接口进行重置
+        settingList.value = [];
+        for (var i = 0; i <= 2; i++) {
+          await getData(i)
+        }
       })
-      Datalist.value = Detail;
-      myTotal.value = Total;
-      params.value = {
-        PageNum: PageNum.value,
-        Total: myTotal.value
+      for (var i = 0; i <= 2; i++) {
+        await getData(i)
       }
+
     })
     const PageNum = ref(1);
     const tabIndex = ref(0);
-    const params = ref({});
-    const settingList = [{
-      key: '0',
-      name: '全部',
-      component: 'PageList'
-    }, {
-      key: '1',
-      name: '设备告警',
-      component: 'PageList'
-    }, {
-      key: '2',
-      name: '工单',
-      component: 'PageList'
-    }]
-    const Datalist: any = ref([]);
     function handleSuccess() {
       // 提示
       info('操作成功');
@@ -121,51 +118,42 @@ export default defineComponent({
     }
     async function Tab_Click(e) {
       tabIndex.value = e;
-      PageNum.value = 1;
-      infoDetail.Detail = null;
-      const userStore = useUserStore()
-      const { Detail, Total } = await NoticeList({
-        Token: userStore.getToken,
-        PageNum: PageNum.value,
-        PageSize: 8,
-        Type: tabIndex.value == 0 ? '' : tabIndex.value
-      })
-      Datalist.value = Detail;
-      params.value = {
-        PageNum: PageNum.value,
-        Total: Total
-      }
-
-
+      settingList.value[tabIndex.value];
     }
-    async function onNoticeClick(record) {
-
+    async function getData(type) {
+      const data = await NoticeList({
+        PageNum: 1,
+        PageSize: 9,
+        Type: type
+      })
+      settingList.value.push({
+        key: type,
+        name: type == 0 ? '全部' : type == 1 ? '设备告警' : type == 2 ? '工单' : '',
+        component: '',
+        current: 1,
+        list: data.Detail,
+        total: data.Total,
+        params: {
+          current: 1,
+          PageSize: 10,
+          Total: data.Total
+        }
+      })
+    }
+    async function onNoticeClick(record, index) {
       //  显示详细内容到其他div
       // record.NoticeId
       // 对record进行类型判断
+      itemIndex.value = index;
       let NoticeId = null;
       if (typeof record === "object") {
         NoticeId = record.NoticeId;
       } else {
         NoticeId = record;
       }
-      const userStore = useUserStore()
       NoticeRead({
         NoticeId: [NoticeId],
-        Token:userStore.getToken
       }).then(async () => {
-        const userStore = useUserStore()
-        const { Detail, Total } = await NoticeList({
-          Token: userStore.getToken,
-          PageNum: PageNum.value,
-          PageSize: 8,
-          Type: tabIndex.value
-        })
-        Datalist.value = Detail;
-        params.value = {
-          PageNum: PageNum.value,
-          Total: Total
-        }
       })
       const { Detail } = await NoticeInfo({
         NoticeId: NoticeId
@@ -180,23 +168,15 @@ export default defineComponent({
     }
     async function changePage(index) {
       PageNum.value = index;
-      const userStore = useUserStore()
       const { Detail, Total } = await NoticeList({
-        Token: userStore.getToken,
         PageNum: PageNum.value,
         PageSize: 8,
         Type: tabIndex.value
       })
-      Datalist.value = Detail;
-      params.value = {
-        PageNum: PageNum.value,
-        Total: Total
-      }
-
-
+      settingList.value[tabIndex.value].list = Detail;
+      settingList.value[tabIndex.value].current = PageNum.value.toString();
     }
     function SelectUser() {
-      console.log(ListRef.value[tabIndex.value].myselectedIndex, '?...myselectedIndex...?');
       if (ListRef.value[tabIndex.value].myselectedIndex !== null) {
         openModal(true, {
           NoticeId: infoDetail?.Detail?.NoticeId,
@@ -228,8 +208,6 @@ export default defineComponent({
     async function DelMsg() {
 
       const userId = await userStore.getUserInfo.user?.UserId
-      // const userId =  await userStore.getUserInfo.user;
-      console.log(userId, '?...userId...?')
       // UserId
       // 弹出确认删除提示框
       createConfirm({
@@ -237,31 +215,33 @@ export default defineComponent({
         title: () => h('span', '温馨提示'),
         content: () => h('span', '是否删除消息?'),
         onOk: async () => {
-          await DelNotice({
-            NoticeId: infoDetail?.Detail?.NoticeId,
-            // 获取用户UserId
-            UserId: userId
-          })
+          try {
+            await DelNotice({
+              NoticeId: Number(infoDetail?.Detail?.NoticeId),
+              // 获取用户UserId
+              UserId: [Number(userId)]
+            })
+          } finally {
+            settingList.value = [];
+            for (var i = 0; i <= 2; i++) {
+              await getData(i);
+            }
+          }
+
         }
       })
 
     }
     function nextItem() {
-
-      console.log(ListRef.value[tabIndex.value].myselectedIndex, '?...selectedIndex...?');
-      console.log(Datalist.value.length, '....Datalist.length....?');
-
       // 当前数据长度
-      if (ListRef.value[tabIndex.value].myselectedIndex < Datalist.value.length - 1) {
+      if (ListRef.value[tabIndex.value].myselectedIndex < settingList.value[tabIndex.value].list.length - 1) {
         ++ListRef.value[tabIndex.value].myselectedIndex;
-        onNoticeClick(Datalist.value[ListRef.value[tabIndex.value].myselectedIndex].NoticeId);
-        console.log(Datalist.value[ListRef.value[tabIndex.value].myselectedIndex].NoticeId, '?...NoticeId...?');
+        onNoticeClick(ListRef.value[tabIndex.value].Datalist[ListRef.value[tabIndex.value].myselectedIndex], '');
 
       } else {
         ListRef.value[tabIndex.value].myselectedIndex = 0;
+        onNoticeClick(settingList.value[ListRef.value[tabIndex.value].myselectedIndex].NoticeId, '');
       }
-
-
     }
     return {
       ListRef,
@@ -269,10 +249,11 @@ export default defineComponent({
       contentStyle: {
         height: '800px'
       },
+      itemIndex,
       myTotal,
       infoDetail,
       PageNum,
-      Datalist,
+      getData,
       registerModal,
       goDetail,
       nextItem,
@@ -283,7 +264,6 @@ export default defineComponent({
       handleSuccess,
       DelMsg,
       info,
-      params,
       tabIndex,
       settingList,
       Tab_Click
@@ -304,14 +284,21 @@ export default defineComponent({
     background-color: @item-active-bg;
   }
 
+
+  .ant-tabs-tabpane {
+    height: calc(100% - 81px);
+  }
+
   ::v-deep(.ant-tabs-content) {
     display: inline-block;
     width: 100%;
+    height: 100%;
   }
 
   ::v-deep(.ant-tabs) {
-    border: 1px solid;
     border-radius: 20px;
+    border: 1px solid rgb(197, 198, 201);
+    background: rgb(246, 248, 251);
   }
 
   ::v-deep(.ant-tabs-nav-wrap) {
@@ -331,5 +318,20 @@ export default defineComponent({
   flex-wrap: wrap;
   text-align: center;
   color: #b9b1b1;
+}
+
+.board {
+  position: relative;
+  width: calc(100% - 400px);
+  background: #ffffff;
+
+  &_item {
+    height: 50px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-bottom: 1px solid rgb(238, 238, 238);
+
+  }
 }
 </style>

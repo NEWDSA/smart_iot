@@ -122,8 +122,8 @@ export default defineComponent({
     async function getData() {
       //  获取区域设备
       dataSource.value = [];
-      const { Page } = await getReginDevice(pagination)
-      const result = Page.List;
+      const { Detail,Total } = await getReginDevice(pagination)
+      const result = Detail;
       const TypeList: any = [];
       result.map(async (item) => {
         const DeviceList = await getDeviceType({
@@ -134,7 +134,7 @@ export default defineComponent({
         dataSource.value.push(item)
       })
       setPagination({
-        total: Page.Total
+        total: Total
       })
     }
 

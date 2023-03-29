@@ -1,23 +1,26 @@
 <template>
-  <a-list :class="prefixCls" bordered>
-    <template v-for="item, index in Datalist" :key="item.id">
+  <a-list :class="prefixCls">
+    <template v-for="item, index in Datalist" :key="index">
       <a-list-item @click="handleTitleClick(item, index)" class="list-item">
         <a-list-item-meta>
           <template #avatar>
-            <Icon class="icon" icon="ri:message-2-fill" />
+            <SvgIcon :size="40" name="msg" />
           </template>
           <template #title>
             <span>{{ item.Type == 1 ? '设备告警' : '工单' }}</span>
             <div class="extra">
               <div class="info">
-                <div>{{ filterresult(item.Basic.CreatedAt.seconds) }}</div>
-                <div class="point"></div>
+                <div> {{ item.Content }}</div>
+                <div style="display:inline-block;float: right; text-align: right;">
+                  <span :class="item?.IsRead == 0 ? 'noread' : 'read'"></span>
+                  {{ item?.IsRead == 0 ? '未读' : '已读' }}
+                </div>
               </div>
             </div>
           </template>
           <template #description>
             <div class="description">
-              {{ item.Content }}
+              {{ filterresult(item.Basic.CreatedAt.seconds) }}
             </div>
           </template>
         </a-list-item-meta>
@@ -27,14 +30,17 @@
 </template>
 <script lang="ts">
 import { Progress, Row, Col } from 'ant-design-vue';
-import { reactive, defineComponent, PropType, ref, watch, unref } from 'vue'
+import { defineComponent,ref } from 'vue'
 import Icon from '@/components/Icon/index';
 import { Button } from '@/components/Button'
 import { useDesign } from '@/hooks/web/useDesign';
 import { List } from 'ant-design-vue';
+import { SvgIcon } from '@/components/Icon';
+import { useGo } from '@/hooks/web/usePage';
 import dayjs from 'dayjs';
 export default defineComponent({
   components: {
+    SvgIcon,
     Icon,
     Progress,
     [List.name]: List,
@@ -59,7 +65,7 @@ export default defineComponent({
 
     },
     onTitleClick: {
-      type: Function as PropType<(Recordable) => void>
+      type: Function
     }
   },
   emits: ['changePage'],
@@ -67,16 +73,7 @@ export default defineComponent({
     const { prefixCls } = useDesign('header-notify-list')
     const { selectedIndex, params } = props;
     const myselectedIndex = ref(null);
-    // const pagenation = reactive({
-    //   current: params?.PageNum,
-    //   total: params?.Total,
-    //   PageSize: 4,
-    //   onChange: changePage
-    // })
-    // watch(() => props.params, (newValue, oldValue) => {
-    //   pagenation.current = newValue.PageNum;
-    //   pagenation.total = newValue.Total;
-    // })
+    const go = useGo();
     function changePage(e) {
       emit('changePage', e);
 
@@ -86,11 +83,14 @@ export default defineComponent({
     }
 
     function handleTitleClick(item, index) {
+      // 页面跳转
+      // go('/messagecenter/msgCenter'); // 设备详情设备
       myselectedIndex.value = index;
-      props.onTitleClick && props.onTitleClick(item)
+      props.onTitleClick && props.onTitleClick(item,index)
+
     }
 
-    return { prefixCls, selectedIndex, filterresult, myselectedIndex, handleTitleClick }
+    return { prefixCls, selectedIndex, changePage, filterresult, myselectedIndex, handleTitleClick }
   }
 })
 </script>
@@ -143,5 +143,37 @@ export default defineComponent({
       }
     }
   }
+}
+
+::v-deep(.ant-list-item) {
+  border-bottom: 1px solid #dfcfcf;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: 1px solid #dfcfcf;
+
+  }
+}
+
+.noread {
+  position: relative;
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  background: rgb(255, 205, 45);
+  border-radius: 100%;
+  float: right;
+  left: -50px;
+}
+
+.read {
+  position: relative;
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  background: rgb(82, 196, 26);
+  border-radius: 100%;
+  float: right;
+  left: -50px;
 }
 </style>

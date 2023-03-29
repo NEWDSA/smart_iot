@@ -121,6 +121,7 @@ import { BasicModal, useModalInner } from '@/components/Modal'
 import { dataURLtoBlob } from '@/utils/file/base64Conver'
 import { isFunction } from '@/utils/is'
 import { useI18n } from '@/hooks/web/useI18n'
+import { error } from 'console'
 
 type apiFunParams = { file: Blob; name: string; filename: string }
 
@@ -135,7 +136,7 @@ export default defineComponent({
   name: 'CropperModal',
   components: { BasicModal, Space, CropperImage, Upload, Avatar, Tooltip },
   props,
-  emits: ['uploadSuccess', 'register'],
+  emits: ['uploadSuccess', 'register','uploadError'],
   setup(props, { emit }) {
     let filename = ''
     const src = ref('')
@@ -186,8 +187,14 @@ export default defineComponent({
         try {
           setModalProps({ confirmLoading: true })
           const result = await uploadApi({ name: 'file', file: blob, filename })
-          emit('uploadSuccess', { source: previewSource.value, data: result.data })
+          if(result.data.Code == 0){
+            emit('uploadSuccess', { source: previewSource.value, data: result.data })
           closeModal()
+          }else{
+            emit('uploadError')
+            return;
+          }
+         
         } finally {
           setModalProps({ confirmLoading: false })
         }

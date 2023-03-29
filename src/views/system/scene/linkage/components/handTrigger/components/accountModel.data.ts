@@ -1,7 +1,7 @@
+import { h } from 'vue'
 import { BasicColumn } from '@/components/Table'
 import { FormSchema } from '@/components/Table'
 import { Tag } from 'ant-design-vue'
-import { h } from 'vue'
 export const columns: BasicColumn[] = [
   {
     title: '设备名称',
@@ -10,7 +10,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '设备类型',
-    dataIndex: 'DeviceTypeName',
+    dataIndex: 'typeName',
     width: 120
   },
   {
@@ -18,7 +18,6 @@ export const columns: BasicColumn[] = [
     dataIndex: 'DeviceId',
     width: 120
   },
-  // 需对部门信息进行处理
   {
     title: '设备状态',
     dataIndex: 'DeviceStatus',
@@ -32,13 +31,43 @@ export const columns: BasicColumn[] = [
     }
   }
 ]
-
 export const searchFormSchema: FormSchema[] = [
+  // 接入区域列表
+  {
+    field: 'RegionId',
+    label: '',
+    component: 'TreeSelect',
+    colProps: { span: 3 },
+    componentProps: {
+      placeholder:'请选择区域',
+      fieldNames: {
+        label: 'RegionName',
+        key: 'RegionId',
+        value: 'RegionId'
+      },
+      getPopupContainer: () => document.body
+    }
+  },
+  {
+    field: 'TypeId',
+    label: '',
+    component: 'TreeSelect',
+    colProps: { span: 3 },
+    componentProps: {
+      placeholder:'请选择设备类型',
+      fieldNames: {
+        label: 'TypeName',
+        key: 'TypeId',
+        value: 'TypeId'
+      },
+      getPopupContainer: () => document.body
+    }
+  },
   {
     field: 'DeviceName',
-    label: '设备名称',
+    label: '',
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 3 },
     componentProps: () => {
       return {
         placeholder: '请输入设备名称',
@@ -47,44 +76,5 @@ export const searchFormSchema: FormSchema[] = [
         }
       }
     }
-  }
-]
-
-export const accountFormSchema: FormSchema[] = [
-  {
-    field: 'Dept',
-    label: '设备',
-    component: 'TreeSelect',
-    colProps: {
-      offset: 1,
-      lg: 11,
-      md: 11
-    },
-    // 特殊化处理
-    componentProps: {
-      placeholder: '请选择设备',
-      fieldNames: {
-        label: 'TypeName',
-        key: 'TypeId',
-        value: 'TypeId'
-      },
-      getPopupContainer: () => document.body
-    },
-    required: true
-  },
-
-  {
-    field: 'nickname',
-    label: '设备名称',
-    component: 'Input',
-    colProps: {
-      offset: 1,
-      lg: 11,
-      md: 11
-    },
-    componentProps:{
-      placeholder: '请输入设备名称'
-    },
-    required: true
   }
 ]

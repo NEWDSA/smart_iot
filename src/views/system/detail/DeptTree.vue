@@ -49,12 +49,10 @@ export default defineComponent({
     }
 
     function handleSelect(keys) {
-      // getTree().setSelectedKeys(['1']);
       emit('select', keys[0]);
     }
     onMounted(() => {
       fetch();
-      // console.log(getTree().setSelectedKeys(['1']), 'zhang li...')
     });
     return { treeData,selectedKeys, treeRef, handleSelect,getTree };
   },

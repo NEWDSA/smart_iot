@@ -24,7 +24,7 @@ enum Api {
 
 
     DeviceCheckRule = '/device/check/rule',
-    DeviceDisableRule = 'device/disable/rule',
+    DeviceDisableRule = '/device/disable/rule',
     DeviceRelieve = '/device/relieve',
     DeviceRuleList = '/device/rule/list',
     ruleEnable = '/rule/enable',

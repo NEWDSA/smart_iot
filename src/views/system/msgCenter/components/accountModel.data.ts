@@ -33,7 +33,7 @@ export const columns: BasicColumn[] = [
     width: 120,
     customRender: ({ record }) => {
       const status = record.Status
-      const enable = ~~status === 2
+      const enable = ~~status === 0
       const color = enable ? 'green' : 'red'
       const text = enable ? '正常' : '停用'
       return h(Tag, { color: color }, () => text)
@@ -48,7 +48,7 @@ export const searchFormSchema: FormSchema[] = [
     colProps: { span: 8 },
     componentProps: () => {
       return {
-        placeholder: '请输入设备名称',
+        placeholder: '请输入用户名称',
         onChange: (e: any) => {
           console.log(e)
         }

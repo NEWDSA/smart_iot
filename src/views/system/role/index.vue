@@ -8,17 +8,17 @@
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
             {
-              ifShow:hasPermission(['handleEdit_Role']),
+              ifShow: hasPermission(['handleEdit_Role']),
               icon: 'clarity:note-edit-line',
               onClick: handleEdit.bind(null, record),
             },
             {
-              ifShow:hasPermission(['handleDetail_Role']),
+              ifShow: hasPermission(['handleDetail_Role']),
               icon: 'mdi:account-plus-outline',
               onClick: handleDetail.bind(null, record),
             },
             {
-              ifShow:hasPermission(['handleDelete_Role']),
+              ifShow: hasPermission(['handleDelete_Role']),
               icon: 'ant-design:delete-outlined',
               color: 'error',
               popConfirm: {
@@ -40,15 +40,17 @@ import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getRoleListByPage, DelRole } from '@/api/demo/system';
 import { useDrawer } from '@/components/Drawer';
 import RoleDrawer from './RoleDrawer.vue';
-import { columns, searchFormSchema } from './role.data';
+import { columns } from './role.data';
 import { useGo } from '@/hooks/web/usePage';
-import {usePermission} from '@/hooks/web/useButtonPermission';
+import { useMessage } from '@/hooks/web/useMessage';
+import { usePermission } from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'RoleManagement',
   components: { BasicTable, RoleDrawer, TableAction },
   setup() {
     const { hasPermission } = usePermission();
     const [registerDrawer, { openDrawer }] = useDrawer();
+    const { createMessage } = useMessage();
     const go = useGo();
     const [registerTable, { reload, deleteTableDataRecord }] = useTable({
       title: '角色列表',
@@ -59,11 +61,7 @@ export default defineComponent({
         })
       },
       columns,
-      formConfig: {
-        labelWidth: 120,
-        schemas: searchFormSchema,
-      },
-      useSearchForm: true,
+      useSearchForm: false,
       showTableSetting: true,
       bordered: true,
       showIndexColumn: false,
@@ -71,7 +69,6 @@ export default defineComponent({
         width: 80,
         title: '操作',
         dataIndex: 'action',
-        // slots: { customRender: 'action' },
         fixed: undefined,
       },
     });
@@ -82,6 +79,7 @@ export default defineComponent({
     }
 
     function handleEdit(record: Recordable) {
+
       openDrawer(true, {
         record,
         isUpdate: true,
@@ -90,10 +88,14 @@ export default defineComponent({
 
     async function handleDelete(record: Recordable) {
       await deleteTableDataRecord(record.RoleId);
+
       try {
-        await DelRole({
-          RoleId: record.RoleId
+        const { Data, Msg } = await DelRole({
+          RoleId: await record.RoleId
         })
+
+        // 弹窗提示
+        Msg == 'fail' ? createMessage.error(Data) : createMessage.success('删除角色成功');
       } finally {
         reload();
       }
@@ -101,8 +103,8 @@ export default defineComponent({
     function handleDetail(record) {
       go(`/system/detail/${record.RoleId}`)
     }
-    function handleSuccess() {
-      reload();
+    async function handleSuccess() {
+      await reload();
     }
 
     return {

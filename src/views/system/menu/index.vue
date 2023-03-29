@@ -27,7 +27,7 @@
         </template>
       </template>
     </BasicTable>
-    <MenuDrawer @register="registerDrawer" @success="handleSuccess" />
+    <MenuModal @register="registerMenuModal" @success="handleSuccess" />
   </div>
 </template>
 <script lang="ts">
@@ -35,17 +35,18 @@ import { defineComponent, nextTick, ref } from 'vue';
 
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getMenuList, DelMenuList } from '@/api/demo/system';
-import { useDrawer } from '@/components/Drawer';
-import MenuDrawer from './MenuDrawer.vue';
-import { columns, searchFormSchema } from './menu.data';
+// import MenuDrawer from './MenuDrawer.vue';
+import MenuModal from './MenuModal.vue';
+import { columns } from './menu.data';
+import { useModal } from '@/components/Modal';
 import {usePermission} from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'MenuManagement',
-  components: { BasicTable, MenuDrawer, TableAction },
+  components: { BasicTable, MenuModal, TableAction },
   setup() {
     const { hasPermission } = usePermission();
-
-    const [registerDrawer, { openDrawer }] = useDrawer();
+    const [registerMenuModal, { openModal }] = useModal();
+    // const [registerMenuModal, { openDrawer }] = useDrawer();
     const checkAll = ref(true);
     const [registerTable, { reload, expandAll, collapseAll }] = useTable({
       title: '菜单列表',
@@ -76,14 +77,10 @@ export default defineComponent({
         return datas
       },
       columns,
-      formConfig: {
-        labelWidth: 120,
-        schemas: searchFormSchema,
-      },
       isTreeTable: true,
       pagination: false,
       striped: false,
-      useSearchForm: true,
+      useSearchForm: false,
       showTableSetting: true,
       bordered: true,
       showIndexColumn: false,
@@ -96,12 +93,12 @@ export default defineComponent({
       },
     });
     function handleCreate() {
-      openDrawer(true, {
+      openModal(true, {
         isUpdate: false,
       });
     }
     function handleEdit(record: Recordable) {
-      openDrawer(true, {
+      openModal(true, {
         record,
         isUpdate: true,
       });
@@ -114,8 +111,6 @@ export default defineComponent({
       } finally {
         reload();
       }
-      // 删除菜单
-
     }
 
     function handleSuccess() {
@@ -133,7 +128,7 @@ export default defineComponent({
 
     return {
       registerTable,
-      registerDrawer,
+      registerMenuModal,
       handleCreate,
       handleEdit,
       handleDelete,

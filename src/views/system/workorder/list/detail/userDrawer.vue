@@ -6,9 +6,9 @@
       <a-button type="primary" @click="collapseAll">折叠全部</a-button>
     </template> -->
         </BasicTable>
-        <div style="width:95%">
+        <!-- <div style="width:95%">
             <a-textarea v-model:value="value" placeholder="Basic usage" :rows="4" />
-        </div>
+        </div> -->
     </BasicModal>
 </template>
 <script lang="ts">
@@ -37,7 +37,7 @@ export default defineComponent({
             DataType.value = data.type
 
             checkedKeys.value = []
-            checkedKeys.value = data.data
+            // checkedKeys.value = data.data
 
         });
 
@@ -86,10 +86,10 @@ export default defineComponent({
                     }
                 }
 
-                if(value.value == ''){
-                    message.error('请输入内容')
-                    return;
-                }
+                // if(value.value == ''){
+                //     message.error('请输入内容')
+                //     return;
+                // }
 
                 // 将数据传递给接口
                 setModalProps({ confirmLoading: true });

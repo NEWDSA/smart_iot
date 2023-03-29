@@ -42,7 +42,7 @@ export const columns: BasicColumn[] = [
 ]
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'DeviceName',
+    field: 'UserName',
     label: '用户名',
     component: 'Input',
     colProps: { span: 8 },
@@ -50,13 +50,12 @@ export const searchFormSchema: FormSchema[] = [
       return {
         placeholder: '请输入用户名',
         onChange: (e: any) => {
-          console.log(e)
         }
       }
     }
   },
   {
-    field: 'DeviceName',
+    field: 'PhoneNumber',
     label: '手机号',
     component: 'Input',
     colProps: { span: 8 },
@@ -64,7 +63,6 @@ export const searchFormSchema: FormSchema[] = [
       return {
         placeholder: '请输入手机号',
         onChange: (e: any) => {
-          console.log(e)
         }
       }
     }

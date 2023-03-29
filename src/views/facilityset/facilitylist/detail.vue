@@ -22,7 +22,7 @@
         :NetworkStatus="infoFacility.NetworkStatus"></control>
       <warn v-if="facilityDetailTabIndex == '3'" :DeviceSerial="infoFacility.DeviceSerial"
         :NetworkStatus="infoFacility.NetworkStatus"></warn>
-      <scene v-if="facilityDetailTabIndex == '4'" :DeviceId="infoFacility.DeviceSerial"></scene>
+      <scene v-if="facilityDetailTabIndex == '4'" :DeviceId="infoFacility.DeviceId"></scene>
     </div>
   </PageWrapper>
 </template>

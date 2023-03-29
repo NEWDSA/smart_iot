@@ -7,13 +7,12 @@ export function usePermission() {
   /**
    * Determine whether there is permission
    */
-  debugger
+  // debugger
   function hasPermission(value?: any[], def = true): boolean {
     // Visible by default
     if (!value) {
       return def
     }
-    console.log(userStore.getUserInfo.Permissions,'...value...?');
     if (isArray(value)) {
       return (intersection(value, userStore.getUserInfo.Permissions)).length > 0 || userStore.getUserInfo.Permissions=='*:*:*'
     }

@@ -1,7 +1,7 @@
 import { BasicColumn } from '@/components/Table'
 import { FormSchema } from '@/components/Table'
 import { h } from 'vue'
-import { Tag } from 'ant-design-vue'
+import { Tag, TreeSelect } from 'ant-design-vue'
 import { Icon } from '@/components/Icon'
 import dayjs from 'dayjs'
 
@@ -26,16 +26,16 @@ export const columns: BasicColumn[] = [
     width: 50
   },
   {
-    title: '请求地址',
+    title: '路由地址',
     dataIndex: 'Path',
     width: 50
   },
   {
-    title: '状态',
-    dataIndex: 'status',
+    title: '菜单状态',
+    dataIndex: 'Status',
     width: 80,
     customRender: ({ record }) => {
-      const status = record.status
+      const status = record.Status
       const enable = ~~status === 0
       const color = enable ? 'green' : 'red'
       const text = enable ? '启用' : '停用'
@@ -56,28 +56,6 @@ export const columns: BasicColumn[] = [
 const isDir = (type: string) => type === 'M'
 const isMenu = (type: string) => type === 'C'
 const isButton = (type: string) => type === 'F'
-
-export const searchFormSchema: FormSchema[] = [
-  {
-    field: 'MenuName',
-    label: '菜单名称',
-    component: 'Input',
-    colProps: { span: 8 }
-  },
-  {
-    field: 'status',
-    label: '状态',
-    component: 'Select',
-    componentProps: {
-      options: [
-        { label: '启用', value: '0' },
-        { label: '停用', value: '1' }
-      ]
-    },
-    colProps: { span: 8 }
-  }
-]
-
 export const formSchema: FormSchema[] = [
   {
     field: 'MenuType',
@@ -118,8 +96,8 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
     required: true,
     ifShow: ({ values }) => isButton(values.MenuType),
-    componentProps:{
-      placehldr:'请输入权限标识'
+    componentProps: {
+      placehldr: '请输入权限标识'
     }
   },
   {
@@ -132,10 +110,8 @@ export const formSchema: FormSchema[] = [
     field: 'Icon',
     label: '图标',
     component: 'IconPicker',
-    required: true,
     ifShow: ({ values }) => !isButton(values.MenuType)
   },
-
   {
     field: 'Component',
     label: '组件地址',

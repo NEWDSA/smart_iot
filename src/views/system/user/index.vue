@@ -1,7 +1,8 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
-    <BasicTable :dataSource="dataSource" @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+    <BasicTable @register="registerTable" :clickToRowSelect="clickToRowSelect" class="w-3/4 xl:w-4/5"
+      :searchInfo="searchInfo">
       <template #toolbar>
         <a-button type="primary" @click="handleBulk">批量调动</a-button>
         <a-button type="primary" @click="handleCreate">新增账号</a-button>
@@ -36,17 +37,17 @@
         </template>
       </template>
     </BasicTable>
-    <component :is="currentModal" v-model:visible="modalVisible" :data="myData" @success="Dat" :isUpdate="true" />
+
     <AccountModal @register="registerModal" @success="handleSuccess" />
-    <AccountTable @register="registerMyTable" @success="Dat" />
+    <AccountTable @register="registerMyTable" @success="handleSuccess" />
     <pwdModal @register="registerpwdModal" @success="pwdSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
-import { onMounted, defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
+import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
-import { getAccountList, getDeptList, BulkDept, delAccount } from '@/api/demo/system';
+import { getAccountList, getDeptList, delAccount } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
 
@@ -61,7 +62,6 @@ export default defineComponent({
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction, pwdModal },
   setup() {
     const go = useGo();
-    const dataSource: any = ref([]);
     const myData: any = ref('');
     const update = getCurrentInstance() as ComponentInternalInstance | null
     const [registerModal, { openModal }] = useModal();
@@ -70,23 +70,30 @@ export default defineComponent({
     const searchInfo = reactive<Recordable>({});
     const checkedKeys = ref<Array<string | number>>([]);
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
-    const basicData: any = ref('');
     const modalVisible = ref<Boolean>(false);
+    const clickToRowSelect = ref(false);
     const {
       createConfirm
     } = useMessage();
     function onChange() {
-      pagination.PageNum = arguments[0].current;
-      getData()
-
-
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
+      api: async (p) => {
+        const { List, Total } = await getAccountList(p);
+        List?.map(async item => {
+          const result = await getDeptList();
+          item.DeptName = result.List.find(item1 => item1.DeptId == item.DeptId).DeptName
+        })
+        return {
+          Total,
+          List
+        }
+      },
       rowSelection: {
         type: 'checkbox',
         selectedRowKeys: checkedKeys,
@@ -111,10 +118,6 @@ export default defineComponent({
       showTableSetting: true,
       bordered: true,
       handleSearchInfoFn(info) {
-        // 接入接口进行数据查询
-        Object.assign(pagination, info)
-        getData();
-        return info;
       },
       actionColumn: {
         width: 120,
@@ -129,35 +132,15 @@ export default defineComponent({
     }
     function pwdSuccess() {
       reload();
-      // currentModal.value = pwdModal;
-      //   nextTick(() => {
-      //     modalVisible.value = true;
-      //   })
-    }
-    async function getData() {
-
-      dataSource.value = [];
-      const { List, Total } = await getAccountList(pagination);
-      setPagination({
-        total: Total
-      })
-      const accountList = List;
-      accountList?.map(async item => {
-        const { List } = await getDeptList();
-        item.DeptName = List.find(async item1 => await item1.DeptId == await item.DeptId)?.DeptName
-        dataSource.value.push(item);
-      })
-
-
     }
     function onSelectChange(selectedRowKeys: (string | number)[]) {
       checkedKeys.value = selectedRowKeys;
     }
     function handleBulk(record: Recordable) {
       if (getSelectRowKeys().length > 0) {
-        currentModal.value = AccountTable;
-        nextTick(() => {
-          modalVisible.value = true;
+        openModal2(true, {
+          user: toRaw(checkedKeys.value),
+          isUpdate: true
         })
       } else {
         createConfirm({
@@ -186,38 +169,8 @@ export default defineComponent({
       }
 
     }
-    onMounted(() => {
-      getData()
-    })
-    function Dat(values) {
-      if (values) {
-        let Detp = toRaw(values).join();
-        let user = toRaw(checkedKeys.value)
-        try {
-          BulkDept({
-            UserIds: user,
-            DeptId: Number(Detp)
-          })
-        } finally {
-          reload();
-        }
-      }else{
-        reload();
-      }
-
-
-
-
-    }
-
-    async function handleSuccess({ isUpdate, values }) {
-      if (isUpdate) {
-        // 演示不刷新表格直接更新内部数据。
-        // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-        await updateTableDataRecord(values.RoleId, values);
-      } else {
-        await reload();
-      }
+    function handleSuccess() {
+      reload();
     }
     function handleEditPwd(record: Recordable) {
       // 弹出修改用户密码框
@@ -229,8 +182,6 @@ export default defineComponent({
     }
     function handleSelect(DeptId = '') {
       searchInfo.DeptId = DeptId;
-      Object.assign(pagination, searchInfo);
-      getData()
       reload();
     }
     return {
@@ -249,17 +200,14 @@ export default defineComponent({
       onChange,
       openModal2,
       openModal3,
-      Dat,
       pwdSuccess,
-      getData,
+      clickToRowSelect,
       pagination,
       internalInstance,
       modalVisible,
       currentModal,
       checkedKeys,
       searchInfo,
-      basicData,
-      dataSource,
       myData,
       update
     };

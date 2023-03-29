@@ -13,7 +13,8 @@
         </div>
         <div class="flex items-center my-4">
           <div class="w-4/10 text-gray-400">{{ workObj[1].lable }}</div>
-          <div class="w-6/10 text-gray-400 truncate ...">{{ workObj[1].value }}</div>
+          <div class="w-6/10 text-gray-400 truncate ...">{{ dayjs.unix(workObj[1].value).format('YYYY-MM-DD HH:mm:ss') }}
+          </div>
         </div>
         <div class="flex items-center my-4">
           <div class="w-4/10 text-gray-400">{{ workObj[2].lable }}</div>
@@ -21,7 +22,7 @@
         </div>
         <div class="flex items-center my-4">
           <div class="w-4/10 text-gray-400">{{ workObj[3].lable }}</div>
-          <div class="w-6/10 text-gray-400 truncate ...">{{ workObj[3].value == 1 ? '受理中':'已完结' }}</div>
+          <div class="w-6/10 text-gray-400 truncate ...">{{ workObj[3].value == 1 ? '受理中' : '已完结' }}</div>
         </div>
         <div class="flex items-center my-4">
           <div class="w-4/10 text-gray-400">{{ workObj[4].lable }}</div>
@@ -87,7 +88,8 @@
         </div>
         <div class="flex items-center my-4">
           <div class="w-4/10 text-gray-400">{{ workObj[13].lable }}</div>
-          <div class="w-6/10 text-gray-400 truncate ...">{{ dayjs.unix(workObj[13].value).format('YYYY-MM-DD HH:mm:ss') }}</div>
+          <div class="w-6/10 text-gray-400 truncate ...">{{ dayjs.unix(workObj[13].value).format('YYYY-MM-DD HH:mm:ss') }}
+          </div>
         </div>
 
         <div class="flex items-center my-4" v-if="editStatus == true">
@@ -117,6 +119,7 @@ import { useModal } from '@/components/Modal';
 import userDrawer from '@/views/facilityset/facilitylist/components/userDrawer.vue'
 import dayjs from 'dayjs'
 
+
 const [registerMyTable, { openModal }] = useModal();
 
 const props = defineProps({
@@ -124,6 +127,8 @@ const props = defineProps({
   workOrderId: { type: Number || String, default: null },
 })
 
+const workTitle = ref('')
+const workContent = ref('')
 const workObj = ref([
   {
     lable: '工单号',
@@ -223,7 +228,7 @@ const getTaskTicketInfo = () => {
   TaskTicketInfoApi({ 'Id': props.workOrderId }).then(res => {
     workObj.value[0].value = res[0]?.Id
     workObj.value[1].value = res[0]?.Basic?.CreatedAt.seconds
-    workObj.value[2].value = res[0]?.Basic?.CreatedAt.seconds
+    workObj.value[2].value = res[0]?.CreatorName
     workObj.value[3].value = res[0]?.Status
     workObj.value[4].value = '默认模板' //res[0]?.TemplateName
     workObj.value[5].value = res[0]?.Priority == 1 ? '低' : res[0]?.Priority == 2 ? '一般' : res[0]?.Priority == 3 ? '紧急' : '非常紧急'
@@ -238,15 +243,26 @@ const getTaskTicketInfo = () => {
     workObj.value[11].value = null
     workObj.value[12].value = res[0]?.usedTime
     workObj.value[13].value = res[0]?.Basic?.UpdatedAt.seconds
+
+
+    workTitle.value = res[0]?.Title
+    workContent.value = res[0]?.Content
   })
 }
 
 function editStatusFun() {
-  EPriority.value = workObj.value[5].value == '低'  ? 1 : workObj.value[5].value == '一般' ? 2 : workObj.value[5].value == '紧急' ? 3 : 4
-  EPriorityW.value = workObj.value[5].value
+  EPriority.value = workObj?.value[5].value == '低' ? 1 : workObj.value[5].value == '一般' ? 2 : workObj.value[5].value == '紧急' ? 3 : 4
+  EPriorityW.value = workObj?.value[5].value
 
-  SGRvalue.value = workObj.value[8].value
-  SGRvalueW.value = workObj.value[8].valueW.split(',')
+  if (workObj.value[8]?.value && workObj.value[8]?.valueW) {
+    SGRvalue.value = workObj.value[8]?.value
+    SGRvalueW.value = workObj.value[8]?.valueW.split(',')
+  } else {
+    SGRvalue.value = []
+    SGRvalueW.value = []
+  }
+
+
 
   // EWorkorderDetailContent.value = WorkorderDetail.value.Content
   editStatus.value = !editStatus.value
@@ -276,7 +292,9 @@ function hadlkOkInput() {
     Detail: {
       Id: Number(props.workOrderId),
       Priority: EPriority.value,
-      Followers: SGRvalue.value
+      Followers: SGRvalue.value,
+      Title: workTitle.value,
+      Content: workContent.value,
     }
   }
 

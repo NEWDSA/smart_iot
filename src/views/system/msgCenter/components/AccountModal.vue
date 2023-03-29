@@ -30,13 +30,15 @@ export default defineComponent({
     function onChange() {
     }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      
       NoticeId.value = data.NoticeId
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
+      clearSelectedRowKeys()
 
     });
 
-    const [registerTable, { reload, updateTableDataRecord, getSelectRowKeys, setPagination, getForm }] = useTable({
+    const [registerTable, {clearSelectedRowKeys}] = useTable({
       onChange,
       rowSelection: {
         type: 'checkbox',
@@ -94,23 +96,6 @@ export default defineComponent({
       } else {
         info('请至少选择一项');
       }
-
-      // console.log(checkedKeys.value, '?...checkedKeys...?');
-
-      // console.log('你好开心哦!!!');
-      // try {
-      //   const params = {
-      //     DeviceId: toRaw(checkedKeys.value),
-      //     RegionId: paramList.value
-
-      //   }
-      //   setModalProps({ confirmLoading: true });
-      //   // !unref(isUpdate) ? await editDeviceArea(params) : ''
-      //   closeModal();
-      //   emit('success');
-      // } finally {
-      //   setModalProps({ confirmLoading: false });
-      // }
     }
 
     return { registerModal, registerTable, handleSubmit, onSelectChange, checkedKeys, getTitle, searchInfo, info };

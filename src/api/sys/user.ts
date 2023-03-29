@@ -1,4 +1,5 @@
 import { defHttp,realHttp } from '@/utils/http/axios'
+import { message } from 'ant-design-vue'
 import { LoginParams, LoginResultModel, GetUserInfoModel } from './model/userModel'
 
 import { ErrorMessageMode } from '/#/axios'
@@ -27,7 +28,7 @@ export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') 
     url:Api.LoginReal,
     params
   },{
-    errorMessageMode: mode
+    errorMessageMode: 'message'
   })
 }
 

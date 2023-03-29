@@ -8,7 +8,7 @@
                             工单受理组
                         </div>
                         <div class="flex items-center" style="width: calc(100% - 150px);">
-                            <Select v-model:value="SZvalue" mode="tags" style="width: 80%" :token-separators="[',']"
+                            <Select v-model:value="SZvalueW" mode="tags" style="width: 80%" :token-separators="[',']"
                                 placeholder="请选择工单受理组" disabled></Select>
                             <div class="pl-4" style="width:20%">
                                 <Button @click="showSZu()">
@@ -20,7 +20,8 @@
                 </div>
                 <div class="ant-col ant-col-18">
                     <div class="ant-row ant-form-item items-center">
-                        <div class="pr-2" style="width: 150px;text-align: right;"><span class="text-red-600">*</span>
+                        <div class="pr-2" style="width: 150px;text-align: right;">
+                            <span class="text-red-600">*</span>
                             工单受理人
                         </div>
                         <div class="flex items-center" style="width: calc(100% - 150px);">
@@ -36,7 +37,8 @@
                 </div>
                 <div class="ant-col ant-col-18">
                     <div class="ant-row ant-form-item items-center">
-                        <div class="pr-2" style="width: 150px;text-align: right;"><span class="text-red-600">*</span>
+                        <div class="pr-2" style="width: 150px;text-align: right;">
+                            <!-- <span class="text-red-600">*</span> -->
                             工单关注人
                         </div>
                         <div class="flex items-center" style="width: calc(100% - 150px);">
@@ -52,7 +54,8 @@
                 </div>
                 <div class="ant-col ant-col-18">
                     <div class="ant-row ant-form-item items-center">
-                        <div class="pr-2" style="width: 150px;text-align: right;"><span class="text-red-600">*</span>
+                        <div class="pr-2" style="width: 150px;text-align: right;">
+                            <!-- <span class="text-red-600">*</span> -->
                             关联设备
                         </div>
                         <div class="flex items-center" style="width: calc(100% - 150px);">
@@ -95,6 +98,7 @@ import { getwarnFormConfig } from './workData';
 import { TaskTicketSaveApi } from '@/api/sys/workorder'
 import { message, Select, Button } from 'ant-design-vue';
 import Icon from '@/components/Icon';
+import {getDeptInfoList} from '@/api/demo/system'
 
 import AccountTable from '@/views/system/region/device/AccountTable.vue';
 import userDrawer from '@/views/facilityset/facilitylist/components/userDrawer.vue';
@@ -162,7 +166,7 @@ export default defineComponent({
             },
         ]);
 
-        const getTitle = '设备上报';
+        const getTitle = '创建工单';
 
         async function handleSubmit() {
             try {
@@ -171,8 +175,8 @@ export default defineComponent({
                 // await createDept(values)
                 // console.log(values)
                 console.log('values', values);//Date.parse(data)
-
-                if (SZvalue.value.length && SRvalue.value.length && SGRvalue.value.length && Devicevalue.value.length) {
+                // && SGRvalue.value.length && Devicevalue.value.length
+                if (SZvalue.value.length && SRvalue.value.length ) {
                     values.AcceptanceGroup = SZvalue.value
                     values.Acceptor = SRvalue.value
                     values.Followers = SGRvalue.value
@@ -186,13 +190,13 @@ export default defineComponent({
                         message.warn('请选择工单受理人')
                     }
 
-                    if (SGRvalue.value.length < 1) {
-                        message.warn('请选择工单关注人')
-                    }
+                    // if (SGRvalue.value.length < 1) {
+                    //     message.warn('请选择工单关注人')
+                    // }
 
-                    if (Devicevalue.value.length == 0) {
-                        message.warn('请选择关联设备')
-                    }
+                    // if (Devicevalue.value.length == 0) {
+                    //     message.warn('请选择关联设备')
+                    // }
 
                     return
                 }
@@ -222,10 +226,16 @@ export default defineComponent({
         }
 
         function showSRen() {
-            openModal2(true, {
+            if(SZvalue.value.length>0){
+                openModal2(true, {
                 type: 'S',
                 data:SRvalue.value
             });
+            }else{
+                message.warn('请先选择受理组')
+            }
+
+            
         }
 
         function showGRen() {
@@ -241,9 +251,18 @@ export default defineComponent({
             });
         }
 
-        function bulkPermission(data, dataW) {
+        async function bulkPermission(data) {
             SZvalue.value = data
-            SZvalueW.value = dataW
+            SZvalueW.value = []
+            if(data.length >0){
+                for(let i=0;i<data.length;i++){
+                    await getDeptInfoList(data[i]).then(res=>{
+                        SZvalueW.value.push(res.DeptName)
+                    })
+                }
+            }
+            
+            // SZvalueW.value = dataW
             // console.log(data)
         }
 

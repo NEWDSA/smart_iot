@@ -12,7 +12,7 @@
             {{ deviceRef.title }}
           </div>
           <div class="mt-4">
-            <CountTo :decimals="1" :startVal="1" :endVal="deviceRef.value" class="text-4xl" />
+            <CountTo :startVal="1" :endVal="deviceRef.value" class="text-4xl" />
             <!-- {{ item.value }} -->
           </div>
         </div>
@@ -60,8 +60,8 @@ onMounted(() => {
 function getBoardNum() {
 
   let obj: any = {
-    BeginTime:1676476800, //new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000,
-    EndTime: 1676646000 //new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000 + 1000,
+    BeginTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000,
+    EndTime: new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000 + 1000,
   }
 
 

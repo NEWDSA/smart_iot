@@ -3,7 +3,8 @@
     <Card size="default" :loading="loading" title="" class=" w-full !md:mt-0">
 
       <div class="flex items-center" style="justify-content: end;">
-        <Tag color="#222222">{{ 1 }}</Tag>
+        <DatePicker v-model:value="value1"></DatePicker>
+        <!-- <Tag color="#222222">{{ 1 }}</Tag> -->
       </div>
 
       <div class="w-full flex">
@@ -19,7 +20,8 @@
 
         <div class="w-3/4 pl-5 flex items-center">
           <div class="w-1/3 pl-5 flex items-center" v-for="(item) in deviceList" :key="item.title">
-            <Progress :percent="Number(((item.value / deviceRef.value) * 100).toFixed(2))" type="circle"
+            <!-- :format="(percent) => percent == 100 ? '100%' : `${percent} %`" -->
+            <Progress :percent="Number.isNaN(item.value / deviceRef.value) ? 0 : ((item.value / deviceRef.value) * 100).toFixed(2)" type="circle" :show-info="false"
               stroke-linecap="square" :strokeWidth="12" :width="80" :strokeColor="item.color" />
             <div class="pl-5">
               <div class="text-lg text-gray-500">{{ item.title }}</div>
@@ -27,7 +29,7 @@
                 <CountTo :decimals="1" :startVal="1" :endVal="item.value" class="text-3xl" />
                 <span class="text-2xl"> Kw/h</span>
               </div>
-              <div class="text-gray-400">占比 {{ ((item.value / deviceRef.value) * 100).toFixed(2) }} %</div>
+              <div class="text-gray-400">占比 {{ Number.isNaN(item.value / deviceRef.value) ? 0 : ((item.value / deviceRef.value) * 100).toFixed(2) }} %</div>
             </div>
           </div>
 
@@ -44,7 +46,9 @@
 import { ref, onMounted, reactive } from 'vue';
 import { CountTo } from '@/components/CountTo/index'
 // import { Icon } from '@/components/Icon
-import { Tag, Card, Progress } from 'ant-design-vue'
+import { Tag, Card, Progress,DatePicker } from 'ant-design-vue'
+
+import { Dayjs } from 'dayjs';
 import { facilityBoardNumApi } from '@/api/facility/facility'
 
 defineProps({
@@ -91,7 +95,7 @@ function getBoardNum(type, index) {
 }
 
 const deviceRef = reactive({
-  title: '当日用电量（KW/H）',
+  title: '今日用电量（KW/H）',
   value: 0,
 })
 
@@ -115,5 +119,7 @@ const deviceList = ref([
     color: '#657798'
   },
 ])
+
+const value1 = ref<Dayjs>()
 
 </script>

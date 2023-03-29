@@ -18,7 +18,7 @@
       </template>
     </PageHeader>
 
-    <div class="overflow-hidden" :class="getContentClass" :style="getContentStyle" ref="contentRef">
+    <div :class="getContentClass" :style="getContentStyle" ref="contentRef">
       <slot></slot>
     </div>
 

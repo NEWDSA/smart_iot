@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CompForm ref="myData" :CompObj="CompObj" :TriggerType="TriggerType"/>
+    <!-- <CompForm ref="myData" :CompObj="CompObj" :TriggerType="TriggerType"/> -->
     <SetForm ref="actionData" :setObj="setObj" :OperationMode="OperationMode"/>
   </div>
 </template>
@@ -58,16 +58,15 @@ export default defineComponent({
     }
 
     watch(() => props.InfoObj, (newVal, oldVal) => {
-      console.log(typeof (CompObj.value), CompObj.value)
-        console.log(typeof (setObj.value), setObj.value)
-      // if (props.InfoObj != '') {
+      if (props.InfoObj != '') {
         var oobj = JSON.parse(props.InfoObj)
-        CompObj.value = oobj.EchoItems
+        CompObj.value = oobj.ConditionItems
         setObj.value = oobj.OperationItems
         TriggerType.value = oobj.TriggerType
         OperationMode.value = oobj.OperationMode
-       
-      // }
+        // console.log(typeof (CompObj.value), CompObj.value)
+        // console.log(typeof (setObj.value), setObj.value)
+      }
     })
     // onMounted(()=>{
     //   if(props.InfoObj != ''){
