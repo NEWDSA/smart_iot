@@ -25,7 +25,7 @@
 
       <div class="facility-list">
         <div class="mb-5" 
-          v-for="(item, index) in facilityTabIndex == '0' && !SearchStatus ? facilityList : SelectFacilityList ">
+          v-for="(item, index) in facilityTabIndex == '0' && !SearchStatus ? facilityList : SelectFacilityList">
           <div class="flex items-center mb-5" v-if="!SearchStatus">
             <!--v-if="!SearchStatus && item.facility.length > 0" -->
             <div class="text-df font-bold mr-5">{{ item.facilityTab.TypeName }}</div>

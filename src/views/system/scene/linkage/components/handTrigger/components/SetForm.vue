@@ -45,7 +45,7 @@
   </PageWrapper>
 </template>
 <script lang="tsx">
-import { defineComponent, reactive, ref, onMounted, toRaw, nextTick, defineExpose, unref, watch } from 'vue';
+import { defineComponent, reactive, ref, onMounted, toRaw, nextTick, defineExpose, unref,watch } from 'vue';
 import { Switch, Form, Input, Row, Col, InputNumber, Select, message } from 'ant-design-vue';
 import { BasicForm, FormSchema, useForm, FormActionType } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
@@ -73,31 +73,31 @@ const schemas_normal: FormSchema[] = [
     componentProps: {
       options: [{
         label: '设备',
-        value: 1,
+        value: '1',
         key: '1'
       }, {
         label: '访客类型',
-        value: 2,
+        value: '2',
         key: '2'
       }, {
         label: '参数',
-        value: 3,
+        value: '3',
         key: '3'
       }, {
         label: '日期',
-        value: 4,
+        value: '4',
         key: '4'
       }, {
         label: '系统时间',
-        value: 5,
+        value: '5',
         key: '5'
       }, {
         label: '工单创建',
-        value: 6,
+        value: '6',
         key: '6'
       }, {
         label: '工单更新',
-        value: 7,
+        value: '7',
         key: '7'
       }]
     }
@@ -109,37 +109,11 @@ const schemas_normal: FormSchema[] = [
     component: 'Input',
     slot: 'customSlot',
     colProps: {
-      span: 8
+      span: 4,
     },
     // 判断显示隐藏
-    ifShow: ({ values }) => {
-      return false
-    }
-  },
-  {
-    field: 'DeviceName',
-    label: '',
-    component: 'Input',
-    slot: 'customSlot',
-    colProps: {
-      span: 8
-    },
-    // 判断显示隐藏
-    ifShow: ({ values }) => {
-      return values.OperationType == '1'
-    }
-  },
-  {
-    field: 'DeviceSerial',
-    label: '',
-    component: 'Input',
-    slot: 'customSlot',
-    colProps: {
-      span: 8
-    },
-    // 判断显示隐藏
-    ifShow: ({ values }) => {
-      return false
+    show: ({ values }) => {
+      return values.OperationType == '1';
     }
   },
   // 设备参数
@@ -321,7 +295,6 @@ const schemas_normal: FormSchema[] = [
   }
 ];
 const add: any = ref([]);
-const DeviceIdArr: any = ref([]);
 const xformElRef: any = ref([]);
 const setItemRef = (el) => {
   console.log(el)
@@ -424,7 +397,7 @@ export default defineComponent({
 
       if (props.setObj.length != 0) {
         console.log(props.setObj, "4546as4d6as4d65as4d5a4s5d5a6sd")
-
+        
         // debugger;
         huix()
         bcIndex.value = props.OperationMode
@@ -521,14 +494,12 @@ export default defineComponent({
       const obj = { ...params }
       // 根据所选择的设备进行设备id查询
       const result = await deviceInfo({
-        Id: obj[0].DeviceId
+        Id: obj[0][0].DeviceId
       })
 
       let FormSchema = JSON.parse(result[0]?.DeviceModel)
       xformElRef.value[Number(TIndex.value)].setFieldsValue({
-        DeviceName: obj[0].DeviceName,
-        DeviceId: obj[0].DeviceId,
-        DeviceSerial: obj[0].DeviceSerial,
+        DeviceId: obj[0][0].DeviceId,
       })
       let myobj: any = [];
       FormSchema.forEach(async (item, index) => {
@@ -555,7 +526,7 @@ export default defineComponent({
         ifShow: ({ values }) => {
           return values.OperationType == '1'
         }
-      }, 'DeviceName')
+      }, 'DeviceId')
       FormSchema.forEach((item, index) => {
         // 使用updateSchema添加
 
@@ -606,7 +577,7 @@ export default defineComponent({
           //     // console.log(values,'DeviceFieldDeviceFieldDeviceField')
           //     return values.DeviceField == item.model.field && values.OperationType == '1'
           //   }
-          // }, 'DeviceName')
+          // }, 'DeviceField')
 
 
         } else {
@@ -741,7 +712,6 @@ export default defineComponent({
     // }
 
     function EndData() {
-      DeviceIdArr.value = []
       console.log(xformElRef.value, 'EndDataEndData')
       const form = unref(xformElRef)
       let fromArr: any = []
@@ -752,16 +722,13 @@ export default defineComponent({
             message.warn('请选择完整条件');
             return false
           }
-          if (xformElRef.value[i].getFieldsValue().OperationType == '1') {
-            DeviceIdArr.value.push(Number(xformElRef.value[i].getFieldsValue().DeviceId))
-          }
+
           fromArr.push(xformElRef.value[i].getFieldsValue())
         }
       }
 
       let enddata: any = []
       for (let i = 0; i < add.value.length; i++) {
-        fromArr[i].OperationType = Number(fromArr[i].OperationType)
         enddata.push(fromArr[i])
         // enddata[i].push(FfromArr[i])
       }
@@ -770,10 +737,6 @@ export default defineComponent({
       return enddata
 
     }
-
-    onMounted(() => {
-      add.value = []
-    })
 
     function huix() {
       add.value = []
@@ -882,8 +845,7 @@ export default defineComponent({
       TIndex,
       bcIndex,
       delete_rule,
-      huix,          
-      DeviceIdArr
+      huix
       // getForm
     };
   }

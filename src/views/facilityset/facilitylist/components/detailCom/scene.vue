@@ -56,12 +56,12 @@
 
                         <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="handleEdit(index, index2)">
                             编辑</div>
-                        <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded"
-                            v-if="Scene.Status == 2 || !Scene.Status" @click.stop="enableDevice(Scene.RuleId, index)">启用
+                        <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded" v-if="Scene.Status == 2 || !Scene.Status"
+                            @click.stop="enableDevice(Scene.RuleId, index)">启用
                         </div>
                         <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded"
-                            v-if="Scene.Status == 1 || Scene.Status == 5"
-                            @click.stop="disableDevice(Scene.RuleId, index)">禁用</div>
+                            v-if="Scene.Status == 1 || Scene.Status == 5" @click.stop="disableDevice(Scene.RuleId, index)">
+                            禁用</div>
                         <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
                             v-if="Scene.Status == 3 || Scene.Status == 4">启用</div>
                     </div>
@@ -90,7 +90,7 @@
 import { ref, onMounted, reactive } from 'vue';
 import { Input, Pagination, message } from 'ant-design-vue';
 import Icon from '@/components/Icon';
-import { facilityRuleListApi,ruleEnableApi,ruleDisableApi } from '@/api/facility/facility'
+import { facilityRuleListApi, ruleEnableApi, ruleDisableApi } from '@/api/facility/facility'
 // import { any } from 'vue-types';
 // import { , Modal, } from 'ant-design-vue';
 
@@ -119,18 +119,18 @@ const searchValue = ref()
 const total = ref()
 
 // 获取列表
-function getSceneList(type,name) {
+function getSceneList(type, name) {
     searchObj.DeviceId = props.DeviceId
     if (type) {
         searchObj.PageNum = 1
     }
 
-    if(name){
+    if (name) {
         searchObj.Name = searchValue.value
-    }else{
-       delete searchObj.Name
+    } else {
+        delete searchObj.Name
     }
-    
+
     facilityRuleListApi(searchObj).then(res => {
         console.log(res)
         if (res.List) {

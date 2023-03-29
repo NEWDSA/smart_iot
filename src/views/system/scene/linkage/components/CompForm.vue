@@ -104,37 +104,37 @@ const schemas_normal: FormSchema[] = [
       options: [
         {
           label: '设备',
-          value: '1',
+          value: 1,
           key: '1'
         },
         {
           label: '访客类型',
-          value: '2',
+          value: 2,
           key: '2'
         },
         {
           label: '参数',
-          value: '3',
+          value: 3,
           key: '3'
         },
         {
           label: '日期',
-          value: '4',
+          value: 4,
           key: '4'
         },
         {
           label: '时间',
-          value: '5',
+          value: 5,
           key: '5'
         },
         {
           label: '工单创建',
-          value: '6',
+          value: 6,
           key: '6'
         },
         {
           label: '工单更新',
-          value: '7',
+          value: 7,
           key: '7'
         }
       ]
@@ -151,7 +151,33 @@ const schemas_normal: FormSchema[] = [
     },
     // 判断显示隐藏
     ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'DeviceName',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
       return values.ConditionType == '1'
+    }
+  },
+  {
+    field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
     }
   },
   // 工单
@@ -679,37 +705,37 @@ const schemas_normal2: FormSchema[] = [
       options: [
         {
           label: '设备',
-          value: '1',
+          value: 1,
           key: '1'
         },
         {
           label: '访客类型',
-          value: '2',
+          value: 2,
           key: '2'
         },
         {
           label: '参数',
-          value: '3',
+          value: 3,
           key: '3'
         },
         {
           label: '日期',
-          value: '4',
+          value: 4,
           key: '4'
         },
         {
           label: '系统时间',
-          value: '5',
+          value: 5,
           key: '5'
         },
         {
           label: '工单创建',
-          value: '6',
+          value: 6,
           key: '6'
         },
         {
           label: '工单更新',
-          value: '7',
+          value: 7,
           key: '7'
         }
       ]
@@ -726,7 +752,33 @@ const schemas_normal2: FormSchema[] = [
     },
     // 判断显示隐藏
     ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'DeviceName',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot2',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
       return values.ConditionType == '1'
+    }
+  },
+  {
+    field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot2',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
     }
   },
   // 工单
@@ -1223,7 +1275,9 @@ export default defineComponent({
         }
 
         formElRef.value[Number(ZIndex.value)].setFieldsValue({
+          DeviceName:obj[0][0].DeviceName,
           DeviceId: obj[0][0].DeviceId,
+          DeviceSerial:obj[0][0].DeviceSerial,
           // DeviceId:obj[0][0].DeviceId
         })
         let myobj: any = [];
@@ -1260,7 +1314,7 @@ export default defineComponent({
             ifShow: ({ values }) => {
               return values.ConditionType == '1'
             }
-          }, 'DeviceId')
+          }, 'DeviceName')
         }
 
 
@@ -1349,7 +1403,9 @@ export default defineComponent({
           pp = 0
         }
         FformElRef.value[Number(FIndex.value)].setFieldsValue({
+          DeviceName:obj[0][0].DeviceName,
           DeviceId: obj[0][0].DeviceId,
+          DeviceSerial:obj[0][0].DeviceSerial,
         })
         let myobj: any = [];
         FormSchema.forEach(async (item, index) => {
@@ -1385,7 +1441,7 @@ export default defineComponent({
             ifShow: ({ values }) => {
               return values.ConditionType == '1'
             }
-          }, 'DeviceId')
+          }, 'DeviceName')
         }
 
         FormSchema.forEach((item, index) => {
@@ -1631,7 +1687,7 @@ export default defineComponent({
           }
 
           // console.log(enddata[o][p][enddata[o][p]['DeviceField']])
-          if (enddata[o][p][enddata[o][p]['DeviceField']] == true || enddata[o][p][enddata[o][p]['DeviceField']] == false) {
+          if (enddata[o][p][enddata[o][p]['DeviceField']] === true || enddata[o][p][enddata[o][p]['DeviceField']] === false) {
             enddata[o][p].Gval = 'value==' + enddata[o][p].switch
           } else if (enddata[o][p]['DeviceField'] == 'switch' && !enddata[o][p][enddata[o][p]['DeviceField']]) {
             enddata[o][p].Gval = 'value==false'
@@ -1874,7 +1930,7 @@ export default defineComponent({
   align-items: center;
   justify-content: flex-start;
 }
-
+ 
 .col_flex {
   display: flex;
   align-items: center;

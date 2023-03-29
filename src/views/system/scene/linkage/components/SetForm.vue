@@ -73,31 +73,31 @@ const schemas_normal: FormSchema[] = [
     componentProps: {
       options: [{
         label: '设备',
-        value: '1',
+        value: 1,
         key: '1'
       }, {
         label: '访客类型',
-        value: '2',
+        value: 2,
         key: '2'
       }, {
         label: '参数',
-        value: '3',
+        value: 3,
         key: '3'
       }, {
         label: '日期',
-        value: '4',
+        value: 4,
         key: '4'
       }, {
         label: '系统时间',
-        value: '5',
+        value: 5,
         key: '5'
       }, {
         label: '工单创建',
-        value: '6',
+        value: 6,
         key: '6'
       }, {
         label: '工单更新',
-        value: '7',
+        value: 7,
         key: '7'
       }]
     }
@@ -109,11 +109,37 @@ const schemas_normal: FormSchema[] = [
     component: 'Input',
     slot: 'customSlot',
     colProps: {
-      span: 4,
+      span: 8
     },
     // 判断显示隐藏
-    show: ({ values }) => {
-      return values.OperationType == '1';
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'DeviceName',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.OperationType == '1'
+    }
+  },
+  {
+    field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
     }
   },
   // 设备参数
@@ -500,7 +526,9 @@ export default defineComponent({
 
       let FormSchema = JSON.parse(result[0]?.DeviceModel)
       xformElRef.value[Number(TIndex.value)].setFieldsValue({
+        DeviceName: obj[0][0].DeviceName,
         DeviceId: obj[0][0].DeviceId,
+        DeviceSerial: obj[0][0].DeviceSerial,
       })
       let myobj: any = [];
       FormSchema.forEach(async (item, index) => {
@@ -527,7 +555,7 @@ export default defineComponent({
         ifShow: ({ values }) => {
           return values.OperationType == '1'
         }
-      }, 'DeviceId')
+      }, 'DeviceName')
       FormSchema.forEach((item, index) => {
         // 使用updateSchema添加
 
@@ -578,7 +606,7 @@ export default defineComponent({
           //     // console.log(values,'DeviceFieldDeviceFieldDeviceField')
           //     return values.DeviceField == item.model.field && values.OperationType == '1'
           //   }
-          // }, 'DeviceField')
+          // }, 'DeviceName')
 
 
         } else {
@@ -743,10 +771,10 @@ export default defineComponent({
 
     }
 
-    onMounted(()=>{
+    onMounted(() => {
       add.value = []
     })
-    
+
     function huix() {
       add.value = []
       xformElRef.value = []
