@@ -94,13 +94,13 @@ export default defineComponent({
       settingList.value = newValue;
     })
     onMounted(async () => {
-      emitter.on('getData', async () => {
-        // 对接口进行重置
-        settingList.value = [];
-        for (var i = 0; i <= 2; i++) {
-          await getData(i)
-        }
-      })
+     emitter.on('getData', async () => {
+      // 对接口进行重置
+      settingList.value = [];
+      for (var i = 0; i <= 2; i++) {
+        await getData(i)
+      }
+    })
       for (var i = 0; i <= 2; i++) {
         await getData(i)
       }

@@ -11,12 +11,12 @@
             {
               icon: 'clarity:note-edit-line',
               onClick: handleEdit.bind(null, record),
-              ifShow:  hasPermission(['handleEdit_Menu'])
+              ifShow: hasPermission(['handleEdit_Menu'])
             },
             {
               icon: 'ant-design:delete-outlined',
               color: 'error',
-              ifShow:  hasPermission(['handleDelete_Menu']),
+              ifShow: hasPermission(['handleDelete_Menu']),
               popConfirm: {
                 title: '是否确认删除',
                 placement: 'left',
@@ -35,27 +35,23 @@ import { defineComponent, nextTick, ref } from 'vue';
 
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getMenuList, DelMenuList } from '@/api/demo/system';
-// import MenuDrawer from './MenuDrawer.vue';
 import MenuModal from './MenuModal.vue';
 import { columns } from './menu.data';
 import { useModal } from '@/components/Modal';
-import {usePermission} from '@/hooks/web/useButtonPermission';
+import { usePermission } from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'MenuManagement',
   components: { BasicTable, MenuModal, TableAction },
   setup() {
     const { hasPermission } = usePermission();
     const [registerMenuModal, { openModal }] = useModal();
-    // const [registerMenuModal, { openDrawer }] = useDrawer();
     const checkAll = ref(true);
     const [registerTable, { reload, expandAll, collapseAll }] = useTable({
       title: '菜单列表',
       api: async (p) => {
         // 对数据进行特殊处理
         const { List } = await getMenuList(p);
-
         return List;
-
       },
       afterFetch(res) {
         let result = res;
