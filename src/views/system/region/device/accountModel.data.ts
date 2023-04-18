@@ -45,7 +45,8 @@ export const searchFormSchema: FormSchema[] = [
     field: 'Sort',
     label: '选择排序',
     component: 'Select',
-    colProps: { span: 4 },
+    colProps: { span: 5 },
+    defaultValue:'2',
     componentProps:{
       options:[{
         label:'按名称排序',value:'1'
@@ -58,7 +59,7 @@ export const searchFormSchema: FormSchema[] = [
     field: 'TypeId',
     label: '设备分类',
     component: 'TreeSelect',
-    colProps: { span: 4 },
+    colProps: { span: 5 },
     componentProps: {
       fieldNames: {
         label: 'TypeName',

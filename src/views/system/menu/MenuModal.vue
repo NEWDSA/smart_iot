@@ -30,7 +30,6 @@ export default defineComponent({
     });
 
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-      console.log(data, '?...data...?');
       resetFields();
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
@@ -62,6 +61,7 @@ export default defineComponent({
         if (!values.ParentId) {
           values.ParentId = 0;
         }
+        values.OrderNum===undefined || values.OrderNum===null ?values.OrderNum=0:values.OrderNum;
         !unref(isUpdate) ? await createMenuList(values) : await editMenuList({ ...values, MenuId: MenuId.value })
         closeModal();
         emit('success');

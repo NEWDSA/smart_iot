@@ -1,6 +1,6 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
-    <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect"  />
+    <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
     <BasicTable class="w-3/4 xl:w-4/5" :dataSource="dataSource" :clickToRowSelect="clickToRowSelect"
       @register="registerTable" :searchInfo="searchInfo">
       <template #toolbar>
@@ -73,7 +73,7 @@ export default defineComponent({
     } = useMessage();
     function onChange() {
     }
-    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys,setSelectedRowKeys,deleteTableDataRecord }] = useTable({
       title: '区域设备管理',
       onChange,
       rowSelection: {
@@ -137,6 +137,7 @@ export default defineComponent({
 
     }
     function onSelectChange(selectedRowKeys: []) {
+      console.log(selectedRowKeys,'...selectedRowKeys...?')
       checkedKeys.value = selectedRowKeys;
       PermisionList.DeviceId = Object.values(selectedRowKeys);
     }
@@ -162,8 +163,8 @@ export default defineComponent({
         });
       }
     }
-    function bulkPermission() {
-      reload()
+    async function bulkPermission() {
+      await reload()
 
     }
     function handleBulk(record: Recordable) {
@@ -206,31 +207,30 @@ export default defineComponent({
 
     }
     // 获取table数据
-    async function getData() {
-      //  获取区域设备
-      dataSource.value = [];
-      const { Detail,Total } = await getReginDevice(pagination)
-      const result = Detail;
-      const TypeList: any = [];
-      setPagination({
-        total: Total
-      })
-      result.map(async (item) => {
-        const DeviceList = await getDeviceType({
-          Id: item.TypeId
-        })
+    // async function getData() {
+    //   //  获取区域设备
+    //   dataSource.value = [];
+    //   const { Detail, Total } = await getReginDevice(pagination)
+    //   const result = Detail;
+    //   const TypeList: any = [];
+    //   setPagination({
+    //     total: Total
+    //   })
+    //   result.map(async (item) => {
+    //     const DeviceList = await getDeviceType({
+    //       Id: item.TypeId
+    //     })
 
-        TypeList.push(...DeviceList)
-        item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
-        dataSource.value.push(item)
-      })
-    }
-    function handleSuccess() {
-      // reload()
-      getData();
+    //     TypeList.push(...DeviceList);
+    //     item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
+    //     dataSource.value.push(item)
+    //   })
+    // }
+    async function handleSuccess() {
+      await reload();
     }
     function handleEditPwd(record: Recordable) {
-
+      setSelectedRowKeys([record.DeviceId]);
       if (getSelectRowKeys().length > 0 && getSelectRowKeys().length <= 1) {
         openModal2(true, {
           DeviceId: checkedKeys.value,

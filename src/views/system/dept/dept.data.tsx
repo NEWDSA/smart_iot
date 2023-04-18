@@ -89,7 +89,6 @@ export const formSchema: FormSchema[] = [
     field: 'OrderNum',
     label: '排序',
     component: 'InputNumber',
-    required: true
   },
 
   {

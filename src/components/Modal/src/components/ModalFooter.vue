@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex justify-end">
     <slot name="insertFooter"></slot>
     <a-button v-bind="cancelButtonProps" @click="handleCancel" v-if="showCancelBtn">
       {{ cancelText }}

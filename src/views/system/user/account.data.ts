@@ -37,7 +37,10 @@ export const columns: BasicColumn[] = [
   // 需对部门信息进行处理
   {
     title: '部门',
-    dataIndex: 'DeptName'
+    dataIndex: 'DeptName',
+    customRender:({record})=>{
+      return record.Dept.DeptName;
+    }
   },
   {
     title: '状态',

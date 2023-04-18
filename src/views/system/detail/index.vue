@@ -74,6 +74,7 @@ export default defineComponent({
         onChange: onSelectChange,
       },
       columns,
+      showIndexColumn: false,
       fetchSetting: {
         pageField: 'PageNum',
         // 传给后台的每页显示多少条的字段

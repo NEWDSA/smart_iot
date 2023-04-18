@@ -1,8 +1,15 @@
 <template>
   <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle"
     @ok="handleSubmit">
-    <BasicTable :dataSource="dataSource" @register="registerTable" :searchInfo="searchInfo">
+    <BasicTable ref="tableRef" @register="registerTable" :searchInfo="searchInfo">
     </BasicTable>
+    <!-- footer -->
+    <template #insertFooter>
+      <!-- 插入分页 -->
+      <Pagination class="mr-1" hideOnSinglePage v-model:current="pagenation.current"
+        v-model:pageSize="pagenation.PageSize" show-less-items :total="pagenation.total" @change="changePage">
+      </Pagination>
+    </template>
   </BasicModal>
 </template>
 <script lang="ts">
@@ -11,21 +18,52 @@ import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { editDeviceArea } from '@/api/demo/region';
 import { deviceTree, getReginDevice } from '@/api/demo/region'
-import { BasicTable, useTable, TableAction } from '@/components/Table';
+import { BasicTable, useTable, TableActionType, TableAction } from '@/components/Table';
+import { Pagination } from 'ant-design-vue';
 import { columns, searchFormSchema } from './accountModel.data';
 export default defineComponent({
   name: 'AccountModal',
   props: ['Device'],
-  components: { BasicModal, BasicForm, BasicTable, TableAction },
+  components: { BasicModal, BasicForm, BasicTable, TableAction, Pagination },
   emits: ['success', 'register'],
   setup(_, { emit }) {
     const isUpdate = ref(true);
+    const height = 300;
     const searchInfo = reactive<Recordable>({});
     const TreeTableData: any = reactive([]);
     const dataSource: any = ref([]);
     const checkedKeys = ref<Array<string | number>>([]);
     const paramList: any = ref();
-    function onChange() {
+    const params=ref({});
+    const PageNum = ref(1);
+    const PageSize = ref(10);
+    const pagenation = reactive({
+      current: 1,
+      total: 0,
+      PageSize: 10,
+      Sort: 2
+    })
+    const tableRef = ref<Nullable<TableActionType>>(null);
+    function getTableAction() {
+      const tableAction = unref(tableRef);
+      if (!tableAction) {
+        throw new Error('tableAction is null');
+      }
+      return tableAction;
+    }
+    function onChange(e) {
+    }
+    async function changePage(index) {
+      pagenation.current = index;
+      let myparams = {
+        PageNum: pagenation.current,
+        PageSize: pagenation.PageSize,
+        Sort: pagenation.Sort
+      }
+      Object.assign(myparams,getForm().getFieldsValue());
+      const { Detail, Total } = await getReginDevice(myparams);
+      getTableAction().setTableData(Detail);
+      pagenation.total = Total;
     }
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       paramList.value = data.params
@@ -59,7 +97,7 @@ export default defineComponent({
 
     });
 
-    const [registerTable, { getForm }] = useTable({
+    const [registerTable, { getForm, }] = useTable({
       title: '',
       onChange,
       rowSelection: {
@@ -68,22 +106,42 @@ export default defineComponent({
         onChange: onSelectChange,
       },
       rowKey: 'DeviceId',
-      api:getReginDevice,
-      beforeFetch:(p)=>{
-         p.Sort=2;
+      api: async (p) => {
+        const { Total
+          , Detail
+        } = await getReginDevice(p);
+        pagenation.total = Total;
+        return new Promise((resolve) => {
+          resolve([...Detail])
+        })
+      },
+      beforeFetch: (p) => {
+        p.PageNum = PageNum.value;
+        p.PageSize = 10;
       },
       formConfig: {
         labelWidth: 100,
         schemas: searchFormSchema,
         autoSubmitOnEnter: true,
+        actionColOptions: {
+          span: 3
+        }
       },
       columns,
-      pagination: true,
+      pagination: false,
       useSearchForm: true,
-      showTableSetting: true,
+      showTableSetting: false,
       showIndexColumn: false,
       bordered: true,
-      handleSearchInfoFn(info) {
+      async handleSearchInfoFn(info) {
+        pagenation.current = 1;
+        pagenation.PageSize = 10;
+        pagenation.Sort = info.Sort;
+        let params={
+          PageNum: pagenation.current,
+          PageSize:pagenation.PageSize
+        }
+        Object.assign(params,info);
         return info;
       }
     });
@@ -91,31 +149,10 @@ export default defineComponent({
     function onSelectChange(selectedRowKeys: []) {
       checkedKeys.value = selectedRowKeys;
     }
-    function ModelStatus(isOpen){
-       isOpen?getData():''
+    function ModelStatus(isOpen) {
+      console.log(isOpen);
+      // isOpen ? getData() : ''
     }
-    // onMounted(() => {
-    // })
-    // 获取table数据
-    async function getData() {
-      //  获取区域设备
-      dataSource.value = [];
-      const { Detail,Total } = await getReginDevice(pagination)
-      const result = Detail;
-      const TypeList: any = [];
-      result.map(async (item) => {
-        const DeviceList = await getDeviceType({
-          Id: item.TypeId
-        })
-        TypeList.push(...DeviceList)
-        item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
-        dataSource.value.push(item)
-      })
-      setPagination({
-        total: Total
-      })
-    }
-
     async function handleSubmit() {
       try {
         const params = {
@@ -132,7 +169,12 @@ export default defineComponent({
       }
     }
 
-    return { registerModal, registerTable, handleSubmit, onSelectChange, ModelStatus, paramList, checkedKeys, getTitle, searchInfo, dataSource };
+    return { registerModal, registerTable, handleSubmit, onSelectChange, ModelStatus, changePage, getTableAction,params, tableRef, pagenation, PageNum, PageSize, height, paramList, checkedKeys, getTitle, searchInfo, dataSource };
   },
 });
 </script>
+<style lang="less" scoped>
+.ant-pagination {
+  margin-right: 2rem;
+}
+</style>

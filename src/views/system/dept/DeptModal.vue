@@ -54,7 +54,7 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         const values = await validate();
-
+        values.OrderNum===undefined || values.OrderNum===null ?values.OrderNum=0:values.OrderNum;
         unref(isModifiy) == 1 ? Object.assign(values, { ParentId:DeptId.value}) : ''
         setModalProps({ confirmLoading: true });
         !unref(isUpdate) ? await createDept(values) : await modifiDept({ ...values, deptId: DeptId.value })

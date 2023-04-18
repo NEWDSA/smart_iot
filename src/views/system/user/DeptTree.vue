@@ -1,14 +1,14 @@
 <template>
   <div class="m-4 mr-0 overflow-hidden bg-white">
-    <BasicTree title="部门列表" toolbar search treeWrapperClassName="h-[calc(100%-35px)] overflow-auto"
-      :clickRowToExpand="false" :treeData="treeData" :fieldNames="{ key: 'DeptId', title: 'DeptName' }"
-      @select="handleSelect" />
+    <BasicTree title="部门列表" :selectedKeys="selectedKeys" toolbar search ref="treeRef"
+      treeWrapperClassName="h-[calc(100%-35px)] overflow-auto" :clickRowToExpand="false" :treeData="treeData"
+      :fieldNames="{ key: 'DeptId', title: 'DeptName' }" @select="handleSelect" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, unref } from 'vue';
 
-import { BasicTree, TreeItem } from '@/components/Tree';
+import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { getDeptList } from '@/api/demo/system';
 
 export default defineComponent({
@@ -18,38 +18,35 @@ export default defineComponent({
   emits: ['select'],
   setup(_, { emit }) {
     const treeData = ref<TreeItem[]>([]);
-
+    const treeRef = ref<Nullable<TreeActionType>>(null);
+    const selectedKeys = ref();
+    const lastSelectedKey = ref();
+    function getTree() {
+      const tree = unref(treeRef);
+      if (!tree) {
+        throw new Error('tree is null!');
+      }
+      return tree;
+    }
     // 获取部门数据
     async function fetch() {
-      // 组装后端数据
-      function listToTreeSimple(data) {
-        const res: any = [];
-        data.List.forEach((item) => {
-          const parent = data.List.find((node) => node.DeptId === item.ParentId);
-          if (parent) {
-            parent.children = parent.children || [];
-            parent.children.push(item);
-          } else {
-            // * 根节点
-            res.push(item);
-          }
-        });
-
-        return res
-      }
-      let datas = listToTreeSimple(await getDeptList());
-      treeData.value = datas;
-      return treeData
+      const { List } = await getDeptList();
+      selectedKeys.value = [List[0].DeptId];
+      emit('select', List[0].DeptId
+      );
+      treeData.value = List;
 
     }
 
     function handleSelect(keys) {
+      console.log(keys[0], '....selectedKeys....')
+      getTree().setCheckedKeys(keys[0]);
       emit('select', keys[0]);
     }
     onMounted(() => {
       fetch();
     });
-    return { treeData, handleSelect };
+    return { treeData, selectedKeys, lastSelectedKey, handleSelect };
   },
 });
 </script>

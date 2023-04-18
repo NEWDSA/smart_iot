@@ -2,8 +2,8 @@
   <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
     <BasicForm @register="registerForm">
       <template #customEmail="{ model, field }">
-        <Tooltip :title="model[field]"  placement="bottom">
-          <a-input  v-model:value="model[field]" placeholder="请输入邮箱" />
+        <Tooltip :title="model[field]" placement="bottom">
+          <a-input v-model:value="model[field]" placeholder="请输入邮箱" />
         </Tooltip>
       </template>
     </BasicForm>
@@ -46,30 +46,33 @@ export default defineComponent({
             return item
           }
         })
-        console.log()
         updateSchema({
           field: 'RoleIds',
-          defaultValue: Object.keys(resd).length > 0 ? result.RoleIds : '',
+          defaultValue: Object.keys(resd).length > 0 ? result.RoleIds.toString() : '',
           componentProps: { treeData: result.Roles }
         })
+
       } else {
         const { List } = await getAllRoleList()
         updateSchema({
-          defaultValue: {},
+          defaultValue: List[0].RoleId,
           field: 'RoleIds',
           componentProps: { treeData: List }
         })
+        setFieldsValue({DeptId:data.DeptId});
+        const treeData = await getDeptDrop().then((res) => {
+          return res.TreeSelect
+        });
+        await updateSchema({
+          field: 'DeptId',
+          componentProps: { treeData },
+        });
+
       }
-      const treeData = await getDeptDrop().then((res) => {
-        return res.TreeSelect
-      });
-      updateSchema({
-        field: 'DeptId',
-        componentProps: { treeData },
-      });
+
 
     });
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增账号2' : '编辑账号'));
+    const getTitle = computed(() => (!unref(isUpdate) ? '添加用户' : '编辑用户'));
     async function handleSubmit() {
       try {
         const values = await validate();

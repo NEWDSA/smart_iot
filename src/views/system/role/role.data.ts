@@ -77,8 +77,7 @@ export const formSchema: FormSchema[] = [
   {
     field: 'RoleSort',
     label: '排序',
-    component: 'InputNumber',
-    required: true
+    component: 'InputNumber'
   },
   {
     field: 'Status',

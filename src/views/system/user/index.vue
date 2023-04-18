@@ -5,7 +5,7 @@
       :searchInfo="searchInfo">
       <template #toolbar>
         <a-button type="primary" @click="handleBulk">批量调动</a-button>
-        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+        <a-button type="primary" @click="handleCreate">添加用户</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'DeptName'">
@@ -44,10 +44,10 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue';
+import { defineComponent, reactive, ref, toRaw, shallowRef, ComponentOptions, nextTick, getCurrentInstance, ComponentInternalInstance, watchEffect } from 'vue';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { useMessage } from '@/hooks/web/useMessage';
-import { getAccountList, getDeptList, delAccount } from '@/api/demo/system';
+import { getAccountList, delAccount } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
 
@@ -63,6 +63,7 @@ export default defineComponent({
   setup() {
     const go = useGo();
     const myData: any = ref('');
+    const lastSelectedKey = ref();
     const update = getCurrentInstance() as ComponentInternalInstance | null
     const [registerModal, { openModal }] = useModal();
     const [registerpwdModal, { openModal: openModal3 }] = useModal();
@@ -85,10 +86,6 @@ export default defineComponent({
       onChange,
       api: async (p) => {
         const { List, Total } = await getAccountList(p);
-        List?.map(async item => {
-          const result = await getDeptList();
-          item.DeptName = result.List.find(item1 => item1.DeptId == item.DeptId).DeptName
-        })
         return {
           Total,
           List
@@ -118,6 +115,7 @@ export default defineComponent({
       showTableSetting: true,
       bordered: true,
       handleSearchInfoFn(info) {
+        return info
       },
       actionColumn: {
         width: 120,
@@ -128,7 +126,9 @@ export default defineComponent({
     function handleCreate() {
       openModal(true, {
         isUpdate: false,
-      });
+        DeptId: searchInfo.DeptId
+      })
+
     }
     function pwdSuccess() {
       reload();
@@ -169,8 +169,8 @@ export default defineComponent({
       }
 
     }
-    function handleSuccess() {
-      reload();
+    async function handleSuccess() {
+      await reload();
     }
     function handleEditPwd(record: Recordable) {
       // 弹出修改用户密码框
@@ -180,9 +180,10 @@ export default defineComponent({
         modalVisible.value = true;
       })
     }
-    function handleSelect(DeptId = '') {
+    async function handleSelect(DeptId) {
+
       searchInfo.DeptId = DeptId;
-      reload();
+      await reload();
     }
     return {
       registerTable,
@@ -201,6 +202,7 @@ export default defineComponent({
       openModal2,
       openModal3,
       pwdSuccess,
+      lastSelectedKey,
       clickToRowSelect,
       pagination,
       internalInstance,

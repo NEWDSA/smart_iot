@@ -47,7 +47,8 @@ enum Api {
   NoticeRead = '/notice/is-read',
   IsRead = '/notice/list-unread',
   AllRead='/notice/whole-is-read',
-  DeviceDepartment='/device-department/list-device-id'
+  DeviceDepartment='/device-department/list-device-id',
+  DeviceList='/device/query'
 }
 
 // 获取用户列表
@@ -309,3 +310,13 @@ realHttp.get(
     isTransformResponse: true
   }
 )
+
+// 设备列表
+export const DeviceList=(params?)=>
+realHttp.get({
+  url:Api.DeviceList,
+  params
+},{
+  isTransformResponse: true
+})
+

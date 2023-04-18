@@ -11,6 +11,7 @@ import { defineComponent, ref, unref, onMounted } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
 import { getDeptList, BulkDept } from '@/api/demo/system';
+import { cwd } from 'process';
 
 export default defineComponent({
   name: 'AccountModal',
@@ -63,6 +64,7 @@ export default defineComponent({
     }
     function handleSelect(keys) {
       checkData.value = keys.checked;
+      console.log(checkData.value, '?...checkData...?');
       if (keys.checked.length > 1) {
         checkData.value = keys.checked[keys.checked.length - 1];
         getTree().setCheckedKeys([checkData.value]);
@@ -72,9 +74,12 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         // 将数据传递给接口
+       console.log(getTree().getCheckedKeys(),'...getCheckedKeys...?');
+      //  let treeCheck=getTree().getCheckedKeys();
+      //  let DeptId=treeCheck.checked;
         await BulkDept({
           UserIds: user.value,
-          DeptId: Number(checkData.value)
+          DeptId: Number(await checkData.value)
         })
         setModalProps({ confirmLoading: true });
         closeModal();
