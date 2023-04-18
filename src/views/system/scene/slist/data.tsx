@@ -76,12 +76,12 @@ export const achieveList: TabItem[] = [
   },
   {
     key: '1',
-    name: '设备触发',
+    name: '条件触发',
     component: 'card',
   },
   {
     key: '2',
-    name: '定时触发触发',
+    name: '定时触发',
     component: 'card',
   },
   {

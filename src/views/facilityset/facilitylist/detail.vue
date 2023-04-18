@@ -19,7 +19,7 @@
         :NetworkStatus="infoFacility.NetworkStatus"></log>
       <control v-if="facilityDetailTabIndex == '2'" :DeviceModel="infoFacility.DeviceModel"
         :DeviceId="infoFacility.DeviceSerial" :ModelId="infoFacility.DeviceModelId"
-        :NetworkStatus="infoFacility.NetworkStatus"></control>
+        :NetworkStatus="infoFacility.NetworkStatus" :DeviceStatus="devices"></control>
       <warn v-if="facilityDetailTabIndex == '3'" :DeviceSerial="infoFacility.DeviceSerial"
         :NetworkStatus="infoFacility.NetworkStatus"></warn>
       <scene v-if="facilityDetailTabIndex == '4'" :DeviceId="infoFacility.DeviceId"></scene>
@@ -39,6 +39,15 @@ import { facilityDetailApi } from '@/api/facility/facility'
 import { useGo } from '@/hooks/web/usePage';
 import { useRoute, onBeforeRouteLeave } from 'vue-router';
 import { subscribeDeviceStatusNew } from '@/utils/iot';
+import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
+    // 设备登录
+    const titles = ref([])
+    registerTopAreaRef(titles)
+    const current = ref("")
+    registerCurrentAreaRef(current)
+    const devices = ref([])
+    registerDevicesRef(devices)
+    connect()
 const route = useRoute();
 const go = useGo();
 const infoFacility = ref()
@@ -47,6 +56,10 @@ onMounted(() => {
   // 此处可以得到用户ID
   const facilityId = ref(route.params?.id);
   getfacilityId(facilityId.value);
+})
+
+watch(()=>devices.value,(data)=> {
+console.log(devices.value,'devices.valuedevices.valuedevices.value')
 })
 
 const Inter = ref()
@@ -82,7 +95,7 @@ watch(() => facilityDetailTabIndex.value, (data) => {
   console.log(facilityDetailTabIndex.value,infoFacility.value.NetworkStatus)
   if (facilityDetailTabIndex.value == '2' && infoFacility.value.NetworkStatus !=0 && infoFacility.value.NetworkStatus !=2) {
     getLod()
-    Inter.value = setInterval(getLod, 100000)
+    Inter.value = setInterval(getLod, 10000)
   } else {
     console.log('clearInterval')
     // if (Inter.value !='') {
@@ -103,6 +116,7 @@ onBeforeRouteLeave(() => {
 
 
 function getLod() {
+  // console.log(132)
   subscribeDeviceStatusNew(infoFacility.value.DeviceSerial)
 }
 

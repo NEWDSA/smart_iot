@@ -13,6 +13,7 @@ import type { FormProps } from '@/components/Form'
 
 import { DEFAULT_FILTER_FN, DEFAULT_SORT_FN, FETCH_SETTING, DEFAULT_SIZE } from './const'
 import { propTypes } from '@/utils/propTypes'
+import { number } from 'vue-types'
 
 export const basicProps = {
   clickToRowSelect: { type: Boolean, default: true },
@@ -39,7 +40,7 @@ export const basicProps = {
     type: Array as PropType<Recordable[]>,
     default: null
   },
-  indentSize: propTypes.number.def(24),
+  indentSize: { type: Number, default: 25 },
   canColDrag: { type: Boolean, default: true },
   api: {
     type: Function as PropType<(...arg: any[]) => Promise<any>>,

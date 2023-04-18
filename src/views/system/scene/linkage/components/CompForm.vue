@@ -4,7 +4,7 @@
       <Form :model="RuleForm">
         <Row class="enter-x col_flex">
           <Col :span="4">
-          <FormItem name="switch" class="enter-x">
+          <FormItem name="switch" class="enter-x pp">
             <Switch v-model:checked="isShake" checked-children="边缘触发" un-checked-children="水平触发" />
           </FormItem>
           </Col>
@@ -16,21 +16,35 @@
         <div class="flex justify-center items-center lc_liner" v-if="index > 0 && item.hasOwnProperty('checked1')">
           <div
             style="position: relative;display:flex;height: 35px;align-items: center;justify-content: center;width: 50px;">
-            <svg style="position:absolute;" width="50" height="35">
+            <!-- <svg style="position:absolute;" width="50" height="35">
               <line x1="50" y1="50" x2="50" y2="0" style="stroke:rgb(0,155,5);stroke-width:3" />
-            </svg>
+            </svg> -->
             <Switch style="position:absolute;left:50%;" checkedChildren="AND" v-model:checked="item.checked1"
               unCheckedChildren="OR"></Switch>
           </div>
         </div>
         <div v-if="item && item.schemas_normal.length > 0" id="schemas" class="border bg-light-100 p-4 lc_liner">
+
           <BasicForm v-if="item && item.schemas_normal.length > 0" :schemas="item.schemas_normal" @register="register"
-            ref="FformElRef" @get-form="formvalueFF(arg, index)">
+            ref="FformElRef" @get-form="formvalueFF(arg, index)" class="m l-10">
+            <template #deleteSlot="{ model, field }">
+              <div class="w-8 h-8 mr-2 flex justify-center items-center"
+                style="border-radius: 50%;border:3px solid black;">
+                {{ index + 1 }}
+              </div>
+            </template>
             <template #customSlot="{ model, field }">
               <a-input @click="e_Device(index)" placeholder="请选择设备" v-model:value="model[field]">
-                <template #suffix>
+                <!-- <template #suffix>
                   <Icon icon="carbon:logo-github" />
-                </template>
+                </template> -->
+              </a-input>
+            </template>
+            <template #customSlot11="{ model, field }">
+              <a-input @click="e_Device(index, 1)" placeholder="请选择设备" v-model:value="model[field]">
+                <!-- <template #suffix>
+                  <Icon icon="carbon:logo-github" />
+                </template> -->
               </a-input>
             </template>
           </BasicForm>
@@ -39,29 +53,38 @@
               ref="formElRef" :schemas="itemr.schemas_normal" :key="itemr" @register="registerForm">
               <template #customSlot2="{ model, field }">
                 <a-input @click="filter_Device(item, index, cindex)" placehol der="请选择设备" v-model:value="model[field]">
-                  <template #suffix>
+                  <!-- <template #suffix>
                     <Icon icon="carbon:logo-github" />
-                  </template>
+                  </template> -->
+                </a-input>
+              </template>
+              <template #customSlot22="{ model, field }">
+                <a-input @click="filter_Device(item, index, cindex, 1)" placehol der="请选择设备" v-model:value="model[field]">
+                  <!-- <template #suffix>
+                    <Icon icon="carbon:logo-github" />
+                  </template> -->
                 </a-input>
               </template>
               <!-- 显示删除按钮 -->
               <template v-if="item.FormAdd.length > 0" #deleteSlot="{ model, field }">
-                <Icon @click="delete_rule_zi(index, cindex)"  class="ml-2" icon="ant-design:delete-outlined" />
+                <Icon @click="delete_rule_zi(index, cindex)" class="ml-2" icon="ant-design:delete-outlined" />
               </template>
             </BasicForm>
           </template>
           <!-- 添加过滤条件 -->
-          <div v-if="item && item.schemas_normal.length > 0" class="p-1 relative flex items-center justify-between" @click="addRule(index)">
-            <div><Icon icon="bi:plus" size="14" />
-            添加过滤条件</div>
-            
-            <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" color="red" size="20px"/>
+          <div v-if="item && item.schemas_normal.length > 0" class="p-1 relative flex items-center justify-between">
+            <div @click="addRule(index)">
+              <Icon icon="bi:plus" size="14" />
+              添加过滤条件
+            </div>
+
+            <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" color="red" size="20px" />
           </div>
         </div>
 
       </template>
       <!-- 引入模态框 -->
-      <AccountTable @register="registerMyTable" @success="handleSuccess" />
+      <AccountTable @register="registerMyTable" @success="handleSuccess" @successFF="handleSuccessFK" />
       <a-button type="primary" class="my-4" @click="handel_Add"> 添加条件 </a-button>
     </div>
   </PageWrapper>
@@ -79,8 +102,10 @@ import SelectItem from '@/layouts/default/setting/components/SelectItem.vue'
 import { deviceInfo } from '@/api/demo/scence'
 const [registerMyTable, { openModal }] = useModal()
 import { error } from '@/utils/log'
+import { visitorTypeListApi } from '@/api/visitor/visitor';
 import { on } from 'events'
 import { Item } from 'ant-design-vue/lib/menu'
+import { filterOption } from 'ant-design-vue/lib/vc-mentions/src/util'
 const schemas: FormSchema[] = []
 const FformArr: any = ref([])
 const formArr: any = ref([])
@@ -90,15 +115,30 @@ const result1: any = ref([])
 const FIndex = ref()
 const ZIndex = ref()
 const DeviceIdArr: any = ref([])
-
+const VisitorIdArr: any = ref([])
+const RegionIdArr:any = ref([])
+const VisitorTypeArr = ref([])
+visitorTypeListApi().then(res => {
+  VisitorTypeArr.value = res.Detail
+})
+// console.log(VisitorTypeArr,'VisitorTypeArr')
 
 const schemas_normal: FormSchema[] = [
+  {
+    field: 'delete',
+    label: '',
+    component: 'Input',
+    slot: 'deleteSlot',
+    colProps: {
+      span: 1
+    }
+  },
   {
     field: 'ConditionType',
     component: 'Select',
     label: '',
     colProps: {
-      span: 5
+      span: 4
     },
     componentProps: {
       options: [
@@ -108,7 +148,7 @@ const schemas_normal: FormSchema[] = [
           key: '1'
         },
         {
-          label: '访客类型',
+          label: '访客',
           value: 2,
           key: '2'
         },
@@ -169,6 +209,19 @@ const schemas_normal: FormSchema[] = [
   },
   {
     field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'RegionId',
     label: '',
     component: 'Input',
     slot: 'customSlot',
@@ -283,15 +336,6 @@ const schemas_normal: FormSchema[] = [
       ]
     }
   },
-  // {
-  //   field: 'delete',
-  //   label: '',
-  //   component: 'Input',
-  //   slot: 'deleteSlot',
-  //   colProps: {
-  //     span: 3
-  //   }
-  // },
   // 时间5
   {
     field: 'checkTime',
@@ -304,12 +348,12 @@ const schemas_normal: FormSchema[] = [
       options: [
         {
           label: '上报时间',
-          value: '1',
+          value: 1,
           key: '1'
         },
         {
           label: '系统时间',
-          value: '2',
+          value: 2,
           key: '2'
         },
       ]
@@ -329,8 +373,12 @@ const schemas_normal: FormSchema[] = [
     componentProps: {
       options: [
         {
-          value: '=',
+          value: '==',
           label: '等于'
+        },
+        {
+          value: '!=',
+          label: '不等于'
         },
         {
           value: '>',
@@ -365,7 +413,7 @@ const schemas_normal: FormSchema[] = [
     label: ' ',
     labelWidth: '10px',
     colProps: {
-      span: 5
+      span: 4
     },
     componentProps: {
       format: 'HH:mm',
@@ -382,7 +430,7 @@ const schemas_normal: FormSchema[] = [
     label: ' ',
     labelWidth: '10px',
     colProps: {
-      span: 5
+      span: 3
     },
     componentProps: {
       format: 'HH:mm',
@@ -397,9 +445,9 @@ const schemas_normal: FormSchema[] = [
     field: 'EndTime',
     component: 'TimePicker',
     label: '~',
-    labelWidth: '10px',
+    labelWidth: '20px',
     colProps: {
-      span: 5
+      span: 3
     },
     componentProps: {
       format: 'HH:mm',
@@ -421,13 +469,13 @@ const schemas_normal: FormSchema[] = [
     componentProps: {
       options: [
         {
-          label: '按周',
-          value: '1',
+          label: '上报时间',
+          value: 1,
           key: '1'
         },
         {
-          label: '按月',
-          value: '2',
+          label: '系统时间',
+          value: 2,
           key: '2'
         },
       ]
@@ -442,13 +490,17 @@ const schemas_normal: FormSchema[] = [
     label: '',
     component: 'Select',
     colProps: {
-      span: 5,
+      span: 4,
     },
     componentProps: {
       options: [
         {
-          value: '=',
+          value: '==',
           label: '等于'
+        },
+        {
+          value: '!=',
+          label: '不等于'
         },
         {
           value: '>',
@@ -478,51 +530,185 @@ const schemas_normal: FormSchema[] = [
     }
   },
   {
-    field: 'checkDate',
-    component: 'Select',
+    field: 'checkDateRange',
+    component: 'RangePicker',
     label: ' ',
     labelWidth: '10px',
     colProps: {
-      span: 5
+      span: 10
     },
     componentProps: {
-      mode: 'multiple',
-      placeholder: '请选择日期',
-      options:[
-        {
-          label:'星期一',
-          value:1
-        },
-        {
-          label:'星期二',
-          value:2
-        },
-        {
-          label:'星期三',
-          value:3
-        },
-        {
-          label:'星期四',
-          value:4
-        },
-        {
-          label:'星期五',
-          value:5
-        },
-        {
-          label:'星期六',
-          value:6
-        },
-        {
-          label:'星期日',
-          value:7
-        }
-      ]
+      format: 'YYYY-MM-DD',
+      valueFormat: 'YYYY-MM-DD',
+      // placeholder: '请选择结束时间',
     },
     show: ({ values }) => {
-      return values.ConditionType == '4' && values.checkTimeSymbol == 'between';
+      return values.ConditionType == '4' && values.checkTime == 2 && values.checkTimeSymbol == 'between';
     }
   },
+  {
+    field: 'checkDate',
+    component: 'DatePicker',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 6
+    },
+    componentProps: {
+      format: 'YYYY-MM-DD',
+      valueFormat: 'YYYY-MM-DD',
+      placeholder: '请选择结束时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '4' && values.checkTime == 2 && values.checkTimeSymbol != 'between';
+    }
+  },
+  // {
+  //   field: 'checkDateWeek',
+  //   component: 'Select',
+  //   label: ' ',
+  //   labelWidth: '10px',
+  //   colProps: {
+  //     span: 7
+  //   },
+  //   componentProps: {
+  //     mode: 'multiple',
+  //     placeholder: '请选择日期',
+  //     maxTagCount: 2,
+  //     options: [
+  //       {
+  //         label: '星期一',
+  //         value: 1
+  //       },
+  //       {
+  //         label: '星期二',
+  //         value: 2
+  //       },
+  //       {
+  //         label: '星期三',
+  //         value: 3
+  //       },
+  //       {
+  //         label: '星期四',
+  //         value: 4
+  //       },
+  //       {
+  //         label: '星期五',
+  //         value: 5
+  //       },
+  //       {
+  //         label: '星期六',
+  //         value: 6
+  //       },
+  //       {
+  //         label: '星期日',
+  //         value: 7
+  //       }
+  //     ]
+  //   },
+
+  //   show: ({ values }) => {
+  //     return values.ConditionType == 4 && values.checkTime == 1 && values.checkTimeSymbol != 'between';
+  //   }
+  // },
+  // {
+  //   field: 'StartTimeWeek',
+  //   component: 'Select',
+  //   label: ' ',
+  //   labelWidth: '10px',
+  //   colProps: {
+  //     span: 5
+  //   },
+  //   componentProps: {
+  //     // componentProps: {
+  //     placeholder: '请选择日期',
+  //     options: [
+  //       {
+  //         label: '星期一',
+  //         value: 1
+  //       },
+  //       {
+  //         label: '星期二',
+  //         value: 2
+  //       },
+  //       {
+  //         label: '星期三',
+  //         value: 3
+  //       },
+  //       {
+  //         label: '星期四',
+  //         value: 4
+  //       },
+  //       {
+  //         label: '星期五',
+  //         value: 5
+  //       },
+  //       {
+  //         label: '星期六',
+  //         value: 6
+  //       },
+  //       {
+  //         label: '星期日',
+  //         value: 7
+  //       }
+  //     ]
+  //     // },
+  //     // placeholder: '请选择开始时间',
+
+  //   },
+  //   show: ({ values }) => {
+  //     return values.ConditionType == 4 && values.checkTime == 1 && values.checkTimeSymbol == 'between';
+  //   }
+  // },
+  // {
+  //   field: 'EndTimeWeek',
+  //   component: 'Select',
+  //   label: '~',
+  //   labelWidth: '13px',
+  //   colProps: {
+  //     span: 5
+  //   },
+  //   componentProps: {
+  //     // componentProps: {
+  //     placeholder: '请选择日期',
+  //     options: [
+  //       {
+  //         label: '星期一',
+  //         value: 1
+  //       },
+  //       {
+  //         label: '星期二',
+  //         value: 2
+  //       },
+  //       {
+  //         label: '星期三',
+  //         value: 3
+  //       },
+  //       {
+  //         label: '星期四',
+  //         value: 4
+  //       },
+  //       {
+  //         label: '星期五',
+  //         value: 5
+  //       },
+  //       {
+  //         label: '星期六',
+  //         value: 6
+  //       },
+  //       {
+  //         label: '星期日',
+  //         value: 7
+  //       }
+  //     ]
+  //     // },
+  //     // placeholder: '请选择结束时间',
+
+  //   },
+  //   show: ({ values }) => {
+  //     return values.ConditionType == 4 && values.checkTime == 1 && values.checkTimeSymbol == 'between';
+  //   }
+  // },
   // 工单创建 6
   {
     field: 'workOrderSet',
@@ -671,6 +857,117 @@ const schemas_normal: FormSchema[] = [
       return values.ConditionType == '6' && values.workOrderSet == 'Acceptor'
     }
   },
+  // 访客 2
+  // 设备
+  {
+    field: 'DeviceId',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot11',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'DeviceName',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot11',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2
+    }
+  },
+  {
+    field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot11',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'RegionId',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot11',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'visitor',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: 1,
+          label: '访客类型'
+        },
+        {
+          value: 2,
+          label: '车牌号'
+        },
+      ],
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2
+    }
+  },
+  {
+    field: 'VisitorType',
+    label: '为',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      showSearch: true,
+      options: VisitorTypeArr,
+      fieldNames: {
+        label: 'VisitorTypeName', value: 'VisitorTypeId'
+      }
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2 && values.visitor == 1
+    }
+  },
+  {
+    field: 'plateNumber',
+    label: '',
+    component: 'Input',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2 && values.visitor == 2
+    }
+  },
 ]
 const resultList: any = ref([]);
 const formElRef: any = ref<Nullable<FormActionType>>(null);
@@ -687,7 +984,7 @@ const schemas_normal2: FormSchema[] = [
     },
     componentProps: {
       checked: false,
-      checkedChildren: 'And',
+      checkedChildren: 'AND',
       unCheckedChildren: "OR"
     }
   },
@@ -696,7 +993,7 @@ const schemas_normal2: FormSchema[] = [
     component: 'Select',
     label: '',
     colProps: {
-      span: 3
+      span: 4
     },
     componentProps: {
       onChange: (e) => {
@@ -709,7 +1006,7 @@ const schemas_normal2: FormSchema[] = [
           key: '1'
         },
         {
-          label: '访客类型',
+          label: '访客',
           value: 2,
           key: '2'
         },
@@ -770,6 +1067,19 @@ const schemas_normal2: FormSchema[] = [
   },
   {
     field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot2',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'RegionId',
     label: '',
     component: 'Input',
     slot: 'customSlot2',
@@ -884,15 +1194,499 @@ const schemas_normal2: FormSchema[] = [
       ]
     }
   },
+  // 访客 2
+  // 设备
+  {
+    field: 'DeviceId',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot22',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'DeviceName',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot22',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2
+    }
+  },
+  {
+    field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot22',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'RegionId',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot22',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'visitor',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: 1,
+          label: '访客类型'
+        },
+        {
+          value: 2,
+          label: '车牌号'
+        },
+      ],
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2
+    }
+  },
+  {
+    field: 'VisitorType',
+    label: '为',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      showSearch: true,
+      options: VisitorTypeArr,
+      fieldNames: {
+        label: 'VisitorTypeName', value: 'VisitorTypeId'
+      }
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2 && values.visitor == 1
+    }
+  },
+  {
+    field: 'plateNumber',
+    label: '',
+    component: 'Input',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == 2 && values.visitor == 2
+    }
+  },
+  // 时间5
+  {
+    field: 'checkTime',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          label: '上报时间',
+          value: 1,
+          key: '1'
+        },
+        {
+          label: '系统时间',
+          value: 2,
+          key: '2'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '5'
+    }
+  },
+  {
+    field: 'checkTimeSymbol',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: '==',
+          label: '等于'
+        },
+        {
+          value: '!=',
+          label: '不等于'
+        },
+        {
+          value: '>',
+          label: '大于'
+        },
+        {
+          value: '>=',
+          label: '大于等于'
+        },
+        {
+          value: '<',
+          label: '小于'
+        },
+        {
+          value: '<=',
+          label: '小于等于'
+        },
+        {
+          value: 'between',
+          label: '在...之间'
+        }
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '5'
+    }
+  },
+  {
+    field: 'ExecuteTime',
+    component: 'TimePicker',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 4
+    },
+    componentProps: {
+      format: 'HH:mm',
+      valueFormat: 'HH:mm',
+      placeholder: '请选择时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '5' && values.checkTimeSymbol != 'between';
+    }
+  },
+  {
+    field: 'StartTime',
+    component: 'TimePicker',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 3
+    },
+    componentProps: {
+      format: 'HH:mm',
+      valueFormat: 'HH:mm',
+      placeholder: '请选择开始时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '5' && values.checkTimeSymbol == 'between';
+    }
+  },
+  {
+    field: 'EndTime',
+    component: 'TimePicker',
+    label: '~',
+    labelWidth: '20px',
+    colProps: {
+      span: 3
+    },
+    componentProps: {
+      format: 'HH:mm',
+      valueFormat: 'HH:mm',
+      placeholder: '请选择结束时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '5' && values.checkTimeSymbol == 'between';
+    }
+  },
+  // 日期4
+  {
+    field: 'checkTime',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        // {
+        //   label: '按周',
+        //   value: 1,
+        //   key: '1'
+        // },
+        {
+          label: '系统时间',
+          value: 2,
+          key: '2'
+        },
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '4'
+    }
+  },
+  {
+    field: 'checkTimeSymbol',
+    label: '',
+    component: 'Select',
+    colProps: {
+      span: 4,
+    },
+    componentProps: {
+      options: [
+        {
+          value: '==',
+          label: '等于'
+        },
+        {
+          value: '!=',
+          label: '不等于'
+        },
+        {
+          value: '>',
+          label: '大于'
+        },
+        {
+          value: '>=',
+          label: '大于等于'
+        },
+        {
+          value: '<',
+          label: '小于'
+        },
+        {
+          value: '<=',
+          label: '小于等于'
+        },
+        {
+          value: 'between',
+          label: '在...之间'
+        }
+      ]
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return values.ConditionType == '4'
+    }
+  },
+  {
+    field: 'checkDateRange',
+    component: 'RangePicker',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 12
+    },
+    componentProps: {
+      format: 'YYYY-MM-DD',
+      valueFormat: 'YYYY-MM-DD',
+      // placeholder: '请选择结束时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '4' && values.checkTime == 2 && values.checkTimeSymbol == 'between';
+    }
+  },
+  {
+    field: 'checkDate',
+    component: 'DatePicker',
+    label: ' ',
+    labelWidth: '10px',
+    colProps: {
+      span: 6
+    },
+    componentProps: {
+      format: 'YYYY-MM-DD',
+      valueFormat: 'YYYY-MM-DD',
+      placeholder: '请选择结束时间',
+    },
+    show: ({ values }) => {
+      return values.ConditionType == '4' && values.checkTime == 2 && values.checkTimeSymbol != 'between';
+    }
+  },
+  // {
+  //   field: 'checkDateWeek',
+  //   component: 'Select',
+  //   label: ' ',
+  //   labelWidth: '10px',
+  //   colProps: {
+  //     span: 7
+  //   },
+  //   componentProps: {
+  //     mode: 'multiple',
+  //     placeholder: '请选择日期',
+  //     maxTagCount: 2,
+  //     options: [
+  //       {
+  //         label: '星期一',
+  //         value: 1
+  //       },
+  //       {
+  //         label: '星期二',
+  //         value: 2
+  //       },
+  //       {
+  //         label: '星期三',
+  //         value: 3
+  //       },
+  //       {
+  //         label: '星期四',
+  //         value: 4
+  //       },
+  //       {
+  //         label: '星期五',
+  //         value: 5
+  //       },
+  //       {
+  //         label: '星期六',
+  //         value: 6
+  //       },
+  //       {
+  //         label: '星期日',
+  //         value: 7
+  //       }
+  //     ]
+  //   },
+
+  //   show: ({ values }) => {
+  //     return values.ConditionType == 4 && values.checkTime == 1 && values.checkTimeSymbol != 'between';
+  //   }
+  // },
+  // {
+  //   field: 'StartTimeWeek',
+  //   component: 'Select',
+  //   label: ' ',
+  //   labelWidth: '10px',
+  //   colProps: {
+  //     span: 5
+  //   },
+  //   componentProps: {
+  //     // componentProps: {
+  //     placeholder: '请选择日期',
+  //     options: [
+  //       {
+  //         label: '星期一',
+  //         value: 1
+  //       },
+  //       {
+  //         label: '星期二',
+  //         value: 2
+  //       },
+  //       {
+  //         label: '星期三',
+  //         value: 3
+  //       },
+  //       {
+  //         label: '星期四',
+  //         value: 4
+  //       },
+  //       {
+  //         label: '星期五',
+  //         value: 5
+  //       },
+  //       {
+  //         label: '星期六',
+  //         value: 6
+  //       },
+  //       {
+  //         label: '星期日',
+  //         value: 7
+  //       }
+  //     ]
+  //     // },
+  //     // placeholder: '请选择开始时间',
+
+  //   },
+  //   show: ({ values }) => {
+  //     return values.ConditionType == 4 && values.checkTime == 1 && values.checkTimeSymbol == 'between';
+  //   }
+  // },
+  // {
+  //   field: 'EndTimeWeek',
+  //   component: 'Select',
+  //   label: '~',
+  //   labelWidth: '13px',
+  //   colProps: {
+  //     span: 5
+  //   },
+  //   componentProps: {
+  //     // componentProps: {
+  //     placeholder: '请选择日期',
+  //     options: [
+  //       {
+  //         label: '星期一',
+  //         value: 1
+  //       },
+  //       {
+  //         label: '星期二',
+  //         value: 2
+  //       },
+  //       {
+  //         label: '星期三',
+  //         value: 3
+  //       },
+  //       {
+  //         label: '星期四',
+  //         value: 4
+  //       },
+  //       {
+  //         label: '星期五',
+  //         value: 5
+  //       },
+  //       {
+  //         label: '星期六',
+  //         value: 6
+  //       },
+  //       {
+  //         label: '星期日',
+  //         value: 7
+  //       }
+  //     ]
+  //     // },
+  //     // placeholder: '请选择结束时间',
+
+  //   },
+  //   show: ({ values }) => {
+  //     return values.ConditionType == 4 && values.checkTime == 1 && values.checkTimeSymbol == 'between';
+  //   }
+  // },
   {
     field: 'delete',
     label: '',
     component: 'Input',
     slot: 'deleteSlot',
     colProps: {
-      span: 3
+      span: 1
     }
-  }
+  },
 ]
 const showForm = ref(false)
 const schemas2: FormSchema[] = [
@@ -1082,7 +1876,7 @@ export default defineComponent({
     // const { CompObj } = props;
     const [
       register,
-      { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue, validate: validateTaskForm, removeSchemaByFiled }
+      { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue, validate: validateTaskForm, removeSchemaByFiled, resetFields }
     ] = useForm({
       labelWidth: 0,
       showActionButtonGroup: false,
@@ -1116,7 +1910,8 @@ export default defineComponent({
         appendSchemaByField: appendMySchemaByField,
         setFieldsValue: setMyFieldsValue,
         getFieldsValue: getMyFieldsValue,
-        removeSchemaByFiled: removeMySchemaByFiled
+        removeSchemaByFiled: removeMySchemaByFiled,
+        resetFields: resetMyFields
       }
     ] = useForm({
       labelWidth: 0,
@@ -1180,7 +1975,7 @@ export default defineComponent({
       await nextTick()
       return form as FormActionType
     }
-    async function filter_Device(item, index, cindex) {
+    async function filter_Device(item, index, cindex, type) {
       FIndex.value = index
       let m = 0
       for (let i = 0; i < add.value.length; i++) {
@@ -1196,11 +1991,21 @@ export default defineComponent({
         }
       }
       console.log(ZIndex.value, FIndex.value)
-      openModal(true, {
-        item: item,
-        itemindex: index,
-        isUpdate: true
-      })
+      if (type) {
+        openModal(true, {
+          item: item,
+          itemindex: index,
+          isUpdate: true,
+          type: 1
+        })
+      } else {
+        openModal(true, {
+          item: item,
+          itemindex: index,
+          isUpdate: true
+        })
+      }
+
     }
 
     function handel_Add() {
@@ -1247,7 +2052,7 @@ export default defineComponent({
     //   }
     // }
     // callbackFunc = callback(3)
-    async function handleSuccess(params) {
+    async function handleSuccess(params, type) {
       console.log(params, 'paramsparamsparamsparams')
       console.log(resultList.value, '4564575645645645646545')
       const obj = { ...params }
@@ -1274,12 +2079,42 @@ export default defineComponent({
           pp = 0
         }
 
-        formElRef.value[Number(ZIndex.value)].setFieldsValue({
-          DeviceName:obj[0][0].DeviceName,
-          DeviceId: obj[0][0].DeviceId,
-          DeviceSerial:obj[0][0].DeviceSerial,
-          // DeviceId:obj[0][0].DeviceId
-        })
+        if (type) {
+          // console.log(result)
+          // debugger;
+          pp = 3
+          formElRef.value[Number(ZIndex.value)].setFieldsValue(
+            {
+              DeviceName: result[0].DeviceName,
+              DeviceId: result[0].DeviceId,
+              DeviceSerial: result[0].DeviceSerial,
+              RegionId:result[0].RegionId
+            }
+            // [
+            //   {
+            //     field: 'DeviceName',
+            //     defaultValue: result[0].DeviceName,
+            //   },
+            //   {
+            //     field: 'DeviceId',
+            //     defaultValue: result[0].DeviceId,
+            //   },
+            //   {
+            //     field: 'DeviceSerial',
+            //     defaultValue: result[0].DeviceSerial,
+            //   },
+            // ]
+          );
+        } else {
+          formElRef.value[Number(ZIndex.value)].setFieldsValue({
+            DeviceName: obj[0][0].DeviceName,
+            DeviceId: obj[0][0].DeviceId,
+            DeviceSerial: obj[0][0].DeviceSerial,
+            RegionId:obj[0][0].RegionId
+          })
+        }
+
+
         let myobj: any = [];
         FormSchema.forEach(async (item, index) => {
           myobj.push({
@@ -1290,7 +2125,44 @@ export default defineComponent({
 
         if (pp == 1) {
           // debugger;
-          console.log(myobj)
+          const aa: any = []
+          aa.push({
+            ConditionType: formElRef.value[Number(ZIndex.value)].getFieldsValue().ConditionType
+          })
+          aa.push({
+            DeviceId: formElRef.value[Number(ZIndex.value)].getFieldsValue().DeviceId
+          })
+          aa.push({
+            DeviceName: formElRef.value[Number(ZIndex.value)].getFieldsValue().DeviceName
+          })
+          // aa.push({
+          //   DeviceSerial: formElRef.value[Number(ZIndex.value)].getFieldsValue().DeviceSerial
+          // })
+          formElRef.value[Number(ZIndex.value)].resetFields()
+          // formElRef.value[Number(ZIndex.value)].resetFields()
+          // debugger;
+
+          formElRef.value[Number(ZIndex.value)].setFieldsValue({
+            ConditionType: aa[0].ConditionType,
+            // DeviceName: aa[2].DeviceName,
+            // DeviceId: aa[1].DeviceId,
+            // DeviceSerial: aa[3].DeviceSerial,
+          });
+          let objj = [
+            [
+              {
+                DeviceId: aa[1].DeviceId
+              }
+            ],
+            {
+              itemindex: 1
+            }
+
+          ]
+          await handleSuccess(objj, 1)
+          return;
+        } else if (pp == 3) {
+
           formElRef.value[Number(ZIndex.value)].updateSchema({
             field: 'DeviceField',
             componentProps: { options: myobj },
@@ -1301,7 +2173,7 @@ export default defineComponent({
             component: 'Select',
             label: '',
             colProps: {
-              span: 3
+              span: 4
             },
             componentProps: {
               fieldNames: {
@@ -1321,39 +2193,42 @@ export default defineComponent({
         FormSchema.forEach(async (item, index) => {
 
           // slide
-          if (item.model.view == 'slide') {
+          if (item.model.view == 'slide' || item.model.view == 'label') {
 
             formElRef.value[Number(ZIndex.value)].appendSchemaByField({
               field: item.model.field,
-              component: 'Slider',
+              component: 'InputNumber',
               label: '',
-              defaultValue: item.model['default-value'],
+              // defaultValue: item.model['default-value'],
               colProps: {
-                span: 3
+                span: 4
               },
               componentProps: {
                 placeholder: item.model.name,
-                fieldNames: {
-                  label: 'name',
-                  key: 'value',
-                  value: 'value'
-                },
-                options: item.model['select-item']
+                // fieldNames: {
+                //   label: 'name',
+                //   key: 'value',
+                //   value: 'value'
+                // },
+                // options: item.model['select-item']
               },
               ifShow: ({ values }) => {
-                return values.DeviceField == item.model.field && values.ConditionType == '1'
+                console.log(values)
+                return values.DeviceField == item.model.field && values.ConditionType == 1
               }
             }, 'DeviceField')
 
             // 大于小于
             formElRef.value[Number(ZIndex.value)].appendSchemaByField({
-              field: 'equation',
+              field: item.model.field + 'equation',
               component: 'Select',
               label: '',
               colProps: {
                 span: 3
               },
+              // defaultValue:'=',
               componentProps: {
+                defaultValue: '=',
                 options: [
                   { label: '>', value: '>' },
                   { label: '<', value: '<' },
@@ -1363,7 +2238,9 @@ export default defineComponent({
                 ]
               },
               ifShow: ({ values }) => {
-                return values.DeviceField == item.model.field && values.ConditionType == '1'
+
+                console.log(item, 'DeviceFieldDeviceFieldDeviceField')
+                return values.DeviceField == item.model.field && values.ConditionType == 1
               }
             }, 'DeviceField')
           } else {
@@ -1373,7 +2250,7 @@ export default defineComponent({
               label: '',
               defaultValue: item.model['default-value'],
               colProps: {
-                span: 3
+                span: 4
               },
               componentProps: {
                 placeholder: item.model.name,
@@ -1385,13 +2262,14 @@ export default defineComponent({
                 options: item.model['select-item']
               },
               ifShow: ({ values }) => {
-                return values.DeviceField == item.model.field
+                return values.DeviceField == item.model.field && values.ConditionType == 1
               }
             }, 'DeviceField')
           }
 
         })
       }
+      // 父
       else if (typeof result[0]?.DeviceModel !== 'undefined' && !Reflect.has(obj[1], 'item')) {
         let FormSchema = JSON.parse(result[0]?.DeviceModel)
         // console.log(FformElRef.value[Number(FIndex.value)].getFieldsValue().device,obj[0][0].DeviceId)
@@ -1402,11 +2280,43 @@ export default defineComponent({
         if (!FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceId) {
           pp = 0
         }
-        FformElRef.value[Number(FIndex.value)].setFieldsValue({
-          DeviceName:obj[0][0].DeviceName,
-          DeviceId: obj[0][0].DeviceId,
-          DeviceSerial:obj[0][0].DeviceSerial,
-        })
+
+        if (type) {
+          // console.log(result)
+          // debugger;
+          pp = 3
+          FformElRef.value[Number(FIndex.value)].setFieldsValue(
+            {
+              DeviceName: result[0].DeviceName,
+              DeviceId: result[0].DeviceId,
+              DeviceSerial: result[0].DeviceSerial,
+              RegionId:result[0].RegionId
+            }
+            // [
+            //   {
+            //     field: 'DeviceName',
+            //     defaultValue: result[0].DeviceName,
+            //   },
+            //   {
+            //     field: 'DeviceId',
+            //     defaultValue: result[0].DeviceId,
+            //   },
+            //   {
+            //     field: 'DeviceSerial',
+            //     defaultValue: result[0].DeviceSerial,
+            //   },
+            // ]
+          );
+        } else {
+          FformElRef.value[Number(FIndex.value)].setFieldsValue({
+            DeviceName: obj[0][0].DeviceName,
+            DeviceId: obj[0][0].DeviceId,
+            DeviceSerial: obj[0][0].DeviceSerial,
+            RegionId:obj[0][0].RegionId
+          })
+        }
+
+
         let myobj: any = [];
         FormSchema.forEach(async (item, index) => {
           myobj.push({
@@ -1417,7 +2327,45 @@ export default defineComponent({
         console.log(FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceId, 'FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceField')
         if (pp == 1) {
           // debugger;
-          console.log(myobj)
+          const aa: any = []
+          aa.push({
+            ConditionType: FformElRef.value[Number(FIndex.value)].getFieldsValue().ConditionType
+          })
+          aa.push({
+            DeviceId: FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceId
+          })
+          aa.push({
+            DeviceName: FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceName
+          })
+          // aa.push({
+          //   DeviceSerial: FformElRef.value[Number(FIndex.value)].getFieldsValue().DeviceSerial
+          // })
+          FformElRef.value[Number(FIndex.value)].resetFields()
+          // FformElRef.value[Number(FIndex.value)].resetFields()
+          // debugger;
+
+          FformElRef.value[Number(FIndex.value)].setFieldsValue({
+            ConditionType: aa[0].ConditionType,
+            // DeviceName: aa[2].DeviceName,
+            // DeviceId: aa[1].DeviceId,
+            // DeviceSerial: aa[3].DeviceSerial,
+          });
+          let objj = [
+            [
+              {
+                DeviceId: aa[1].DeviceId
+              }
+            ],
+            [
+              {
+                // itemindex: 0
+              }
+            ]
+          ]
+          await handleSuccess(objj, 1)
+          return;
+        } else if (pp == 3) {
+
           FformElRef.value[Number(FIndex.value)].updateSchema({
             field: 'DeviceField',
             componentProps: { options: myobj },
@@ -1428,7 +2376,7 @@ export default defineComponent({
             component: 'Select',
             label: '',
             colProps: {
-              span: 3
+              span: 4
             },
             componentProps: {
               fieldNames: {
@@ -1444,28 +2392,28 @@ export default defineComponent({
           }, 'DeviceName')
         }
 
-        FormSchema.forEach((item, index) => {
+        for (let i = 0, item; item = FormSchema[i++];) {
           // 使用updateSchema添加
-
+          console.log(item)
           // slide
-          if (item.model.view == 'slide') {
+          if (item.model.view == 'slide' || item.model.view == 'label') {
 
             FformElRef.value[Number(FIndex.value)].appendSchemaByField({
               field: item.model.field,
-              component: 'Slider',
+              component: 'InputNumber',
               label: '',
-              defaultValue: item.model['default-value'],
+              // defaultValue: item.model['default-value'],
               colProps: {
                 span: 3
               },
               componentProps: {
                 placeholder: item.model.name,
-                fieldNames: {
-                  label: 'name',
-                  key: 'value',
-                  value: 'value'
-                },
-                options: item.model['select-item']
+                // fieldNames: {
+                //   label: 'name',
+                //   key: 'value',
+                //   value: 'value'
+                // },
+                // options: item.model['select-item']
               },
               ifShow: ({ values }) => {
                 console.log(values)
@@ -1475,13 +2423,15 @@ export default defineComponent({
 
             // 大于小于
             FformElRef.value[Number(FIndex.value)].appendSchemaByField({
-              field: 'equation',
+              field: item.model.field + 'equation',
               component: 'Select',
               label: '',
               colProps: {
                 span: 3
               },
+              // defaultValue:'=',
               componentProps: {
+                defaultValue: '=',
                 options: [
                   { label: '>', value: '>' },
                   { label: '<', value: '<' },
@@ -1491,34 +2441,38 @@ export default defineComponent({
                 ]
               },
               ifShow: ({ values }) => {
-                // console.log(values,'DeviceFieldDeviceFieldDeviceField')
+
+                console.log(item, 'DeviceFieldDeviceFieldDeviceField')
                 return values.DeviceField == item.model.field && values.ConditionType == '1'
               }
             }, 'DeviceField')
 
 
           } else {
-            FformElRef.value[Number(FIndex.value)].appendSchemaByField({
-              field: item.model.field,
-              component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
-              label: '',
-              defaultValue: item.model['default-value'],
-              colProps: {
-                span: 3
-              },
-              componentProps: {
-                placeholder: item.model.name,
-                fieldNames: {
-                  label: 'name',
-                  key: 'value',
-                  value: 'value'
+            if (item.model.view) {
+              FformElRef.value[Number(FIndex.value)].appendSchemaByField({
+                field: item.model.field,
+                component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
+                label: '',
+                defaultValue: item.model['default-value'],
+                colProps: {
+                  span: 3
                 },
-                options: item.model['select-item']
-              },
-              ifShow: ({ values }) => {
-                return values.DeviceField == item.model.field
-              }
-            }, 'DeviceField')
+                componentProps: {
+                  placeholder: item.model.name,
+                  fieldNames: {
+                    label: 'name',
+                    key: 'value',
+                    value: 'value'
+                  },
+                  options: item.model['select-item']
+                },
+                ifShow: ({ values }) => {
+                  return values.DeviceField == item.model.field && values.ConditionType == 1
+                }
+              }, 'DeviceField')
+            }
+
           }
 
           // appendSchemaByField(
@@ -1546,11 +2500,50 @@ export default defineComponent({
           //   },
           //   'DeviceField'
           // )
-        })
+        }
       } else {
         console.log('1111')
       }
     }
+
+    async function handleSuccessFK(params) {
+      // console.log(params, 'paramsparamsparamsparams')
+      // console.log(resultList.value, '4564575645645645646545')
+      const obj = { ...params }
+      // 根据所选择的设备进行设备id查询
+      const result = await deviceInfo({
+        Id: obj[0][0].DeviceId
+      })
+      // 判断对象是否包含该属性
+      // Reflect.has(obj[1], 'itemindex')
+      if (obj[1].hasOwnProperty('itemindex')) {
+        // debugger;
+
+        formElRef.value[Number(ZIndex.value)].setFieldsValue(
+          {
+            DeviceName: result[0].DeviceName,
+            DeviceId: result[0].DeviceId,
+            DeviceSerial: result[0].DeviceSerial,
+            RegionId:result[0].RegionId
+          }
+        )
+      }
+      // 父
+      else if (!Reflect.has(obj[1], 'item')) {
+
+        FformElRef.value[Number(FIndex.value)].setFieldsValue(
+          {
+            DeviceName: result[0].DeviceName,
+            DeviceId: result[0].DeviceId,
+            DeviceSerial: result[0].DeviceSerial,
+            RegionId:result[0].RegionId
+          }
+        )
+      } else {
+        console.log('1111')
+      }
+    }
+
     function changeLabel3() {
       updateSchema({
         field: 'field3',
@@ -1577,13 +2570,22 @@ export default defineComponent({
       // removeSchemaByField('field11');
     }
     // 选择设备
-    function e_Device(index) {
+    function e_Device(index, type) {
       FIndex.value = index
       ZIndex.value = ''
-      //  打开弹窗
-      openModal(true, {
-        isUpdate: true
-      })
+      if (type) {
+        //  打开弹窗
+        openModal(true, {
+          isUpdate: true,
+          type: 1
+        })
+      } else {
+        //  打开弹窗
+        openModal(true, {
+          isUpdate: true
+        })
+      }
+
     }
     // 添加规则
     async function addRule(index1) {
@@ -1622,6 +2624,8 @@ export default defineComponent({
 
     function EndData() {
       DeviceIdArr.value = []
+      VisitorIdArr.value = []
+      RegionIdArr.value = []
       console.log(FformElRef.value)
       const Fform = unref(FformElRef)
       let FfromArr: any = []
@@ -1629,11 +2633,13 @@ export default defineComponent({
       if (Fform != null) {
         for (let i = 0; i < FformElRef.value.length; i++) {
           if (JSON.stringify(FformElRef.value[i].getFieldsValue()) === '{}') {
-            message.warn('请选择完整条件');
-            return false;
+            // message.warn('请完善条件配置');
+            return 1;
           }
-          if (FformElRef.value[i].getFieldsValue().ConditionType == '1') {
+          if (FformElRef.value[i].getFieldsValue().ConditionType == 1 || FformElRef.value[i].getFieldsValue().ConditionType == 2) {
             DeviceIdArr.value.push(Number(FformElRef.value[i].getFieldsValue().DeviceId))
+            console.log('FformElRef.value[i].getFieldsValue().RegionId',FformElRef.value[i].getFieldsValue().RegionId)
+            RegionIdArr.value.push(Number(FformElRef.value[i].getFieldsValue().RegionId))
           }
           FfromArr.push(FformElRef.value[i].getFieldsValue())
         }
@@ -1645,11 +2651,12 @@ export default defineComponent({
       if (form != null) {
         for (let i = 0; i < formElRef.value.length; i++) {
           if (JSON.stringify(formElRef.value[i].getFieldsValue()) === '{}') {
-            message.warn('请选择完整条件');
-            return false
+            // message.warn('请完善条件配置');
+            return 1
           }
-          if (formElRef.value[i].getFieldsValue().ConditionType == '1') {
+          if (formElRef.value[i].getFieldsValue().ConditionType == 1 || formElRef.value[i].getFieldsValue().ConditionType == 2) {
             DeviceIdArr.value.push(Number(formElRef.value[i].getFieldsValue().DeviceId))
+            RegionIdArr.value.push(Number(formElRef.value[i].getFieldsValue().RegionId))
           }
           fromArr.push(formElRef.value[i].getFieldsValue())
         }
@@ -1679,6 +2686,153 @@ export default defineComponent({
 
       for (let o = 0; o < enddata.length; o++) {
         for (let p = 0; p < enddata[o].length; p++) {
+          if (enddata[o][p].ConditionType == 1) {
+            if (!enddata[o][p].DeviceField) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+            var str = enddata[o][p]['DeviceField'].substr(0, 6)
+
+            if (!enddata[o][p][enddata[o][p]['DeviceField']] && str !== 'switch') {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+
+            // console.log(enddata[o][p]['DeviceField']+'equation')
+            if (enddata[o][p][enddata[o][p]['DeviceField']] === true || enddata[o][p][enddata[o][p]['DeviceField']] === false) {
+              enddata[o][p].Gval = 'value==' + enddata[o][p][enddata[o][p]['DeviceField']]
+            } else if (!enddata[o][p][enddata[o][p]['DeviceField']] && str == 'switch') {
+              enddata[o][p].Gval = 'value==false'
+            } else if (!enddata[o][p][enddata[o][p]['DeviceField'] + 'equation']) {
+              enddata[o][p].Gval = 'value==' + enddata[o][p][enddata[o][p]['DeviceField']]
+            } else {
+              enddata[o][p].Gval = 'value' + enddata[o][p][enddata[o][p]['DeviceField'] + 'equation'] + enddata[o][p][enddata[o][p]['DeviceField']]
+            }
+
+            enddata[o][p].ConditionType = Number(enddata[o][p].ConditionType)
+          } else if (enddata[o][p].ConditionType == 2) {
+            if (!enddata[o][p].DeviceName) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+            if (!enddata[o][p].visitor) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+            if (enddata[o][p].visitor == 1 && !enddata[o][p].VisitorType) {
+              // message.warn('请选择完整条件')
+              return 1;
+            } else if (enddata[o][p].visitor == 2 && !enddata[o][p].plateNumber) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+
+            if (enddata[o][p].visitor == 1) {
+              VisitorIdArr.value.push(enddata[o][p].VisitorType)
+            }
+          } else if (enddata[o][p].ConditionType == 4) {
+            if (!enddata[o][p].checkTime) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+            if (!enddata[o][p].checkTimeSymbol) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+
+            if (enddata[o][p].checkTime == 1) {
+              if (enddata[o][p].checkTimeSymbol !== 'between') {
+                if (!enddata[o][p].checkDateWeek) {
+                  // message.warn('请选择完整条件')
+                  return 1;
+                }
+              } else {
+                if (!enddata[o][p].StartTimeWeek || !enddata[o][p].EndTimeWeek) {
+                  // message.warn('请选择完整条件')
+                  return 1;
+                }
+              }
+            } else {
+              if (enddata[o][p].checkTimeSymbol !== 'between') {
+                if (!enddata[o][p].checkDate) {
+                  // message.warn('请选择完整条件')
+                  return 1;
+                }
+              } else {
+                if (!enddata[o][p].checkDateRange) {
+                  // message.warn('请选择完整条件')
+                  return 1;
+                }
+              }
+            }
+
+            if (enddata[o][p].checkTimeSymbol !== 'between' && enddata[o][p].checkTimeSymbol !== '==' && enddata[o][p].checkTimeSymbol !== '<=') {
+              enddata[o][p].Gval = 'value' + enddata[o][p].checkTimeSymbol + Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000
+            } else if (enddata[o][p].checkTimeSymbol == '==') {
+              enddata[o][p].Gval = 'value<=' + ((Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000) + 86399) + '&&' + 'value>=' + Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000
+            }else if(enddata[o][p].checkTimeSymbol == '<='){
+              enddata[o][p].Gval = 'value<=' + ((Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000) + 86399)
+            }
+            else {
+              // console.log(enddata[o][p].checkDateRange[1])
+              enddata[o][p].Gval = 'value<=' + ((Date.parse(enddata[o][p].checkDateRange[1]).valueOf() / 1000) + 86399) + '&&' + 'value>=' + Date.parse(enddata[o][p].checkDateRange[0]).valueOf() / 1000
+            }
+
+          } else if (enddata[o][p].ConditionType == 5) {
+            if (!enddata[o][p].checkTime) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+            if (!enddata[o][p].checkTimeSymbol) {
+              // message.warn('请选择完整条件')
+              return 1;
+            }
+            // checkTime
+            // if (enddata[o][p].checkTime == 1) {
+            //   if (enddata[o][p].checkTimeSymbol !== 'between') {
+            //     if (!enddata[o][p].checkDateWeek) {
+            //       message.warn('请选择完整条件')
+            //       return;
+            //     }
+            //   } else {
+            //     if (!enddata[o][p].StartTimeWeek || !enddata[o][p].EndTimeWeek) {
+            //       message.warn('请选择完整条件')
+            //       return;
+            //     }
+            //   }
+            // } else {
+            //   if (enddata[o][p].checkTimeSymbol !== 'between') {
+            //     if (!enddata[o][p].checkDate) {
+            //       message.warn('请选择完整条件')
+            //       return;
+            //     }
+            //   } else {
+            //     if (!enddata[o][p].checkDateRange) {
+            //       message.warn('请选择完整条件')
+            //       return;
+            //     }
+            //   }
+            // }
+            if (enddata[o][p].checkTimeSymbol !== 'between' && enddata[o][p].checkTimeSymbol !== '==') {
+              if (!enddata[o][p].ExecuteTime) {
+                // message.warn('请选择完整条件')
+                return 1;
+              }
+              enddata[o][p].Gval = 'value' + enddata[o][p].checkTimeSymbol + Date.parse('2006-01-02 ' + enddata[o][p].ExecuteTime).valueOf() / 1000
+            } else if (enddata[o][p].checkTimeSymbol == '==') {
+              enddata[o][p].Gval = 'value<=' + ((Date.parse('2006-01-02 ' + enddata[o][p].ExecuteTime).valueOf() / 1000) + 5) + '&&' + 'value>=' + (Date.parse('2006-01-02 ' + enddata[o][p].ExecuteTime).valueOf() / 1000)
+            } else {
+              if (!enddata[o][p].EndTime || !enddata[o][p].StartTime) {
+                // message.warn('请选择完整条件')
+                return 1;
+              }
+              enddata[o][p].Gval = 'value<' + Date.parse('2006-01-02 ' + enddata[o][p].EndTime).valueOf() / 1000 + '&&' + 'value>' + Date.parse('2006-01-02 ' + enddata[o][p].StartTime).valueOf() / 1000
+            }
+
+
+          }
+
+
           if (p == 0) {
 
           } else {
@@ -1686,22 +2840,11 @@ export default defineComponent({
             enddata[o][p].Op = enddata[o][p].Option == false ? 'or' : 'and'
           }
 
-          // console.log(enddata[o][p][enddata[o][p]['DeviceField']])
-          if (enddata[o][p][enddata[o][p]['DeviceField']] === true || enddata[o][p][enddata[o][p]['DeviceField']] === false) {
-            enddata[o][p].Gval = 'value==' + enddata[o][p].switch
-          } else if (enddata[o][p]['DeviceField'] == 'switch' && !enddata[o][p][enddata[o][p]['DeviceField']]) {
-            enddata[o][p].Gval = 'value==false'
-          } else if (!enddata[o][p].equation) {
-            enddata[o][p].Gval = 'value==' + enddata[o][p][enddata[o][p]['DeviceField']]
-          } else {
-            enddata[o][p].Gval = 'value' + enddata[o][p].equation + enddata[o][p][enddata[o][p]['DeviceField']]
-          }
-
-          enddata[o][p].ConditionType = Number(enddata[o][p].ConditionType)
         }
       }
 
-      console.log(add.value)
+      console.log(enddata)
+
       return enddata
 
     }
@@ -1716,6 +2859,10 @@ export default defineComponent({
       //   ...data.obj,
       // });
       add.value = []
+      FformArr.value = []
+      formArr.value = []
+      DeviceIdArr.value = []
+      RegionIdArr.value = []
       // console.log(add.value )
       // console.log(EndData())
       // let a = [
@@ -1748,7 +2895,7 @@ export default defineComponent({
       //   ]
       // ]
       let aobj: any = props.CompObj
-      // console.log(aobj[k])
+      console.log(props.CompObj, 'props.CompObjprops.CompObjprops.CompObjprops.CompObj')
       let a: any = []
       for (let k in aobj) {
         console.log(aobj[k])
@@ -1819,35 +2966,39 @@ export default defineComponent({
           });
         }
 
-        for (let o = 0; o < formElRef.value.length; o++) {
-          console.log(formElRef.value)
-          formElRef.value[o].setFieldsValue({
-            ...formArr.value[o],
-          });
+        if (formElRef.value) {
+          for (let o = 0; o < formElRef.value.length; o++) {
+            console.log(formElRef.value)
+            formElRef.value[o].setFieldsValue({
+              ...formArr.value[o],
+            });
 
-          let objj = [
-            [
+            let objj = [
+              [
+                {
+                  DeviceId: formArr.value[o].DeviceId
+                }
+              ],
               {
-                DeviceId: formArr.value[o].DeviceId
+                itemindex: 1
               }
-            ],
-            {
-              itemindex: 1
-            }
 
-          ]
-          console.log(objj[1].hasOwnProperty('itemindex'), '156456456456')
-          ZIndex.value = o
-          // debugger;
-          await handleSuccess(objj)
+            ]
+            console.log(objj[1].hasOwnProperty('itemindex'), '156456456456')
+            ZIndex.value = o
+            // debugger;
+            await handleSuccess(objj)
 
-          // setTimeout(() => {
-          formElRef.value[o].setFieldsValue({
-            ...formArr.value[o],
-          });
-          // }, 500)
+            // setTimeout(() => {
+            formElRef.value[o].setFieldsValue({
+              ...formArr.value[o],
+            });
+            // }, 500)
 
+          }
         }
+
+
 
 
       })
@@ -1860,9 +3011,12 @@ export default defineComponent({
 
     // })
 
+    function filterOption(input: string, option: any) {
+      console.log(option, input)
+      return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    }
 
-
-    defineExpose({ EndData, isShake, DeviceIdArr });
+    defineExpose({ EndData, isShake, DeviceIdArr, VisitorIdArr,RegionIdArr });
 
     return {
       formData,
@@ -1913,9 +3067,13 @@ export default defineComponent({
       FIndex,
       ZIndex,
       DeviceIdArr,
+      VisitorIdArr,
+      RegionIdArr,
       FformArr,
       formArr,
-      huix
+      huix,
+      filterOption,
+      handleSuccessFK
     }
   }
 
@@ -1930,7 +3088,12 @@ export default defineComponent({
   align-items: center;
   justify-content: flex-start;
 }
- 
+
+::v-deep(.ant-form-item) {
+  padding: 5px;
+  background: #F3F3F3;
+}
+
 .col_flex {
   display: flex;
   align-items: center;
@@ -1946,4 +3109,25 @@ export default defineComponent({
   position: relative;
   width: 95%;
 }
+
+.pp .ant-switch {
+  // background-color: none !important;
+  background-color: rgba(1, 1, 1, 0) !important;
+  border: 3px solid #0960bd !important;
+  line-height: 2px;
+
+  ::v-deep(.ant-switch-handle) {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::v-deep(.ant-switch-handle::before) {
+    background-color: #0960bd !important;
+  }
+
+  ::v-deep(.ant-switch-inner) {
+    color: #0960bd !important;
+  }
+}
+
 </style>

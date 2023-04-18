@@ -1,7 +1,8 @@
 <template>
   <div class="md:flex">
-    <Card size="default" style="" :loading="loading" title="设备数据" class=" w-full !md:mt-0">
+    <Card size="default" style="" :loading="loading" title="工单数据" class=" w-full !md:mt-0">
       <template #extra>
+        <DatePicker v-model:value="value1" @change="changeData"></DatePicker>
         <!-- <Tag color="#222222">{{ 1 }}</Tag> -->
       </template>
 
@@ -33,7 +34,10 @@ import { ref,onMounted } from 'vue';
 import { CountTo } from '@/components/CountTo/index'
 import { TaskTicketCountDataApi } from '@/api/sys/workorder'
 // import { Icon } from '@/components/Icon'
-import { Tag, Card } from 'ant-design-vue'
+import dayjs, { Dayjs } from 'dayjs'
+import { Tag, Card,DatePicker } from 'ant-design-vue'
+
+const value1 = ref<Dayjs>()
 
 defineProps({
   loading: {
@@ -42,14 +46,22 @@ defineProps({
 })
 
 onMounted(()=>{
+  value1.value = dayjs(new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf())
+
   getfacilityData()
 })
 
 // StartTime:new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf(),
 //     EndTime:new Date(new Date().getTime()).valueOf(),
 
-function getfacilityData(){
-  var NoticeTime = new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000;
+function getfacilityData(time){
+  var NoticeTime
+  if (time) {
+    NoticeTime = time
+  } else {
+    NoticeTime = new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf()/1000;
+  }
+
   TaskTicketCountDataApi({'NoticeTime':NoticeTime}).then(res=>{
     deviceList.value[0].value = res?.TaskTicketTotal || 0
 
@@ -60,6 +72,12 @@ function getfacilityData(){
     deviceList.value[3].value = res?.TaskTicketTotal || 0 - res?.CloseTaskTicketTotal || 0
     
   })
+}
+
+function changeData(e, key) {
+
+  getfacilityData(new Date(key).valueOf()/1000)
+
 }
 
 const deviceList = ref([

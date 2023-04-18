@@ -20,9 +20,20 @@
             <div>
               {{ item.fuTitle }}
             </div>
-            <div class="pl-5 text-green-500 ">
+            <div class="pl-3 text-green-500 flex items-center">
               <CountTo :startVal="1" :endVal="item.fuValue" class="text-lg" />
-              <span v-if="index == 3" class="text-lg"> %</span>
+              <span v-if="index == 3" class="text-lg pr-1"> %</span>
+              <div v-if="index == 3 && item.fuValue<0"><Icon
+                icon="mdi:triangle"
+                :size="14"
+                style="transform:scale(1,-1);"
+                color="green"
+              /></div>
+              <div v-if="index == 3 && item.fuValue>0"><Icon
+                icon="mdi:triangle"
+                :size="14"
+                color="red"
+              /></div>
             </div>
           </div>
         </div>
@@ -35,7 +46,7 @@
 import { ref, onMounted } from 'vue';
 import { CountTo } from '@/components/CountTo/index'
 import { facilityDataApi } from '@/api/facility/facility'
-// import { Icon } from '@/components/Icon'
+import { Icon } from '@/components/Icon'
 import dayjs, { Dayjs } from 'dayjs'
 import { Tag, Card, DatePicker } from 'ant-design-vue'
 // import { TreeSelect,  } from 'ant-design-vue';

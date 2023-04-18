@@ -2,16 +2,35 @@
   <PageWrapper>
     <BasicForm @register="register">
     </BasicForm>
+    <Modal v-model:visible="dialogVisible" title="选择日期">
+      <div class="number-picker-body">
+        <div v-for="n in 31" :key="n" class="number-picker-item" :class="{ selected: isSelected(n) }"
+          @click="toggleSelect(n)">
+          {{ n }}
+        </div>
+      </div>
+      <template #footer>
+        <a-button type="primary" @click="handleConfirm">确定</a-button>
+        <a-button @click="dialogVisible = false, selectedNumbers = []">取消</a-button>
+      </template>
+    </Modal>
+
   </PageWrapper>
 </template>
 <script lang="tsx">
-import { defineComponent, defineExpose, watch, onMounted } from 'vue';
-
+import { defineComponent, defineExpose, watch, onMounted, ref, toRefs, reactive } from 'vue';
+import { Modal } from 'ant-design-vue'
 import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 import { CollapseContainer } from '@/components/Container/index';
 import { PageWrapper } from '@/components/Page';
 import { Icon } from '@/components/Icon';
 import AccountTable from './AccountTable.vue';
+const state = reactive({
+  dialogVisible: false,
+  selectedDates: [],
+})
+const selectedNumbers = ref([])
+const cselectedNumbers = ref([])
 const schemas: FormSchema[] = [{
   field: 'ConditionItems',
   component: 'Select',
@@ -41,10 +60,10 @@ const schemas: FormSchema[] = [{
     mode: 'multiple',
     placeholder: '请选择时间',
     options: [
-      // {
-      //   label: '每天',
-      //   value: '7',
-      // },
+      {
+        label: '每天',
+        value: null,
+      },
       {
         label: '周一',
         value: '1',
@@ -71,9 +90,10 @@ const schemas: FormSchema[] = [{
       },
       {
         label: '周日',
-        value: '0',
+        value: '7',
       }
-    ]
+    ],
+    maxTagCount:2,
   },
   colProps: { span: 4 },
   ifShow: ({ values }) => {
@@ -86,16 +106,23 @@ const schemas: FormSchema[] = [{
   labelWidth: '10px',
   // component: 'DatePicker',
   // componentProps: {
+
   //   format: 'DD',
   //   valueFormat: 'DD',
   //   // placeholder: ['开始时间', '结束时间'],
   //   // showTime: { format: 'HH:mm:ss' },
-  //   placeholder: '请选择时间',
+  //   placeholder: '请选择11时间',
   // },
   component: 'Select',
   componentProps: {
     placeholder: '请选择时间',
     mode: 'multiple',
+    onClick: (value) => {
+      // console.log(cselectedNumbers.value)
+      state.dialogVisible = true
+      selectedNumbers.value = cselectedNumbers.value
+    },
+    maxTagCount:2,
     // options: [
     //   {
     //     label: '1',
@@ -111,7 +138,7 @@ const schemas: FormSchema[] = [{
     //   },
     // ]
   },
-  colProps: { span: 4 },
+  colProps: { span: 5 },
   ifShow: ({ values }) => {
     return values.ConditionItems == 2;
   }
@@ -216,11 +243,11 @@ const schemas: FormSchema[] = [{
     placeholder: '请选择',
     options: [{
       label: '时',
-      value: '1',
+      value: 1,
       key: '1'
     }, {
       label: '分',
-      value: '2',
+      value: 2,
       key: '2'
     }]
   },
@@ -233,7 +260,7 @@ const schemas: FormSchema[] = [{
   component: 'Select',
   label: ' ',
   labelWidth: '10px',
-  defaultValue:'1',
+  defaultValue: '1',
   colProps: {
     span: 3
   },
@@ -243,16 +270,18 @@ const schemas: FormSchema[] = [{
       label: '执行一次',
       value: '1',
       key: '1'
-    }, {
-      label: '执行两次',
-      value: '2',
-      key: '2'
     },
-    {
-      label: '执行三次',
-      value: '3',
-      key: '3'
-    }]
+      //  {
+      //   label: '执行两次',
+      //   value: '2',
+      //   key: '2'
+      // },
+      // {
+      //   label: '执行三次',
+      //   value: '3',
+      //   key: '3'
+      // }
+    ]
   },
   show: ({ values }) => {
     return (values.ConditionItems == 2 || values.ConditionItems == 1) && values.ExecuteNum == 2;
@@ -262,7 +291,7 @@ const schemas: FormSchema[] = [{
 ];
 
 export default defineComponent({
-  components: { BasicForm, CollapseContainer, PageWrapper, Icon, AccountTable },
+  components: { BasicForm, CollapseContainer, PageWrapper, Icon, AccountTable, Modal },
   props: {
     CompObj: {
       type: Object,
@@ -297,23 +326,25 @@ export default defineComponent({
     function handleSuccess() {
 
     }
-    // onMounted(() => {
-    //   huix()
-    // })
+    onMounted(() => {
+      selectedNumbers.value = []
+      cselectedNumbers.value = []
+      // let arr: any = []
+      // for (let i = 1; i <= 31; i++) {
+      //   let obj = {
+      //     label: i,
+      //     value: i
+      //   }
+      //   arr.push(obj)
+      // }
+      // updateSchema({
+      //   field: 'ExecuteDateWeek',
+      //   componentProps: { options: arr },
+      // });
+    })
     function huix() {
-      console.log(props.CompObj,'props.setObjprops.setObjprops.setObj')
-      let arr: any = []
-      for (let i = 1; i <= 31; i++) {
-        let obj = {
-          label: i,
-          value: i
-        }
-        arr.push(obj)
-      }
-      updateSchema({
-        field: 'ExecuteDateWeek',
-        componentProps: { options: arr },
-      });
+      // console.log(props.CompObj,'props.setObjprops.setObjprops.setObj')
+
       // var a = { "ConditionItems": "2", "ExecuteDate": "1", "ExecuteNum": "2", "ExecuteTime": "00:05", "ExecuteDateWeek": 8, "StartTime": "14:00", "EndTime": "14:00", "circulationTime": "10", "circulationUnit": "1", "circulationNum": "2" }
       var a = props.CompObj
       setFieldsValue({
@@ -360,6 +391,35 @@ export default defineComponent({
 
     }
 
+    const showDatePicker = () => {
+      state.dialogVisible = true
+    }
+
+    const handleConfirm = () => {
+      state.dialogVisible = false
+      cselectedNumbers.value = [...selectedNumbers.value]
+      setFieldsValue({
+        ExecuteDateWeek: cselectedNumbers
+      });
+      selectedNumbers.value = []
+    }
+
+    const toggleSelect = (n) => {
+      // console.log(cselectedNumbers.value)
+      if (selectedNumbers.value.includes(n)) {
+        // 如果已经选择了该数字，则取消选择
+        selectedNumbers.value = selectedNumbers.value.filter((x) => x !== n)
+      } else {
+        // 如果还没有选择该数字，则添加到已选择数组中
+        selectedNumbers.value.push(n)
+      }
+    }
+
+    const isSelected = (n) => {
+      // 判断数字是否已选择
+      return selectedNumbers.value.includes(n)
+    }
+
     defineExpose({ EndData });
     // 添加规则
     return {
@@ -370,7 +430,15 @@ export default defineComponent({
       deleteField,
       handleSuccess,
       EndData,
-      huix
+      huix,
+      selectedNumbers,
+      cselectedNumbers,
+      toggleSelect,
+      isSelected,
+      confirm,
+      ...toRefs(state),
+      showDatePicker,
+      handleConfirm,
     };
   }
 });
@@ -391,6 +459,49 @@ export default defineComponent({
   position: relative;
   display: flex;
   align-items: flex-end;
+}
+
+.number-picker {
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 0;
+}
+
+.number-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.number-picker-title {
+  font-size: 14px;
+}
+
+.number-picker-body {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+.number-picker-item {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.number-picker-item.selected {
+  background-color: #1890ff;
+  color: #fff;
 }
 
 // .overflow-hidden

@@ -1,36 +1,37 @@
 <template>
   <PageWrapper contentFullHeight title="设备分类">
-  <div class="">
-    <div class="p-2 bg-white">
-      <div>
-        <!-- <BasicForm @register="register"></BasicForm> -->
+    <div class="">
+      <div class="p-2 bg-white">
+        <div>
+          <!-- <BasicForm @register="register"></BasicForm> -->
+        </div>
+        <div>
+          <a-button v-if="hasPermission(['openModal_Device'])" type="primary" preIcon="ic:baseline-plus"
+            @click="openModal(null, null)">
+            创建新的分类
+          </a-button>
+        </div>
       </div>
-      <div>
-        <a-button v-if="hasPermission(['openModal_Device'])" type="primary" preIcon="ic:baseline-plus" @click="openModal(null, null)">
-          创建新的分类
-        </a-button>
-      </div>
-    </div>
 
-    <div>
-      <BasicTable @register="registertab" @edit-change="onEditChange" :dataSource="[...TreeTableData]">
-        <!-- <template #toolbar>
+      <div>
+        <BasicTable @register="registertab" @edit-change="onEditChange" :dataSource="[...TreeTableData]">
+          <!-- <template #toolbar>
         <a-button type="primary" @click="expandAll">展开全部</a-button>
         <a-button type="primary" @click="collapseAll">折叠全部</a-button>
       </template> -->
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'action'">
-            <TableAction :actions="createActions(record, column)" />
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'action'">
+              <TableAction :actions="createActions(record, column)" />
+            </template>
           </template>
-        </template>
-      </BasicTable>
-      <!-- </div> -->
+        </BasicTable>
+        <!-- </div> -->
+      </div>
+
+      <addclass ref="addmodel" @ok="ClassOK" @close="ClassClose"></addclass>
+
     </div>
-
-    <addclass ref="addmodel" @ok="ClassOK" @close="ClassClose"></addclass>
-
-  </div>
-</PageWrapper>
+  </PageWrapper>
 </template>
 <script lang="ts">
 import { ref, reactive, nextTick, defineComponent, onMounted, } from 'vue';
@@ -39,7 +40,7 @@ import { BasicTable, useTable, TableAction, BasicColumn, EditRecordRow, ActionIt
 import { getBasicColumns, } from './tableData';
 import { PageWrapper } from '@/components/Page';
 import { facilityTypeTreeApi, facilityTypeSaveApi, facilityTypeSameGradeApi, facilityTypeDeleteApi, facilityTypeEditApi } from '@/api/facility/facility'
-import {usePermission} from '@/hooks/web/useButtonPermission';
+import { usePermission } from '@/hooks/web/useButtonPermission';
 import addclass from './components/addclass.vue';
 import { message } from 'ant-design-vue';
 
@@ -47,7 +48,7 @@ import { message } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'AccountDetail',
-  components: { BasicTable, TableAction, addclass,PageWrapper },
+  components: { BasicTable, TableAction, addclass, PageWrapper },
   setup() {
     const { hasPermission } = usePermission();
     onMounted(() => {
@@ -130,6 +131,8 @@ export default defineComponent({
       },
       // titleHelpMessage: '树形组件不能和序列号列同时存在',
       columns: getBasicColumns(),
+      indentSize: 80,
+      pagination:false
       // dataSource: toRaw(TreeTableData),
       // rowKey: 'id',
     })
@@ -179,7 +182,8 @@ export default defineComponent({
       console.log(type, from, parentFrom, deviceid, RadioVal)
 
       if (from[0].value == '') { message.error('请输入分类名称'); return }
-      if (from[1].value == '') { message.error('请输入分类排序'); return }
+      // if (from[1].value == '') { message.error('请输入分类排序'); return }
+      if (from[1].value == '') { from[1].value = 0 }
 
       if (type == 'edit') {
         let obj = {
@@ -187,11 +191,18 @@ export default defineComponent({
           TypeName: from[0].value,
           SortPosition: Number(from[1].value),
           ParentId: Number(parentFrom[0].selectId),
-          Status:RadioVal.value
+          Status: RadioVal.value
         }
 
         facilityTypeEditApi(obj).then(res => {
-          FengfacilityTypeTree();
+          if (typeof (res) == 'string') {
+            var a = res.split('=')
+            // console.log(a)
+            message.error(a[2])
+          } else {
+            message.error('修改成功')
+            FengfacilityTypeTree();
+          }
           // reload()
         })
       } else if (type == 'add') {
@@ -205,7 +216,14 @@ export default defineComponent({
         if (RadioVal.value == '') { message.error('请选择分类状态'); return }
 
         facilityTypeSaveApi(obj).then(res => {
-          FengfacilityTypeTree();
+          if (typeof (res) == 'string') {
+            var a = res.split('=')
+            // console.log(a)
+            message.error(a[2])
+          } else {
+            message.error('新增成功')
+            FengfacilityTypeTree();
+          }
           // reload()
         })
       } else {
@@ -218,11 +236,19 @@ export default defineComponent({
         if (RadioVal.value == '') { message.error('请选择分类状态'); return }
 
         facilityTypeSaveApi(obj).then(res => {
-          FengfacilityTypeTree();
+          if (typeof (res) == 'string') {
+            var a = res.split('=')
+            // console.log(a)
+            message.error(a[2])
+          } else {
+            message.error('新增成功')
+            FengfacilityTypeTree();
+          }
           // reload()
         })
       }
 
+      // message.success('操作成功')
       addmodel.value.handleClock()
       addmodel.value.visible = false
 
@@ -244,19 +270,19 @@ export default defineComponent({
         {
           icon: 'ic:baseline-plus',
           disabled: record.Inherent == 1 ? true : false,
-          ifShow:  hasPermission(['handleAdd_Device']),
+          ifShow: hasPermission(['handleAdd_Device']),
           onClick: handleAdd.bind(null, record),
         },
         {
           icon: 'clarity:note-edit-line',
-          ifShow:  hasPermission(['handleEdit_Device']),
+          ifShow: hasPermission(['handleEdit_Device']),
           disabled: record.Inherent == 1 ? true : false,
           // disabled: editableData.value ? editableData.value !== record.key : false,
           onClick: handleEdit.bind(null, record),
         },
         {
           icon: 'ant-design:delete-outlined',
-          ifShow:  hasPermission(['handleDelete_Device']),
+          ifShow: hasPermission(['handleDelete_Device']),
           color: 'error',
           disabled: record.Inherent == 1 ? true : false,
           popConfirm: {
@@ -279,7 +305,8 @@ export default defineComponent({
 
 
     async function handleDelete(record: Recordable) {
-      await deleteTableDataRecord(record.TypeId)
+      // debugger
+      // await deleteTableDataRecord(record.TypeId)
       await facilityTypeDeleteApi({ 'Ids': [record.TypeId] }).then(res => {
         if (res != 0) {
           var a = res.split('=')

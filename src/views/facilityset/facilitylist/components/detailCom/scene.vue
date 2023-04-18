@@ -17,12 +17,20 @@
 
         <div class="flex items-center flex-wrap" v-if="sceneList?.length > 0">
 
-            <div v-for="(Scene, index) in sceneList" :key="Scene.RuleId" class="w-100 mb-5 mt-3">
+            <div v-for="(Scene, index) in sceneList" :key="Scene.RuleId" class="w-100 mb-5 mt-3"
+                @click="handleEdit(Scene.RuleId, Scene.Status)">
 
-                <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5">
+                <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5" style="position: relative;">
                     <div class="flex items-center justify-between">
-                        <div class="font-bold">{{ Scene.Name }}</div>
-                        <div class="rounded-md px-2 flex items-center" :class="computedStatus(Scene.Status, true)">
+                        <div class="flex items-center">
+                            <img :src="scenesm" alt="">
+
+                            <div class="font-bold truncate ... ml-2 w-6/10">
+                                {{ Scene.Name }}
+                            </div>
+                        </div>
+
+                        <!-- <div class="rounded-md px-2 flex items-center" :class="computedStatus(Scene.Status, true)">
                             <div class="w-1 h-1 mr-2" :class="computedStatus(Scene.Status, false)"
                                 style="border-radius: 50%;"></div>
                             {{
@@ -30,31 +38,46 @@
                                     '异常' :
                                     Scene.Status == 4 ? '故障' : Scene.Status == 5 ? '运行' : '离线'
                             }}
-                        </div>
+                        </div> -->
+                        <Tag :color="Scene.Status == 1 ? tagColor = '#87d068' : Scene.Status == 2 ? tagColor = '#f50' : tagColor = ''"
+                            class="status_icon">{{ Scene.Status == 1 ? '在线' : Scene.Status == 2 ? '离线' : '' }}</Tag>
+                    </div>
+                    <div :class="`${prefixCls}__card-num`">
+                        <span>{{
+                            Scene.TriggerMode == 1 ? '条件触发' : Scene.TriggerMode == 2 ? '定时触发' : Scene.TriggerMode == 3 ?
+                                '手动触发' : '全部'
+                        }}</span>
                     </div>
                     <!-- <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div> -->
-                    <div class="text-gray-500">关联设备 <span class="text-black">{{
+                    <div class="text-gray-500 truncate ...">关联设备 <span class="text-black">{{
                         Scene.DeviceNames
                     }}</span></div>
-                    <div class="text-gray-500">触发方式 <span class="text-black">{{
+                    <!-- <div class="text-gray-500">触发方式 <span class="text-black">{{
                         Scene.TriggerMode == 1 ? '设备触发' : Scene.TriggerMode == 2 ? '定时触发' : '手动触发'
-                    }}</span></div>
+                    }}</span></div> -->
                     <!-- <div class="text-gray-500">关联区域 <span class="text-black">{{
                         checkVisitorType(Scene.VisitorTypeId)
                     }}</span></div> -->
 
-                    <div class="bottom-but flex items-center mt-2 justify-end">
+                    <div class="bottom-but flex items-center mt-5 justify-end">
                         <!-- <Modal
-                v-model:visible="ModalShow[SceneTabIndex == '0' && !SearchStatus ? index : 0].model[index2]"
-                @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
-                <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
-            </Modal> -->
-                        <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index)">
+                    v-model:visible="ModalShow[SceneTabIndex == '0' && !SearchStatus ? index : 0].model[index2]"
+                    @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
+                    <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
+                    </Modal> -->
+                        <Popconfirm title="确认删除此场景？" ok-text="确认" cancel-text="取消" @confirm="confirm(index, Scene.Status)"
+                            @cancel="cancel">
+                            <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="">
+                                删除
+                            </div>
+                        </Popconfirm>
+                        <!-- <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index)">
                             删除
-                        </div>
+                        </div> -->
 
 
-                        <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="handleEdit(index, index2)">
+                        <div class="bg-gray-100 py-2 px-4 mr-3 rounded"
+                            @click.stop="handleEdit(Scene.RuleId, Scene.Status)">
                             编辑</div>
                         <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded" v-if="Scene.Status == 2 || !Scene.Status"
                             @click.stop="enableDevice(Scene.RuleId, index)">启用
@@ -64,6 +87,9 @@
                             禁用</div>
                         <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
                             v-if="Scene.Status == 3 || Scene.Status == 4">启用</div>
+                    </div>
+                    <div style="position: absolute;right: 20px;top:40%">
+                        <img :src="scenebig" alt="">
                     </div>
                 </div>
             </div>
@@ -88,12 +114,18 @@
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
-import { Input, Pagination, message } from 'ant-design-vue';
+import { Input, Pagination, message, Popconfirm, Tag } from 'ant-design-vue';
 import Icon from '@/components/Icon';
+import { ruleDeleteApi } from '@/api/visitor/visitor'
 import { facilityRuleListApi, ruleEnableApi, ruleDisableApi } from '@/api/facility/facility'
 // import { any } from 'vue-types';
 // import { , Modal, } from 'ant-design-vue';
+import scenesm from '@/assets/images/sceneSm.png'
+import scenebig from '@/assets/images/sceneBig.png'
 
+import { useGo } from '@/hooks/web/usePage';
+const go = useGo();
+const prefixCls = ref('account-center-application')
 const props = defineProps({
     DeviceId: {
         type: Number || String,
@@ -181,6 +213,32 @@ function disableDevice(id, index) {
 
 // }
 // }
+
+// 详情、编辑
+function handleEdit(id, status) {
+    if (status == 1) {
+        message.warn('设备启用中，请禁用后再试。')
+        return;
+    } else {
+        go('/scene/linkage/' + id)
+    }
+}
+
+const confirm = (index, status) => {
+    if (status == 1) {
+        message.warn('设备启用中，请禁用后再试。')
+        return;
+    }
+    ruleDeleteApi({ Ids: [sceneList.value[index].RuleId] }).then(res => {
+        if (res == 0) {
+            message.success('删除成功');
+            sceneList.value.splice(index, 1)
+        } else {
+            message.error(res)
+        }
+    })
+};
+
 function search() {
     if (searchValue.value == '') {
         getSceneList(true)
@@ -244,5 +302,48 @@ body {
 
 .ant-select-arrow {
     color: rgb(28, 92, 255) !important;
+}
+
+.account-center-application {
+    &__card {
+        width: 100%;
+        margin-bottom: -12px;
+
+        .ant-card-body {
+            padding: 16px;
+        }
+
+        &-title {
+            margin-bottom: 5px;
+            font-size: 16px;
+            font-weight: 500;
+
+            .icon {
+                margin-top: -5px;
+                font-size: 22px;
+            }
+        }
+
+        .status_icon {
+            float: right;
+        }
+
+        &-num {
+            margin-left: 24px;
+            line-height: 36px;
+            color: @text-color-secondary;
+
+            span {
+                margin-left: 5px;
+                font-size: 18px;
+            }
+        }
+
+        &-download {
+            float: right;
+            font-size: 20px !important;
+            color: @primary-color;
+        }
+    }
 }
 </style>

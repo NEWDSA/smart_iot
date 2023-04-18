@@ -25,26 +25,37 @@
                             <div v-for="(Scene, index) in visitorSceneList" :key="Scene.RuleId" class="w-100 mb-5"
                                 @click="pushScene(Scene.RuleId)">
 
-                                <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5">
+                                <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5" style="position: relative;">
                                     <div class="flex items-center justify-between">
-                                        <div class="font-bold">{{ Scene.Name }}</div>
+                                        <div class="flex items-center w-6/10">
+                                            <img :src="scenesm" alt="">
+
+                                            <div class="font-bold truncate ... ml-2 w-full text-lg">
+                                                {{ Scene.Name }}
+                                            </div>
+                                        </div>
                                         <div class="rounded-md px-2 flex items-center"
                                             :class="computedStatus(Scene.Status, true)">
                                             <div class="w-1 h-1 mr-2" :class="computedStatus(Scene.Status, false)"
                                                 style="border-radius: 50%;"></div>
                                             {{
-                                                Scene.Status == 1 ? '启用' : Scene.Status == 2 ? '禁用' : Scene.Status == 3 ?
+                                                Scene.Status == 1 ? '在线' : Scene.Status == 2 ? '离线' : Scene.Status == 3 ?
                                                     '异常' :
-                                                    Scene.Status == 4 ? '故障' : Scene.Status == 5 ? '运行' : '离线'
+                                                    Scene.Status == 4 ? '故障' : Scene.Status == 5 ? '运行' : '未知'
                                             }}
                                         </div>
                                     </div>
-                                    <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div>
-                                    <!-- <div class="text-gray-500">关联设备 <span class="text-black">{{
-                                        checkDevice(Scene.DeviceIds)
-                                    }}</span></div> -->
-                                    <div class="text-gray-500">关联访客 <span class="text-black">{{
-                                        checkVisitorType(Scene.VisitorTypeId)
+                                    <!-- <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div> -->
+                                    <div :class="`trigger-type`" style="line-height: 36px;">
+                                        <span>{{
+                                            Scene.TriggerMode == 1 ? '条件触发' : Scene.TriggerMode == 2 ? '定时触发' : '手动触发'
+                                        }}</span>
+                                    </div>
+                                    <div class="text-gray-500 w-8/10 truncate ..." style="line-height: 36px;">关联设备 <span class="text-black">{{
+                                        Scene.DeviceNames
+                                    }}</span></div>
+                                    <div class="text-gray-500 w-8/10 truncate ..." style="line-height: 36px;">关联访客 <span class="text-black">{{
+                                        Scene.VisitorTypeNames
                                     }}</span></div>
 
                                     <div class="bottom-but flex items-center mt-2 justify-end">
@@ -53,10 +64,9 @@
                                         @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
                                         <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
                                     </Modal> -->
-                                    
+
                                         <div v-if="hasPermission(['Delete_visitorsceneList'])"
-                                            class="bg-gray-100 py-2 px-4 mr-3 rounded"
-                                            @click.stop="showModalClick(index)">
+                                            class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index)">
                                             删除
                                         </div>
 
@@ -74,6 +84,9 @@
                                         <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
                                             v-if="Scene.Status == 3 || Scene.Status == 4">启用</div>
                                     </div>
+                                    <div style="position: absolute;right: 20px;top:40%">
+                        <img :src="scenebig" alt="">
+                    </div>
                                 </div>
                             </div>
                         </div>
@@ -121,6 +134,8 @@ import { PageWrapper } from '@/components/Page';
 import { facilityDetailApi } from '@/api/facility/facility'
 import { usePermission } from '@/hooks/web/useButtonPermission';
 import { useGo } from '@/hooks/web/usePage';
+import scenesm from '@/assets/images/sceneSm.png'
+import scenebig from '@/assets/images/sceneBig.png'
 // import { nextTick } from 'process';
 
 export default defineComponent({
@@ -289,22 +304,22 @@ export default defineComponent({
         }
 
         function checkDevice(idd) {
-            nextTick(async ()=>{
-            console.log(idd.length)
-            var arr = []
-            for (let i = 0; i < idd.length; i++) {
-                // if (id == visitorSceneTab.value[i].VisitorTypeId) {
-                // console.log(id)
-                await facilityDetailApi({ Id: idd[i] }).then(res => {
-                    // console.log(res[0])
-                    arr.push(res[0].DeviceName)
-                })
+            nextTick(async () => {
+                console.log(idd.length)
+                var arr = []
+                for (let i = 0; i < idd.length; i++) {
+                    // if (id == visitorSceneTab.value[i].VisitorTypeId) {
+                    // console.log(id)
+                    await facilityDetailApi({ Id: idd[i] }).then(res => {
+                        // console.log(res[0])
+                        arr.push(res[0].DeviceName)
+                    })
 
-            }
-            // console.log(arr)
-            let s = arr.toString()
+                }
+                // console.log(arr)
+                let s = arr.toString()
 
-            return s
+                return s
 
             })
         }
@@ -352,7 +367,9 @@ export default defineComponent({
             disableDevice,
             total,
             pushScene,
-            checkDevice
+            checkDevice,
+            scenesm,
+            scenebig
         };
     },
 });
@@ -385,5 +402,16 @@ body {
 
 .ant-select-arrow {
     color: rgb(28, 92, 255) !important;
+}
+
+.trigger-type {
+    // margin-left: 24px;
+    // line-height: 36px;
+    color: @text-color-secondary;
+
+    span {
+        // margin-left: 5px;
+        font-size: 14px;
+    }
 }
 </style>

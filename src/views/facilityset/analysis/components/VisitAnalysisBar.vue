@@ -48,14 +48,36 @@ function getTrendRatio() {
   facilityTrendRatioApi(obj).then(res => {
     if (res.Code == 200) {
       let xAxisdata: any = []
+      let xAxisdatas: any = []
       let seriesdata: any = []
       for (let i = res.List.length - 1; i > -1; i--) {
-        if(type.value =='day'){
-          xAxisdata.push(changeData(res.List[i].StartTime.seconds))
-        }else{
-          xAxisdata.push(changeData(res.List[i].StartTime.seconds) + '~' + changeData(res.List[i].StopTime.seconds))
+        if (type.value == 'day') {
+          if (i == 0) {
+            xAxisdata.push('今日')
+            // return
+          } else {
+            xAxisdata.push(' ')
+          }
+          xAxisdatas.push(changeData(res.List[i].StartTime.seconds))
+        } else if (type.value == 'week') {
+          if (i == 0) {
+            xAxisdata.push('本周')
+            // return
+          } else {
+            xAxisdata.push(' ')
+          }
+          xAxisdatas.push(changeData(res.List[i].StartTime.seconds) + '~' + changeData(res.List[i].StopTime.seconds))
+        } else {
+          if (i == 0) {
+            xAxisdata.push('本月')
+            // return
+          } else {
+            xAxisdata.push(' ')
+          }
+          xAxisdatas.push(changeData(res.List[i].StartTime.seconds) + '~' + changeData(res.List[i].StopTime.seconds))
+          // xAxisdata.push(changeData(res.List[i].StartTime.seconds) + '~' + changeData(res.List[i].StopTime.seconds))
         }
-        
+
         seriesdata.push(res.List[i].Num)
       }
 
@@ -70,6 +92,10 @@ function getTrendRatio() {
               width: 1,
               color: '#019680'
             }
+          },
+          formatter: function (data) {
+            // console.log(data)
+            return data[0].dimensionNames[data[0].dataIndex] + '： ' + toThousands(data[0].data) + '（KW/H）'
           }
         },
         grid: { left: '1%', right: '1%', top: '2  %', bottom: 0, containLabel: true },
@@ -81,13 +107,13 @@ function getTrendRatio() {
           },
           axisLabel: {//坐标轴刻度标签的相关设置。
             interval: 0,
-            rotate: -45,
+            // rotate: -45,
             formatter: function (params: string) {
               var newParamsName = "";
               var paramsNameNumber = params.length;
-              if(type.value == 'day'){
+              if (type.value == 'day') {
                 var provideNumber = 10; //一行显示几个字
-              }else{
+              } else {
                 var provideNumber = 5; //一行显示几个字
               }
               var rowNumber = Math.ceil(paramsNameNumber / provideNumber);
@@ -109,7 +135,7 @@ function getTrendRatio() {
               return newParamsName;
             },
           },
-          
+
         },
         yAxis: {
           type: 'value',
@@ -130,6 +156,7 @@ function getTrendRatio() {
         },
         series: [
           {
+            dimensions: xAxisdatas,
             data: seriesdata,
             type: 'bar',
             barMaxWidth: 80
@@ -143,6 +170,12 @@ function getTrendRatio() {
   })
 
 }
+
+const toThousands = (num = 0) => {
+   return num.toString().replace(/\d+/, function(n) {
+      return n.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+   });
+};
 
 function changeCharTime(ctype: string) {
   type.value = ctype

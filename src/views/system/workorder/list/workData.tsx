@@ -1,4 +1,4 @@
-import { FormProps, FormSchema,BasicColumn } from '@/components/Table';
+import { FormProps, FormSchema, BasicColumn } from '@/components/Table';
 import { h } from 'vue';
 import { Tag } from 'ant-design-vue';
 import { Icon } from '@/components/Icon';
@@ -26,7 +26,7 @@ export function TabColumns() {
             return h(Tag, { color: 'yellow' }, () => '紧急');
 
           case 4:
-            return h(Tag, { color: 'red' }, () => '非常紧急'); 
+            return h(Tag, { color: 'red' }, () => '非常紧急');
 
           default:
             return '异常'
@@ -211,9 +211,28 @@ export const getwarnFormConfig: FormSchema[] = [
       placeholder: '请选择工单模块',
       options: [
         { label: '默认模板', value: 1 }
-      ]
+      ],
+      // onChange:(e)=>{
+      //   console.log(e)
+      //   setFieldsValue({
+      //     TemplateName:e
+      // });
+      // }
     },
     required: true,
+  },
+  {
+    field: 'TemplateName',
+    label: '工单模板名称',
+    component: 'Input',
+    // componentProps: {
+    //   defaultValue:'0',
+    // },
+    // defaultValue:'0',
+    // required: true,
+    show: ({ values }) => {
+      return false
+    }
   },
   {
     field: 'Title',
@@ -228,7 +247,7 @@ export const getwarnFormConfig: FormSchema[] = [
     field: 'Priority',
     label: '优先级',
     component: 'RadioButtonGroup',
-    defaultValue: '4',
+    defaultValue: 1,
     componentProps: {
       options: [
         { label: '低', value: 1 },
@@ -254,29 +273,119 @@ export const getwarnFormConfig: FormSchema[] = [
 
 export const deviceColumns: BasicColumn[] = [
   {
-    title: '设备ID',
-    dataIndex: 'DeviceId',
-    width: 80,
+    title: '可添加设备',
+    dataIndex: 'DeviceName',
+    width: 160,
   },
   {
-    title: '设备名称',
-    dataIndex: 'DeviceName',
-    width: 50,
+    title: '设备ID',
+    dataIndex: 'DeviceId',
+    width: 160,
   },
+  {
+    title: '创建时间',
+    dataIndex: ['Basic', 'CreatedAt', 'seconds'],
+    width: 100,
+    customRender: ({ record }) => {
+      let date = new Date(record.Basic.CreatedAt.seconds * 1000);
+      let Y = date.getFullYear() + '-';
+      let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+      let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
 
+      let h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
+      let m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
+      let s = (date.getSeconds() < 10 ? '0' + (date.getSeconds()) : date.getSeconds());
+      let strDate = Y + M + D + h + m + s;
+      return strDate
+    }
+  },
+  {
+    title: '设备状态',
+    dataIndex: 'NetworkStatus',
+    width: 120,
+    customRender: ({ record }) => {
+      const status = record.NetworkStatus
+      console.log(status)
+      var color
+      var text
+      switch (status) {
+        case 1:
+          color = 'green'
+          text = '启用'
+          return h(Tag, { color: color }, () => text)
+        case 2:
+          color = 'red'
+          text = '禁用'
+          return h(Tag, { color: color }, () => text)
+        case 3:
+          color = 'red'
+          text = '异常'
+          return h(Tag, { color: color }, () => text)
+        case 4:
+          color = 'red'
+          text = '故障'
+          return h(Tag, { color: color }, () => text)
+        case 5:
+          color = 'blue'
+          text = '运行'
+          return h(Tag, { color: color }, () => text)
+
+        default:
+          color = 'gray'
+          text = '离线'
+          return h(Tag, { color: color }, () => text)
+      }
+
+      // const status = record.DeviceStatus
+      // const enable = ~~status === 2
+      // const color = enable ? 'green' : 'red'
+      // const text = enable ? '正常' : '停用'
+      
+    }
+  }
 ]
 
 
 export const searchFormSchema: FormSchema[] = [
+  // {
+  //   field: 'DeviceId',
+  //   label: '设备ID',
+  //   component: 'Input',
+  //   colProps: { span: 8 },
+  //   componentProps: () => {
+  //     return {
+  //       placeholder: '请输入设备ID',
+  //     }
+  //   }
+  // },
   {
-    field: 'DeviceId',
-    label: '设备ID',
-    component: 'Input',
-    colProps: { span: 8 },
-    componentProps: () => {
-      return {
-        placeholder: '请输入设备ID',
-      }
+    field: 'RegionId',
+    label: '',
+    component: 'TreeSelect',
+    colProps: { span: 5 },
+    componentProps: {
+      placeholder: '请选择区域',
+      fieldNames: {
+        label: 'RegionName',
+        key: 'RegionId',
+        value: 'RegionId'
+      },
+      getPopupContainer: () => document.body
+    }
+  },
+  {
+    field: 'TypeId',
+    label: '',
+    component: 'TreeSelect',
+    colProps: { span: 5 },
+    componentProps: {
+      placeholder: '请选择设备类型',
+      fieldNames: {
+        label: 'TypeName',
+        key: 'TypeId',
+        value: 'TypeId'
+      },
+      getPopupContainer: () => document.body
     }
   },
   {

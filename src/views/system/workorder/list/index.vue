@@ -32,12 +32,11 @@
                 </template>
 
                 <template #form-advanceBefore>
-            
-                        <a-button v-if="hasPermission(['addWorkOder_workorderList'])" type="primary" preIcon="ic:baseline-plus" class="ml-5" @click="addWorkOder()">
+
+                    <a-button v-if="hasPermission(['addWorkOder_workorderList'])" type="primary" preIcon="ic:baseline-plus"
+                        class="ml-5" @click="addWorkOder()">
                         创建工单
                     </a-button>
-
-                    
 
                 </template>
             </BasicTable>
@@ -45,10 +44,9 @@
             <!-- <visitorModel @register="registerModal" @success="handleSuccess"></visitorModel> -->
         </div>
 
-    <addModal @register="registerModal" @success="handleSuccess"></addModal>
+        <addModal @register="registerModal" @success="handleSuccess"></addModal>
 
     </PageWrapper>
-
 </template>
   
 <script lang="ts">
@@ -65,11 +63,11 @@ import { message, Select, Input } from 'ant-design-vue';
 import { useLoading } from '@/components/Loading';
 import { PageWrapper } from '@/components/Page';
 import addModal from './addModal.vue'
-import {usePermission} from '@/hooks/web/useButtonPermission';
+import { usePermission } from '@/hooks/web/useButtonPermission';
 export default defineComponent({
-    components: { BasicTable, TableAction, Select, Input, PageWrapper,addModal },
+    components: { BasicTable, TableAction, Select, Input, PageWrapper, addModal },
     setup() {
-      const { hasPermission } = usePermission();
+        const { hasPermission } = usePermission();
         onMounted(() => {
             // visitorTypeListApi().then(res => {
             //     VisitorTypeList.value = res.Detail
@@ -158,34 +156,34 @@ export default defineComponent({
             return [
                 {
                     label: '查看',
-                    ifShow:  hasPermission(['handleLook_workorderList']),
+                    ifShow: hasPermission(['handleLook_workorderList']),
                     onClick: handleLook.bind(null, record)
                 }
             ]
         }
 
-        
+
         function cutTab(id, index) {
             workTypeTabIndex.value = index
             searchInfo.value = {}
             const user: any = userStore.getUserInfo
             if (index == 1) {
                 searchInfo.value.Acceptor = user.user.UserId
-                
+
             }
             if (index == 2) {
                 searchInfo.value.CreatedBy = user.user.UserId
-                
+
             }
             if (index == 3) {
                 searchInfo.value.Follower = user.user.UserId
-                
+
             }
 
             // 延迟 不然会先刷新后加条件
-            setTimeout(()=>{
+            setTimeout(() => {
                 reload()
-            },100)
+            }, 100)
 
         }
 
@@ -253,10 +251,10 @@ body {
     font-family: 'Alibaba PuHuiTi';
 }
 
-.ant-row .ant-col-24{
+.ant-row .ant-col-24 {
     // display: flex;
-    margin-left:50px;
-  flex: none;
+    margin-left: 50px;
+    flex: none;
 }
 
 

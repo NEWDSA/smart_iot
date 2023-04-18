@@ -56,8 +56,12 @@ import { facilityDetailApi, facilityRegionInfoApi, facilityTypeInfoApi } from '@
 import dayjs from 'dayjs'
 
 const props = defineProps({
-  // 工单ID
+  // 设备ID
   DeviceId: { type: Number || String, default: 1000025128043 },
+  workOrderId: { type: Number || String, default: null },
+  workTitle: { type: String, default: null },
+  workContent: { type: String, default: null },
+  mySelf: { type: Number || String, default: 1 } 
 })
 
 const infoFacility = ref()
@@ -79,9 +83,9 @@ onMounted(() => {
   // getTaskTicketInfo()
 })
 
-const getTaskTicketInfo = () => {
+const getTaskTicketInfo = (idd) => {
   console.log('dev')
-  facilityDetailApi({ Id: Number(props.DeviceId) }).then(res => {
+  facilityDetailApi({ Id: idd ? idd : Number(props.DeviceId) }).then(res => {
     infoFacility.value = res[0]
     // console.og
     GetfacilityRegioninfo()

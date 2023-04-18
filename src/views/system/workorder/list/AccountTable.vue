@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" title="选择可控设备的成员分组" @ok="handleSubmit">
+  <BasicModal v-bind="$attrs" @register="registerModal" title="选择受理组" @ok="handleSubmit">
     <BasicTree :checkStrictly="true" ref="treeRef" :checkedKeys="checkedMenu" title="部门列表" toolbar checkable search
       treeWrapperClassName="h-[calc(100%-35px)] overflow-auto" :clickRowToExpand="false" :treeData="treeData"
       :fieldNames="{ key: 'Id', title: 'Name' }" @check="handleSelect" />
@@ -24,7 +24,8 @@ export default defineComponent({
     const checkData = ref('');
     const checkedMenu = ref<Array<string | number>>([]);
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-
+      // console.log(data)
+      checkedMenu.value = data.data
       const { TreeSelect } = await getDeptDrop();
       treeData.value = TreeSelect;
     });
@@ -50,6 +51,7 @@ export default defineComponent({
         //   DeviceId: myResult.value,
         //   DepartmentId: keys?.checked
         // })
+        console.log(checkedMenu.value)
         setModalProps({ confirmLoading: true });
         closeModal();
         emit('success',checkData.value);
@@ -61,3 +63,8 @@ export default defineComponent({
   },
 });
 </script>
+<style>
+.ant-modal {
+    top: 30px;
+}
+</style>

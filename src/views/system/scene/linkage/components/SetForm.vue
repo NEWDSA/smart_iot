@@ -18,14 +18,22 @@
         <template #item="{ element, index }">
 
           <div class="list-group-item" :class="{ 'not-draggable': !enabled }">
-            {{ index }}-333
+            <!-- {{ index }}-333 -->
+
             <BasicForm draggable="true" v-if="element.schemas_normal" :ref="setItemRef" @get-form="formvalue(arg, index)"
               :schemas="element.schemas_normal" @register="register">
+              <template #numslot="{ model, field }">
+                <div class="w-8 h-8 mr-2 flex justify-center items-center"
+                  style="border-radius: 50%;border:3px solid black;">
+                  {{ index + 1 }}
+                </div>
+              </template>
+
               <template #customSlot="{ model, field }">
                 <a-input placeholder="请选择设备" v-model:value="model[field]" @click="e_Device(index)">
-                  <template #suffix>
+                  <!-- <template #suffix>
                     <Icon icon="carbon:logo-github" />
-                  </template>
+                  </template> -->
                 </a-input>
               </template>
               <template #deleteSlot="{ model, field }">
@@ -63,6 +71,19 @@ const schemas: FormSchema[] = [];
 const dragging = ref(false)
 const myArray: any = ref('');
 const schemas_normal: FormSchema[] = [
+  {
+    field: 'BoxNum',
+    label: '',
+    component: 'Input',
+    slot: 'numslot',
+    colProps: {
+      span: 2
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return true
+    }
+  },
   {
     field: 'OperationType',
     component: 'Select',
@@ -316,7 +337,7 @@ const schemas_normal: FormSchema[] = [
     component: 'Input',
     slot: 'deleteSlot',
     colProps: {
-      span: 3
+      span: 1
     }
   }
 ];
@@ -406,7 +427,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const [register, { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue }] =
+    const [register, { appendSchemaByField, setProps, updateSchema, setFieldsValue, getFieldsValue, removeSchemaByFiled, resetFields }] =
       useForm({
         labelWidth: 0,
         showActionButtonGroup: false,
@@ -430,7 +451,7 @@ export default defineComponent({
         bcIndex.value = props.OperationMode
       }
     }, { deep: true }) // 开启深度监视才行
-
+    //  
     function ActionType(type) {
       console.log(xformElRef.value)
     }
@@ -508,9 +529,10 @@ export default defineComponent({
       xformElRef.value = []
       console.log(toRaw(add), 'ddd?')
     }
-    async function handleSuccess(params) {
+    async function handleSuccess(params, type) {
+
       // console.log(getFieldsValue(), '?...getFieldsValue...?')
-      // console.log(params, '?...params...?')
+      console.log(params, '?...params...?')
       // const obj = params[0]
       // // DeviceName
       // console.log(obj[0].DeviceName, '...obj...?')
@@ -525,11 +547,45 @@ export default defineComponent({
       })
 
       let FormSchema = JSON.parse(result[0]?.DeviceModel)
-      xformElRef.value[Number(TIndex.value)].setFieldsValue({
-        DeviceName: obj[0][0].DeviceName,
-        DeviceId: obj[0][0].DeviceId,
-        DeviceSerial: obj[0][0].DeviceSerial,
-      })
+      let FormSchemaId = result[0]?.DeviceModelId
+      console.log(FormSchemaId, 'FormSchemaIdFormSchemaIdFormSchemaId')
+      var pp = 0
+      if (xformElRef.value[Number(TIndex.value)].getFieldsValue().DeviceId !== obj[0][0].DeviceId) {
+        pp = 1
+      }
+      if (!xformElRef.value[Number(TIndex.value)].getFieldsValue().DeviceId) {
+        pp = 0
+      }
+
+      if (type) {
+        // console.log(result)
+        // debugger;
+        pp = 3
+        xformElRef.value[Number(TIndex.value)].updateSchema([
+          {
+            field: 'DeviceName',
+            defaultValue: result[0].DeviceName,
+          },
+          {
+            field: 'DeviceId',
+            defaultValue: result[0].DeviceId,
+          },
+          {
+            field: 'DeviceSerial',
+            defaultValue: result[0].DeviceSerial,
+          },
+        ]);
+      } else {
+        console.log(obj)
+        xformElRef.value[Number(TIndex.value)].setFieldsValue({
+          DeviceName: obj[0][0].DeviceName,
+          DeviceId: obj[0][0].DeviceId,
+          DeviceSerial: obj[0][0].DeviceSerial,
+        })
+      }
+
+
+
       let myobj: any = [];
       FormSchema.forEach(async (item, index) => {
         myobj.push({
@@ -537,25 +593,97 @@ export default defineComponent({
           value: item.model.field,
         })
       })
-      xformElRef.value[Number(TIndex.value)].appendSchemaByField({
-        field: 'DeviceField',
-        component: 'Select',
-        label: '',
-        colProps: {
-          span: 4
-        },
-        componentProps: {
-          fieldNames: {
-            label: 'name',
-            key: 'value',
-            value: 'value'
+
+      // debugger;
+      if (pp == 1) {
+        // debugger;
+        // console.log(myobj)
+        const aa: any = []
+        aa.push({
+          OperationType: xformElRef.value[Number(TIndex.value)].getFieldsValue().OperationType
+        })
+        aa.push({
+          DeviceId: xformElRef.value[Number(TIndex.value)].getFieldsValue().DeviceId
+        })
+        aa.push({
+          DeviceName: xformElRef.value[Number(TIndex.value)].getFieldsValue().DeviceName
+        })
+        // aa.push({
+        //   DeviceSerial: xformElRef.value[Number(TIndex.value)].getFieldsValue().DeviceSerial
+        // })
+        xformElRef.value[Number(TIndex.value)].resetFields()
+        // xformElRef.value[Number(TIndex.value)].resetFields()
+        // debugger;
+
+        xformElRef.value[Number(TIndex.value)].setFieldsValue({
+          OperationType: aa[0].OperationType,
+          // DeviceName: aa[2].DeviceName,
+          // DeviceId: aa[1].DeviceId,
+          // DeviceSerial: aa[3].DeviceSerial,
+        });
+        let objj = [
+          [
+            {
+              DeviceId: aa[1].DeviceId
+            }
+          ]
+        ]
+        await handleSuccess(objj, 1)
+        return;
+
+      } else if (pp == 0) {
+        console.log(FormSchemaId, '445646876876565')
+
+        xformElRef.value[Number(TIndex.value)].appendSchemaByField({
+          field: 'DeviceField',
+          component: 'Select',
+          label: '',
+          colProps: {
+            span: 4
           },
-          options: myobj
-        },
-        ifShow: ({ values }) => {
-          return values.OperationType == '1'
-        }
-      }, 'DeviceName')
+          componentProps: {
+            fieldNames: {
+              label: 'name',
+              key: 'value',
+              value: 'value'
+            },
+            options: myobj
+          },
+          ifShow: ({ values }) => {
+            return values.OperationType == '1'
+          }
+        }, 'DeviceName')
+
+        xformElRef.value[Number(TIndex.value)].appendSchemaByField({
+          field: 'FormSchemaId',
+          component: 'Input',
+          label: '',
+          colProps: {
+            span: 4
+          },
+          defaultValue: FormSchemaId,
+          ifShow: ({ values }) => {
+            return false
+          }
+        }, 'DeviceName')
+        xformElRef.value[Number(TIndex.value)].updateSchema({
+          field: 'FormSchemaId',
+          defaultValue: FormSchemaId,
+        });
+      } else if (pp == 3) {
+
+        xformElRef.value[Number(TIndex.value)].setFieldsValue({
+          FormSchemaId: FormSchemaId
+        });
+
+
+        xformElRef.value[Number(TIndex.value)].updateSchema({
+          field: 'DeviceField',
+          componentProps: { options: myobj },
+        });
+      }
+
+
       FormSchema.forEach((item, index) => {
         // 使用updateSchema添加
 
@@ -568,7 +696,7 @@ export default defineComponent({
             label: '',
             defaultValue: item.model['default-value'],
             colProps: {
-              span: 5
+              span: 3
             },
             componentProps: {
               placeholder: item.model.name,
@@ -610,13 +738,15 @@ export default defineComponent({
 
 
         } else {
+          var str = item.model.field
+
           xformElRef.value[Number(TIndex.value)].appendSchemaByField({
             field: item.model.field,
             component: item.model.view.charAt(0).toUpperCase() + item.model.view.slice(1),
             label: '',
             defaultValue: item.model['default-value'],
             colProps: {
-              span: 5
+              span: 3
             },
             componentProps: {
               placeholder: item.model.name,
@@ -749,8 +879,8 @@ export default defineComponent({
       if (form != null) {
         for (let i = 0; i < xformElRef.value.length; i++) {
           if (JSON.stringify(xformElRef.value[i].getFieldsValue()) === '{}') {
-            message.warn('请选择完整条件');
-            return false
+            // message.warn('请选择完整条件');
+            return 1;
           }
           if (xformElRef.value[i].getFieldsValue().OperationType == '1') {
             DeviceIdArr.value.push(Number(xformElRef.value[i].getFieldsValue().DeviceId))
@@ -761,10 +891,44 @@ export default defineComponent({
 
       let enddata: any = []
       for (let i = 0; i < add.value.length; i++) {
+        console.log(fromArr[i])
+        // debugger;
+        if (!fromArr[i].DeviceField) {
+          // message.warn('请完善执行动作')
+          return 1;
+        }
+        var str = fromArr[i].DeviceField.substr(0, 6)
+
+        if (str !== 'switch' && (!fromArr[i][fromArr[i]['DeviceField']] || fromArr[i][fromArr[i]['DeviceField']] !== false)) {
+          // message.warn('请完善执行动作')
+          return 1;
+        }
+        // for (let o in result) {
+        if (fromArr[i][fromArr[i]['DeviceField']] == true || fromArr[i][fromArr[i]['DeviceField']] == false) {
+          fromArr[i].DeviceOperation = fromArr[i].FormSchemaId + '-' + 'set-' + fromArr[i].DeviceField
+
+          fromArr[i].DeviceParams = {}
+          fromArr[i].DeviceParams[fromArr[i].DeviceField] = fromArr[i][fromArr[i].DeviceField]
+          fromArr[i].DeviceParams[fromArr[i].DeviceField] = fromArr[i][fromArr[i].DeviceField]
+        } else if (str == 'switch' && !fromArr[i][fromArr[i]['DeviceField']]) {
+          fromArr[i].DeviceOperation = fromArr[i].FormSchemaId + '-set-' + fromArr[i].DeviceField
+          fromArr[i].DeviceParams = {}
+          fromArr[i].DeviceParams[fromArr[i].DeviceField] = false
+        } else if (!fromArr[i].equation) {
+          fromArr[i].DeviceOperation = fromArr[i].FormSchemaId + '-' + 'set-' + fromArr[i].DeviceField
+          fromArr[i].DeviceParams = {}
+          fromArr[i].DeviceParams[fromArr[i].DeviceField] = fromArr[i][fromArr[i].DeviceField]
+        } else {
+          fromArr[i].DeviceOperation = 'value' + fromArr[i].equation + fromArr[i][fromArr[i]['DeviceField']]
+        }
+        // }
+
         fromArr[i].OperationType = Number(fromArr[i].OperationType)
         enddata.push(fromArr[i])
         // enddata[i].push(FfromArr[i])
       }
+
+
 
       console.log(add.value)
       return enddata
@@ -839,7 +1003,7 @@ export default defineComponent({
 
     }
 
-    defineExpose({ EndData, bcIndex });
+    defineExpose({ EndData, bcIndex, DeviceIdArr });
 
     return {
       register,
@@ -895,6 +1059,9 @@ export default defineComponent({
   background: #F3F3F3;
 }
 
+::v-deep(.ant-page-header-heading) {
+  justify-content: start !important;
+}
 
 .col_flex {
   display: flex;

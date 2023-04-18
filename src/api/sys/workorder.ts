@@ -9,6 +9,8 @@ enum Api {
     TaskTicketProgressSave = '/task/ticket/progress/save',
     TaskTicketHandOver = '/task/ticket/hand/over',
     TaskTicketEdit = '/task/ticket/edit',
+    TaskTicketCopy = '/task/ticket/copy',
+    TaskTicketAuth = '/task/ticket/auth',
 
     TaskTicketClose = '/task/ticket/close',
     TaskTicketCountData = '/task/ticket/count/data',
@@ -43,13 +45,23 @@ export function TaskTicketInfoApi(params) {
  * @description: 工单修改
  */
 
-export function TaskTicketEditApi(params) {
+export function TaskTicketEditApi(params,id) {
   return realHttp.put({
-    url:Api.TaskTicketEdit,
+    url:Api.TaskTicketEdit + '?id='+id,
     params
   })
 }
 
+/**
+ * @description: 工单复制
+ */
+
+export function TaskTicketCopyApi(params) {
+  return realHttp.get({
+    url:Api.TaskTicketCopy,
+    params
+  })
+}
 
 /**
  * @description: 工单日志列表
@@ -89,9 +101,9 @@ export function TaskTicketProgressListApi(params) {
  * @description: 新建工单进度
  */
 
-export function TaskTicketProgressSaveApi(params) {
+export function TaskTicketProgressSaveApi(params,id) {
   return realHttp.post({
-    url:Api.TaskTicketProgressSave,
+    url:Api.TaskTicketProgressSave + '?id='+id,
     params
   })
 }
@@ -100,9 +112,9 @@ export function TaskTicketProgressSaveApi(params) {
  * @description: 转交工单
  */
 
-export function TaskTicketHandOverApi(params) {
+export function TaskTicketHandOverApi(params,id) {
   return realHttp.put({
-    url:Api.TaskTicketHandOver,
+    url:Api.TaskTicketHandOver + '?id='+id,
     params
   })
 }
@@ -111,13 +123,22 @@ export function TaskTicketHandOverApi(params) {
  * @description: 完结工单
  */
 
-export function TaskTicketCloseApi(params) {
+export function TaskTicketCloseApi(params,id) {
   return realHttp.put({
-    url:Api.TaskTicketClose,
+    url:Api.TaskTicketClose + '?id='+id,
     params
   })
 }
 
+/**
+ * @description: 工单权限
+ */
+
+export function TaskTicketAuthApi(id) {
+  return realHttp.get({
+    url:Api.TaskTicketAuth + '?id='+id,
+  })
+}
 
 /**
  * @description: 工单总览

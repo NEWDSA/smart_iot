@@ -11,7 +11,7 @@
             <div class="mr-3">{{ item?.CreatorName }}</div>
 
             <div class="mr-3">{{ dayjs.unix(item.Basic?.CreatedAt.seconds).format('YYYY-MM-DD HH:mm:ss') }}</div>
-            <div class="mr-3">{{ item2?.Type == 1 ? '更新工单' : '新建工单' }}</div>
+            <div class="mr-3">{{ item.Type == 1 ? '更新工单' : '新建工单' }}</div>
           </div>
           <div class="p-3 flex items-center" v-for="(item2, index2) in item.items">
             <div class="w-1 h-4 bg-blue-600 mr-1"></div>
@@ -33,7 +33,11 @@ import dayjs from 'dayjs'
 
 const props = defineProps({
   // 工单ID
+  DeviceId: { type: Number || String, default: 1000025128043 },
   workOrderId: { type: Number || String, default: null },
+  workTitle: { type: String, default: null },
+  workContent: { type: String, default: null },
+  mySelf: { type: Number || String, default: 1 }
 })
 
 const logList = ref()
@@ -42,9 +46,9 @@ onMounted(() => {
   getTaskTicketInfo()
 })
 
-const getTaskTicketInfo = () => {
+const getTaskTicketInfo = (idd) => {
   console.log('log')
-  TaskTicketLogListApi({ TaskTicketId: props.workOrderId }).then(res => {
+  TaskTicketLogListApi({ TaskTicketId: idd ? idd : props.workOrderId }).then(res => {
     logList.value = res
     // console.log(res)
   })

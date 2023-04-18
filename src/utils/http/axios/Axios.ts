@@ -8,6 +8,7 @@ import { isFunction } from '@/utils/is'
 import { cloneDeep } from 'lodash-es'
 import { ContentTypeEnum } from '@/enums/httpEnum'
 import { RequestEnum } from '@/enums/httpEnum'
+import { getToken } from '@/utils/auth'
 
 export * from './axiosTransform'
 
@@ -144,14 +145,16 @@ export class VAxios {
       })
     }
 
+    const token = getToken()
     return this.axiosInstance.request<T>({
       ...config,
       method: 'POST',
-      data: formData,
+      data: formData, 
       headers: {
         'Content-type': ContentTypeEnum.FORM_DATA,
         // @ts-ignore
-        ignoreCancelToken: true
+        ignoreCancelToken: true,
+        'Authorization': token
       }
     })
   }
