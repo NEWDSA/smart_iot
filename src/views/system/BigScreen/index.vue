@@ -46,15 +46,15 @@
               <div class="other_title">
                 <div class="flex">
                   <span class="text-cool-gray-100 flex w-1/3" style="align-items: center;border: 1px solid blue;">
-                    <img src="@/assets/svg/组合 123.png" />
+                    <img src="@/assets/svg/item1.png" />
                     60
                   </span>
                   <span class="text-cool-gray-100 flex w-1/3" style="align-items: center;border: 1px solid orangered;">
-                    <img src="@/assets/svg/组合 124.png" />
+                    <img src="@/assets/svg/item2.png" />
                     999
                   </span>
                   <span class="text-cool-gray-100 flex w-1/3" style="align-items: center;border: 1px solid orangered;">
-                    <img src="@/assets/svg/组合 127.png" />
+                    <img src="@/assets/svg/item3.png" />
                     666
                   </span>
                 </div>

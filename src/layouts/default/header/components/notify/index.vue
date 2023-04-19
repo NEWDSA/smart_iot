@@ -56,15 +56,17 @@ export default defineComponent({
       tip: '加载中...',
     });
     const count = computed(() => {
-
+      console.log(listData.value[0],'...listData...?')
       listData.value[0].list.length > 0 ? isdot.value = true : isdot.value = false;
-      return listData.value.length;
+      // return listData.value.length;
     })
     onMounted(async () => {
       console.log(listData.value, '?...listData...?');
 
     })
     function onNoticeClick(record) {
+      // 页面添加一个load
+      
       go('/messagecenter/msgCenter')
     }
     function handleClickChange() {
