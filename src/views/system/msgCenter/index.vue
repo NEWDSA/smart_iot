@@ -94,13 +94,14 @@ export default defineComponent({
       settingList.value = newValue;
     })
     onMounted(async () => {
-     emitter.on('getData', async () => {
-      // 对接口进行重置
-      settingList.value = [];
-      for (var i = 0; i <= 2; i++) {
-        await getData(i)
-      }
-    })
+      // emitter.on('getData', async () => {
+      //   console.log('getData...?12121')
+      //   // 对接口进行重置
+      //   settingList.value = [];
+      //   for (var i = 0; i <= 2; i++) {
+      //     await getData(i)
+      //   }
+      // })
       for (var i = 0; i <= 2; i++) {
         await getData(i)
       }
@@ -126,6 +127,7 @@ export default defineComponent({
         PageSize: 9,
         Type: type
       })
+      // settingList.value=[];
       settingList.value.push({
         key: type,
         name: type == 0 ? '全部' : type == 1 ? '设备告警' : type == 2 ? '工单' : '',
@@ -139,7 +141,9 @@ export default defineComponent({
           Total: data.Total
         }
       })
+      console.log(settingList.value, '...itemrere')
     }
+
     async function onNoticeClick(record, index) {
       //  显示详细内容到其他div
       // record.NoticeId
@@ -151,11 +155,19 @@ export default defineComponent({
       } else {
         NoticeId = record;
       }
-      NoticeRead({
-        NoticeId: [NoticeId],
-      }).then(async () => {
-      })
-      const { Detail } = await NoticeInfo({
+
+      const Code = await NoticeRead({ NoticeId: [NoticeId] });
+      if (Code == 0) {
+        const data = await NoticeList({
+          PageNum: 1,
+          PageSize: 9,
+          Type: tabIndex.value
+        })
+        settingList.value[tabIndex.value].list = data.Detail;
+      }
+  
+      // 详情
+      const { Detail } = await NoticeInfo({ 
         NoticeId: NoticeId
       })
       infoDetail.Detail = Detail;
@@ -190,6 +202,9 @@ export default defineComponent({
         });
       }
 
+    }
+    function getNotice() {
+      alert('Notice title')
     }
     function goDetail(infoDetail) {
       // 跳转具体页面
@@ -256,6 +271,7 @@ export default defineComponent({
       getData,
       registerModal,
       goDetail,
+      getNotice,
       nextItem,
       filterresult,
       changePage,

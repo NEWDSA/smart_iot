@@ -51,9 +51,10 @@ export default defineComponent({
       } else {
         const { TreeSelect
         } = await getMenTree();
-
+        checkStrictly.value = false;
         // checkedMenu.value = checkedKeys;
         treeData.value = (TreeSelect) as any as TreeItem[];
+        console.log(treeData.value,'rererere')
       }
 
 
@@ -73,7 +74,6 @@ export default defineComponent({
       }
     }
     function onCheck(checkedKeys, e) {
-      alert('23232')
       check.value = [...checkedKeys, ...e.halfCheckedKeys];
       console.log(checkedKeys, e.halfCheckedKeys, '...checked...');
       console.log(check.value, '...check.value....')

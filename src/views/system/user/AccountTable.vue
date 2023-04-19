@@ -74,16 +74,13 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         // 将数据传递给接口
-       console.log(getTree().getCheckedKeys(),'...getCheckedKeys...?');
-      //  let treeCheck=getTree().getCheckedKeys();
-      //  let DeptId=treeCheck.checked;
         await BulkDept({
           UserIds: user.value,
           DeptId: Number(await checkData.value)
         })
         setModalProps({ confirmLoading: true });
         closeModal();
-        emit('success');
+        await emit('success');
       } finally {
         setModalProps({ confirmLoading: false });
       }

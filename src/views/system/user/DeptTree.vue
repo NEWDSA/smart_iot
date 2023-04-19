@@ -18,16 +18,8 @@ export default defineComponent({
   emits: ['select'],
   setup(_, { emit }) {
     const treeData = ref<TreeItem[]>([]);
-    const treeRef = ref<Nullable<TreeActionType>>(null);
     const selectedKeys = ref();
     const lastSelectedKey = ref();
-    function getTree() {
-      const tree = unref(treeRef);
-      if (!tree) {
-        throw new Error('tree is null!');
-      }
-      return tree;
-    }
     // 获取部门数据
     async function fetch() {
       const { List } = await getDeptList();
@@ -39,8 +31,6 @@ export default defineComponent({
     }
 
     function handleSelect(keys) {
-      console.log(keys[0], '....selectedKeys....')
-      getTree().setCheckedKeys(keys[0]);
       emit('select', keys[0]);
     }
     onMounted(() => {

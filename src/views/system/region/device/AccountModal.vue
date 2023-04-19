@@ -97,7 +97,7 @@ export default defineComponent({
 
     });
 
-    const [registerTable, { getForm, }] = useTable({
+    const [registerTable, { getForm,reload }] = useTable({
       title: '',
       onChange,
       rowSelection: {
@@ -151,7 +151,7 @@ export default defineComponent({
     }
     function ModelStatus(isOpen) {
       console.log(isOpen);
-      // isOpen ? getData() : ''
+      reload()
     }
     async function handleSubmit() {
       try {

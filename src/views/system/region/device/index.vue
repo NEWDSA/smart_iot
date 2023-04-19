@@ -1,8 +1,8 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
-    <DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
-    <BasicTable class="w-3/4 xl:w-4/5" :dataSource="dataSource" :clickToRowSelect="clickToRowSelect"
-      @register="registerTable" :searchInfo="searchInfo">
+    <DeptTree ref="treeRef" class="w-1/4 xl:w-1/5" @select="handleSelect" />
+    <BasicTable class="w-3/4 xl:w-4/5" :clickToRowSelect="clickToRowSelect" @register="registerTable"
+      :searchInfo="searchInfo">
       <template #toolbar>
         <a-button v-if="hasPermission(['BatchAuth_RegionDevice'])" type="primary" @click="handleBulk">批量设置权限</a-button>
         <a-button v-if="hasPermission(['BatchOut_RegionDevice'])" type="primary" @click="handleout">批量移出</a-button>
@@ -54,6 +54,7 @@ export default defineComponent({
     const { hasPermission } = usePermission();
     const go = useGo();
     const searchInfo = reactive<Recordable>({});
+    const treeRef = ref(null);
     const [registerModal, { openModal }] = useModal();
     const [registerMyTable, { openModal: openModal2 }] = useModal();
     const checkedKeys = ref<Array<string | number>>([]);
@@ -73,7 +74,7 @@ export default defineComponent({
     } = useMessage();
     function onChange() {
     }
-    const [registerTable, { reload, getSelectRowKeys,setSelectedRowKeys,deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, setSelectedRowKeys, deleteTableDataRecord }] = useTable({
       title: '区域设备管理',
       onChange,
       rowSelection: {
@@ -91,6 +92,7 @@ export default defineComponent({
           Total
         }
       },
+      immediate: false,
       fetchSetting: {
         pageField: 'PageNum',
         // 传给后台的每页显示多少条的字段
@@ -106,7 +108,6 @@ export default defineComponent({
         schemas: searchFormSchema,
         autoSubmitOnEnter: true,
       },
-      // pagination: true,
       useSearchForm: true,
       showTableSetting: true,
       showIndexColumn: false,
@@ -137,7 +138,6 @@ export default defineComponent({
 
     }
     function onSelectChange(selectedRowKeys: []) {
-      console.log(selectedRowKeys,'...selectedRowKeys...?')
       checkedKeys.value = selectedRowKeys;
       PermisionList.DeviceId = Object.values(selectedRowKeys);
     }
@@ -165,6 +165,7 @@ export default defineComponent({
     }
     async function bulkPermission() {
       await reload()
+      // you don't flush the data
 
     }
     function handleBulk(record: Recordable) {
@@ -206,26 +207,6 @@ export default defineComponent({
       }
 
     }
-    // 获取table数据
-    // async function getData() {
-    //   //  获取区域设备
-    //   dataSource.value = [];
-    //   const { Detail, Total } = await getReginDevice(pagination)
-    //   const result = Detail;
-    //   const TypeList: any = [];
-    //   setPagination({
-    //     total: Total
-    //   })
-    //   result.map(async (item) => {
-    //     const DeviceList = await getDeviceType({
-    //       Id: item.TypeId
-    //     })
-
-    //     TypeList.push(...DeviceList);
-    //     item.typeName = TypeList.find(item1 => item1.TypeId == item.TypeId)?.TypeName;
-    //     dataSource.value.push(item)
-    //   })
-    // }
     async function handleSuccess() {
       await reload();
     }
@@ -265,6 +246,7 @@ export default defineComponent({
       handleout,
       bulkPermission,
       hasPermission,
+      treeRef,
       clickToRowSelect,
       areaId,
       dataSource,

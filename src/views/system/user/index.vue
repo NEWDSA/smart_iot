@@ -80,7 +80,7 @@ export default defineComponent({
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord,clearSelectedRowKeys }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
@@ -169,8 +169,11 @@ export default defineComponent({
       }
 
     }
+    // 批量调动
     async function handleSuccess() {
       await reload();
+      // 清空table 选中状态
+      await clearSelectedRowKeys();
     }
     function handleEditPwd(record: Recordable) {
       // 弹出修改用户密码框
@@ -181,7 +184,7 @@ export default defineComponent({
       })
     }
     async function handleSelect(DeptId) {
-
+      console.log(DeptId,'...DeptId...')
       searchInfo.DeptId = DeptId;
       await reload();
     }

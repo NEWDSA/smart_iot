@@ -1,7 +1,7 @@
 <template>
   <div :class="prefixCls">
     <Popover id="mypopup" title="" trigger="click" :overlayClassName="`${prefixCls}__overlay`">
-      <Badge :count="count" dot :numberStyle="numberStyle">
+      <Badge :count="count" :dot="isdot" :numberStyle="numberStyle">
         <BellOutlined />
       </Badge>
       <template #content>
@@ -12,7 +12,7 @@
                 {{ item.name }}
                 <span v-if="item.list">({{ item.total }})</span>
               </template>
-              <NoticeLists :Datalist="item.list" :params="params" :Total="myTotal" @changePage="changePage"
+              <NoticeLists :Datalist="item.list" :params="item" :Total="myTotal" @changePage="changePage"
                 @title-click="onNoticeClick" />
             </TabPane>
           </template>
@@ -50,21 +50,22 @@ export default defineComponent({
     const tabIndex = ref(0);
     const PageNum = ref(1);
     const params = ref({});
+    const isdot = ref(false);
     const myTotal = ref(0);
     const [openFullLoading, closeFullLoading] = useLoading({
       tip: '加载中...',
     });
     const count = computed(() => {
-      return params.value?.Total;
+
+      listData.value[0].list.length > 0 ? isdot.value = true : isdot.value = false;
+      return listData.value.length;
     })
     onMounted(async () => {
       console.log(listData.value, '?...listData...?');
 
     })
     function onNoticeClick(record) {
-      // createMessage.success('你点击了通知，ID=' + record.id)
-      // 可以直接将其标记为已读（为标题添加删除线）,此处演示的代码会切换删除线状态
-      // record.titleDelete = !record.titleDelete
+      go('/messagecenter/msgCenter')
     }
     function handleClickChange() {
       // clicked.value = !clicked.value;
@@ -131,6 +132,7 @@ export default defineComponent({
       myTotal,
       tabIndex,
       count,
+      isdot,
       PageNum,
       params,
       handleClickChange,
