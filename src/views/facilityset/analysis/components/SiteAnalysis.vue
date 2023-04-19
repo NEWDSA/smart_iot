@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="flex justify-between">
-      <Card style="width: 49.5%;height: 450px;" :loading="loading">
+      <Card style="width: 49.5%;height: 480px;" :loading="loading">
         <VisitAnalysisBar />
       </Card>
-      <Card style="width: 49.5%;height: 450px;" :loading="loading">
+      <Card style="width: 49.5%;height: 480px;" :loading="loading">
         <VisitAnalysis />
       </Card>
       

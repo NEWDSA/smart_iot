@@ -18,6 +18,12 @@ export function getBasicColumns(): BasicColumn[] {
       // onEditRow:
       width: 100,
       // slots:{ customRender : 'address'}
+      customRender: ({ record }) => {
+        if (!record.SortPosition) {
+            return 0 
+        }
+
+      },
     },
     {
       title: '状态',

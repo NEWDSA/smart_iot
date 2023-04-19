@@ -14,7 +14,8 @@
                 <div class="px-5" v-if="editStatus == false">
                     <div class="flex items-center justify-between">
                         <div class="text-xl">{{ WorkorderDetail?.Title }}</div>
-                        <Icon icon="heroicons:pencil-square-solid" :size="20" @click="editStatusFun" v-if="WorkorderDetail?.Status == 1"/>
+                        <Icon icon="heroicons:pencil-square-solid" :size="20" @click="editStatusFun"
+                            v-if="WorkorderDetail?.Status == 1 && mySelf == 2" />
                     </div>
                     <div class="text-gray-400 mt-5">{{ WorkorderDetail?.Content }}</div>
                 </div>
@@ -30,47 +31,56 @@
                         </div>
 
                         <a-button type="primary" size="small" class="ml-4" @click="hadlkOkInput">
-                            保 存
+                            保存
                         </a-button>
                         <a-button type="primary" size="small" class="ml-4" @click="hadlkCancelInput" ghost>
-                            取 消
+                            取消
                         </a-button>
                     </div>
 
                 </div>
 
-                <div class="my-4" >
-                    <a-button type="primary" size="large" @click="openmodal" :disabled="WorkorderDetail?.Status == 2">
-                        转 交
+                <div class="my-4">
+                    <a-button type="primary" size="large" @click="openmodal" v-if="WorkorderDetail?.Status == 1"
+                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
+                        转交
                     </a-button>
-                    <a-button type="primary" size="large" class="ml-4" @click="workOver" v-if="WorkorderDetail?.Status == 1">
-                        完 结
+                    <a-button type="primary" size="large" class="ml-4" @click="workOver" v-if="WorkorderDetail?.Status == 1"
+                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
+                        完结
                     </a-button>
-                    <a-button type="primary" size="large" class="ml-4" v-if="WorkorderDetail?.Status == 2">
-                        重 开 工 单
+                    <a-button type="primary" size="large" class="ml-4" @click="againOpen"
+                        v-if="WorkorderDetail?.Status == 2" :disabled="WorkorderDetail?.Status == 1 || mySelf == 1">
+                        重新受理
                     </a-button>
                 </div>
 
-                <div style="width:95%" >
-                    <a-textarea v-model:value="value" placeholder="在这里输入你的跟进结果" :rows="4" :disabled="WorkorderDetail?.Status == 2"/>
+                <div style="width:95%">
+                    <a-textarea v-model:value="value" placeholder="在这里输入你的跟进结果" :rows="4"
+                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1" />
                 </div>
 
-                <!-- <div>
-                    <Upload v-model:file-list="fileList" name="file" :multiple="true"
-                        action="http://192.168.8.208:4000/api/v1/file/upload" @change="handleChange">
-                        <a-button>
+                <div class="mt-5">
+                    <Upload v-model:file-list="fileList" name="file" :multiple="true" :disabled="WorkorderDetail?.Status == 2 || mySelf == 1"
+                        :action="fileUrl() + 'file/upload'" @change="handleChange" :maxCount="9"
+                        :headers="{
+                            'Authorization':getToken()
+                        }">
+                        <a-button :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
                             <Icon icon="uil:upload" size="14px"></Icon>
                             上传附件
                         </a-button>
                     </Upload>
-                </div> -->
+                </div>
 
                 <div class="my-4">
-                    <a-button type="primary" size="large" @click="hadlkOk" :disabled="WorkorderDetail?.Status == 2">
-                        保 存
+                    <a-button type="primary" size="large" @click="hadlkOk"
+                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
+                        保存
                     </a-button>
-                    <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel" ghost :disabled="WorkorderDetail?.Status == 2">
-                        取 消
+                    <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel" ghost
+                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
+                        取消
                     </a-button>
                 </div>
                 <div class="">
@@ -81,7 +91,11 @@
                         <CollapsePanel expandIconPosition="right" v-for="(item, index) in CollList" :key="index">
                             <template #header>
                                 <div class="flex items-center flex-wrap">
-                                    <Tag color="green">{{ item.Remarks }}</Tag>
+                                    <!-- <Tag color="green">{{ item.Status == 1 ? '新建工单进度' : item.Status == 2 ? '转交工单' :
+                                        item.Status == 3 ? '工单完结' : '更新工单进度' }}</Tag> -->
+                                        <Tag :color="item.Status == 1 ? 'blue' : item.Status == 2 ? 'orange' :
+                                        item.Status == 3 ? 'green' : 'red'">{{ item.Status == 1 ? '创建' : item.Status == 2 ? '转交' :
+                                        item.Status == 3 ? '完结' : '更新' }}</Tag>
                                     <div class="mx-5"></div>
                                     <div class="mr-5 text-gray-500">{{ checkTime(item.Basic?.CreatedAt.seconds) }}</div>
                                     <div class="mr-5 text-gray-500">{{ item.Remarks }}</div>
@@ -99,16 +113,15 @@
 
             <!-- 右侧边栏 -->
             <div class="w-3/10" style="border-left:1px solid #eeeeee;">
-                <div class="">
-                    <Tabs default-active-key="1" centered>
-                        <template v-for="item in achieveList" :key="item.key">
-                            <TabPane :tab="item.name">
-                                <component :is="item.component" :workOrderId="WorkorderId" :DeviceId="DeviceId"
-                                    :ref="(el) => childRef(el, item.key)" />
-                            </TabPane>
-                        </template>
-                    </Tabs>
-                </div>
+                <Tabs default-active-key="1" centered @change="changeTab">
+                    <template v-for="item in achieveList" :key="item.key">
+                        <TabPane :tab="item.name">
+                            <component :is="item.component" :workOrderId="Number(WorkorderId)" :DeviceId="Number(DeviceId)"
+                                :workTitle="WorkorderDetail?.Title" :workContent="WorkorderDetail?.Content" :mySelf="mySelf"
+                                :ref="(el) => childRef(el, item.key)" />
+                        </TabPane>
+                    </template>
+                </Tabs>
             </div>
 
         </div>
@@ -133,10 +146,10 @@
     </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, watch } from 'vue';
 import { BasicTable } from '@/components/Table';
 import { PageWrapper } from '@/components/Page';
-import { TaskTicketInfoApi, TaskTicketCloseApi, TaskTicketProgressSaveApi, TaskTicketProgressListApi, TaskTicketHandOverApi, TaskTicketEditApi } from '@/api/sys/workorder';
+import { TaskTicketInfoApi, TaskTicketCloseApi, TaskTicketProgressSaveApi, TaskTicketProgressListApi, TaskTicketHandOverApi, TaskTicketEditApi, TaskTicketCopyApi, TaskTicketAuthApi } from '@/api/sys/workorder';
 import { Divider, Card, Empty, Descriptions, Steps, Tabs, Collapse, CollapsePanel, Tag, Upload, message, Modal, Input } from 'ant-design-vue';
 import { useModal } from '@/components/Modal';
 import { useRoute } from 'vue-router';
@@ -146,6 +159,9 @@ import deviceDetail from './tab/deviceDetail.vue'
 import log from './tab/log.vue'
 import workorderDetail from './tab/workorderDetail.vue'
 import userDrawer from './userDrawer.vue';
+import { useUserStore } from '@/store/modules/user'
+import { fileUrl } from '@/utils/file/fileUrl'
+import { getToken } from '@/utils/auth'
 // import { refundTimeTableSchema, refundTimeTableData } from './data';
 export default defineComponent({
     components: {
@@ -175,8 +191,8 @@ export default defineComponent({
     setup() {
         const route = useRoute();
         const WorkorderId = ref()
-        const DeviceId = ref(null)
-
+        const DeviceId = ref(1)
+        const mySelf = ref(1)
         const EWorkorderDetailTitle = ref('')
         const EWorkorderDetailContent = ref('')
         const editStatus = ref(false)
@@ -185,13 +201,25 @@ export default defineComponent({
         const value = ref('')
         const CollList: any = ref([])
 
+        const TabKey = ref('1');
         const activeKey = ref([]);
         const sceneStopModal = ref(false)
 
         const annoListRef: any = ref([])
-        const childRef = (el: any) => {
-            annoListRef.value.push(el)
+        const annoListRefj: any = ref([])
+        const annoListRefIndexj: any = ref([])
+        const annoListRefIndex: any = ref([])
+        const childRef = (el: any, key) => {
+            annoListRefj.value.push(el)
+            annoListRefIndexj.value.push(key)
+
         }
+
+        watch(() => annoListRefj.value, (newValue, oldValue) => {
+            annoListRef.value = unique(newValue)
+            annoListRefIndex.value = unique(annoListRefIndexj.value)
+
+        }, { deep: true }) // 开启深度监视才行
 
         interface FileItem {
             uid: string;
@@ -205,6 +233,8 @@ export default defineComponent({
             fileList: FileItem[];
         }
 
+        const userStore = useUserStore()
+
         const [registerMyTable, { openModal }] = useModal();
         function bulkPermission(data, value) {
             var obj: any = {
@@ -215,7 +245,7 @@ export default defineComponent({
                 }
             }
 
-            TaskTicketHandOverApi(obj).then(res => {
+            TaskTicketHandOverApi(obj,Number(WorkorderId.value)).then(res => {
                 if (res == 0) {
                     message.success('转交成功')
                 } else {
@@ -228,6 +258,7 @@ export default defineComponent({
             // 此处可以得到用户ID
             const facilityId = ref(route.params?.id);
             WorkorderId.value = facilityId.value
+            getTaskTicketAuth(facilityId.value)
             getTaskTicketInfo(facilityId.value);
             getTaskTicketProgressList(facilityId.value)
         })
@@ -240,11 +271,38 @@ export default defineComponent({
 
         }
 
+        function getTaskTicketAuth(id){
+            TaskTicketAuthApi(id).then(res=>{
+                if(res==false){
+                    mySelf.value = 1
+                }else{
+                    mySelf.value = 2
+                }
+            })
+        }
+
         function getTaskTicketInfo(id) {
             TaskTicketInfoApi({ "Id": id }).then(res => {
                 WorkorderDetail.value = res[0]
 
                 DeviceId.value = res[0]?.RelevantDevice
+
+                const user: any = userStore.getUserInfo
+                // console.log(user.user); console.log(res[0])
+                // 判断是不是自己
+                if (res[0].Acceptor) {
+                    // console.log(res[0].Acceptor.indexOf(user.user.UserId), 'res[0].Acceptor.indexOf(user.user.UserId)res[0].Acceptor.indexOf(user.user.UserId)')
+                    if (res[0].Acceptor.indexOf(user.user.UserId) > -1) {
+                        mySelf.value = 2
+                    }
+                }
+                // else if (res[0].AcceptanceGroup) {
+                //     // console.log(res[0].Acceptor.indexOf(user.user.UserId), 'res[0].Acceptor.indexOf(user.user.UserId)res[0].Acceptor.indexOf(user.user.UserId)')
+                //     if (res[0].AcceptanceGroup.indexOf(user.user.DeptId) > -1) {
+                //         mySelf.value = 2
+                //     }
+                // }
+
             })
         }
 
@@ -284,7 +342,11 @@ export default defineComponent({
                 Detail: {}
             }
             if (fileList.value.length > 0) {
-                obj.Detail.Files = fileList.value
+                obj.Detail.Files = []
+                for(let i=0,val;val = fileList.value[i++];){
+                    // console.log(val)
+                    obj.Detail.Files.push(val.response.Data)
+                }
             }
             if (value.value != '') {
                 obj.Detail.Operation = value.value
@@ -292,13 +354,14 @@ export default defineComponent({
                 message.error('请输入内容')
                 return;
             }
-            TaskTicketProgressSaveApi(obj).then(res => {
+            TaskTicketProgressSaveApi(obj,Number(WorkorderId.value)).then(res => {
                 if (res == 0) {
                     var Id = WorkorderId.value
                     WorkorderId.value = ''
                     WorkorderId.value = Id
                     message.success('操作成功')
                     value.value = ''
+                    fileList.value = []
                     childHandle()
                     getTaskTicketProgressList(Number(WorkorderId.value))
                 } else {
@@ -327,7 +390,7 @@ export default defineComponent({
                 obj.Detail.Operation = value.value
             }
 
-            TaskTicketCloseApi(obj).then(res => {
+            TaskTicketCloseApi(obj,Number(WorkorderId.value)).then(res => {
                 if (res == 0) {
                     var Id = WorkorderId.value
                     // WorkorderId.value = 33
@@ -336,6 +399,7 @@ export default defineComponent({
                     sceneStopModal.value = false
                     childHandle()
                     getTaskTicketProgressList(Number(WorkorderId.value))
+                    annoListRef.value[0].getTaskTicketInfo(Number(WorkorderId.value))
                     WorkorderDetail.value.Status = 2
                 } else {
                     message.error('操作失败')
@@ -347,15 +411,17 @@ export default defineComponent({
         }
 
         function hadlkOkInput() {
+
             var obj = {
                 Detail: {
                     Id: Number(WorkorderId.value),
                     Title: EWorkorderDetailTitle.value,
-                    Content: EWorkorderDetailContent.value
+                    Content: EWorkorderDetailContent.value,
+                    Priority: WorkorderDetail.value.Priority
                 }
             }
 
-            TaskTicketEditApi(obj).then(res => {
+            TaskTicketEditApi(obj,Number(WorkorderId.value)).then(res => {
                 EWorkorderDetailTitle.value = ''
                 EWorkorderDetailContent.value = ''
                 editStatus.value = false
@@ -382,19 +448,55 @@ export default defineComponent({
             return strDate
         }
 
-        const childHandle = () => {
-            annoListRef.value.map(item => {
-                console.log(item) // 打印效果在下方
-                item.getTaskTicketInfo('我是传递的数据')
+        function againOpen() {
+            TaskTicketCopyApi({ Id: Number(WorkorderId.value) }).then(res => {
+                if (res) {
+                    message.success('重开成功，请返回列表查看')
+                }
+                // console.log(res)
             })
         }
 
+        function changeTab(e) {
+       
+            var o = isInArray(annoListRefIndex.value,e)
+
+            annoListRef.value[o].getTaskTicketInfo(e != 2 ? Number(WorkorderId.value) : Number(DeviceId.value))
+        }
+        const childHandle = () => {
+            console.log(21)
+            // annoListRef.value.map(item => {
+            //     console.log(item) // 打印效果在下方
+            //     item.value.getTaskTicketInfo(Number(WorkorderId.value))
+            // })
+        }
+        function isInArray(arr, value) {
+            if (arr.length > 0) {
+                for (var i = 0; i < arr.length; i++) {
+                    if (value === arr[i]) {
+                        return i;
+                    }
+                }
+            }
+            return false;
+        }
+        function unique(arr) {
+            console.log(arr)
+            var newArr = [];
+            for (var i = 0; i < arr.length; i++) {
+                if (newArr.indexOf(arr[i]) === -1) {
+                    newArr.push(arr[i]);
+                }
+            }
+            return newArr;
+        }
         return {
             getTaskTicketInfo,
             WorkorderId,
             DeviceId,
             WorkorderDetail,
             value,
+            TabKey,
             activeKey,
             sceneStopModal,
             // text,
@@ -419,7 +521,14 @@ export default defineComponent({
             hadlkCancelInput,
             EWorkorderDetailTitle,
             EWorkorderDetailContent,
-            editStatusFun
+            editStatusFun,
+            againOpen,
+            mySelf,
+            isInArray,
+            changeTab,
+            unique,
+            fileUrl,
+            getToken
             //   registerTimeTable,
         };
     },

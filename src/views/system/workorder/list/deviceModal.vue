@@ -1,6 +1,6 @@
 <template>
-    <BasicModal v-bind="$attrs" @register="registerModal" title="选择可控设备的成员分组" @ok="handleSubmit" width="800px">
-        <BasicTable @register="registerTab">
+    <BasicModal v-bind="$attrs" @register="registerModal" title="选择设备" @ok="handleSubmit" width="800px">
+        <BasicTable @register="registerTab" :maxHeight="420">
             <!-- <template #toolbar>
       <a-button type="primary" @click="expandAll">展开全部</a-button>
       <a-button type="primary" @click="collapseAll">折叠全部</a-button>
@@ -9,11 +9,12 @@
     </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref, onMounted } from 'vue';
+import { defineComponent, ref, computed, unref, onMounted,reactive } from 'vue';
 import { useMessage } from '@/hooks/web/useMessage';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { deviceColumns, searchFormSchema } from './workData';
+import { deviceTree, getReginDevice, getDeviceType, getReginList } from '@/api/demo/region'
 // import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
 import { facilityListApi } from '@/api/facility/facility';
@@ -23,19 +24,51 @@ export default defineComponent({
     emits: ['success', 'register', 'select'],
     setup(_, { emit }) {
         const checkedKeys = ref<Array<string | number>>([]);
-        const { createConfirm } = useMessage(); 
-        const checkData:any = ref();
+        const { createConfirm } = useMessage();
+        const checkData: any = ref();
         const DataType = ref('');
+        const TreeTableData: any = reactive([]);
         const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
             // console.log(data,4564564)
             DataType.value = data.type
 
             checkedKeys.value = []
             checkedKeys.value = data.data
-            
+
+            // 获取设备分类
+            await deviceTree().then((res) => {
+                for (let i = 0; i < res.length; i++) {
+                    TreeTableData.push(res[i].SelfData);
+                    if (res[i].SonData) {
+                        TreeTableData[i].children = []
+                        for (let y = 0; y < res[i].SonData.length; y++) {
+
+                            TreeTableData[i].children.push(res[i].SonData[y].SelfData)
+                            if (res[i].SonData[y].SonData) {
+                                TreeTableData[i].children[y].children = []
+                                for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
+                                    TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
+                                }
+                            }
+                        }
+                    }
+                }
+                return res;
+            });
+            // 接入区域列表
+            const { Detail } = await getReginList();
+            getForm().updateSchema({
+                field: 'TypeId',
+                componentProps: { treeData: TreeTableData },
+            })
+            getForm().updateSchema({
+                field: 'RegionId',
+                componentProps: { treeData: Detail },
+            })
+
         });
 
-        const [registerTab, { reload, updateTableDataRecord, getSelectRowKeys, getSelectRows, deleteTableDataRecord }] = useTable({
+        const [registerTab, { reload, updateTableDataRecord,getForm, getSelectRowKeys, getSelectRows, deleteTableDataRecord }] = useTable({
             api: facilityListApi,
             title: '设备列表',
             rowKey: 'DeviceId',
@@ -44,7 +77,7 @@ export default defineComponent({
                 selectedRowKeys: checkedKeys,
                 onChange: onSelectChange,
             },
-            columns:deviceColumns,
+            columns: deviceColumns,
             fetchSetting: {
                 pageField: 'PageNum',
                 // 传给后台的每页显示多少条的字段
@@ -54,7 +87,7 @@ export default defineComponent({
                 // 接口返回表格总数的字段
                 totalField: 'Total'
             },
-            showIndexColumn:false,
+            showIndexColumn: false,
             formConfig: {
                 labelWidth: 120,
                 schemas: searchFormSchema,
@@ -84,13 +117,18 @@ export default defineComponent({
                 // 将数据传递给接口
                 setModalProps({ confirmLoading: true });
                 closeModal();
-                emit('success', data,dataW);
+                emit('success', data, dataW);
             } finally {
                 setModalProps({ confirmLoading: false });
             }
         }
 
-        return { checkData,DataType, registerModal, onSelectChange, handleSubmit, registerTab, checkedKeys };
+        return { checkData, DataType, registerModal, onSelectChange, handleSubmit, registerTab, checkedKeys };
     },
 });
 </script>
+<style>
+.ant-modal {
+    top: 30px;
+}
+</style>

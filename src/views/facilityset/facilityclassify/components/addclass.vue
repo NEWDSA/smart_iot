@@ -87,7 +87,7 @@ const from = reactive([
   },
   {
     title: '排序',
-    type: 'mast',
+    type: 'no',
     value: '',
     placeholder: '请输入排序',
     typeio: 'input'

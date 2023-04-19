@@ -76,9 +76,10 @@
 
         <template #form-advanceAfter>
           <!-- <div class="" style="width: 60px;"> -->
-            <a-button v-if="hasPermission(['addVisitor_visitorlist'])" type="primary" preIcon="ic:baseline-plus" @click="addVisitor()" class="ml-10">
-              添加预约访客
-            </a-button>
+          <a-button v-if="hasPermission(['addVisitor_visitorlist'])" type="primary" preIcon="ic:baseline-plus"
+            @click="addVisitor()" class="ml-10">
+            添加预约访客
+          </a-button>
           <!-- </div> -->
         </template>
       </BasicTable>
@@ -86,7 +87,7 @@
 
       <visitorModel @register="registerModal" @success="handleSuccess"></visitorModel>
     </div>
-</PageWrapper>
+  </PageWrapper>
 </template>
 
 <script>
@@ -99,10 +100,12 @@ import { TabColumns, getFormConfig } from './visitorData'
 import { useModal } from '@/components/Modal';
 import visitorModel from './visitorModal.vue';
 import { message, Select, Input } from 'ant-design-vue';
-import { useLoading } from '@/components/Loading';
+// import { useLoading } from '@/components/Loading';
 import { PageWrapper } from '@/components/Page';
 import { fileUrl } from '@/utils/file/fileUrl'
-import {usePermission} from '@/hooks/web/useButtonPermission';
+import { usePermission } from '@/hooks/web/useButtonPermission';
+import { Loading, useLoading } from '@/components/Loading';
+
 export default defineComponent({
   components: { BasicTable, TableAction, visitorModel, Select, Input, PageWrapper },
   setup() {
@@ -115,6 +118,10 @@ export default defineComponent({
     })
 
     const url = ref(fileUrl())
+
+    const [openFullLoading, closeFullLoading] = useLoading({
+      tip: '加载中...',
+    });
 
     const [registerModal, { openModal }] = useModal();
     // 表格数据
@@ -130,7 +137,7 @@ export default defineComponent({
         dataIndex: 'action',
         // slots: { customRender: 'action' },
         fixed: undefined,
-      }, 
+      },
       formConfig: getFormConfig(),
       showTableSetting: true,
       tableSetting: { fullScreen: true },
@@ -199,14 +206,14 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认预约',
               placement: 'left',
-              ifShow:  hasPermission(['handlecancel_visitorlist']),
+              ifShow: hasPermission(['handlecancel_visitorlist']),
               confirm: handlecancel.bind(null, record, 2),
             },
             // onClick: handleLook.bind(null, record)
           },
           {
             label: '取消',
-            ifShow:  hasPermission(['handlecancel_visitorlist']),
+            ifShow: hasPermission(['handlecancel_visitorlist']),
             popConfirm: {
               title: '是否确认取消',
               placement: 'left',
@@ -216,12 +223,12 @@ export default defineComponent({
           },
           {
             label: '修改',
-            ifShow:  hasPermission(['handleEdit_visitorlist']),
+            ifShow: hasPermission(['handleEdit_visitorlist']),
             onClick: handleEdit.bind(null, record)
           },
           {
             label: '查看',
-            ifShow:  hasPermission(['handleLook_visitorlist']),
+            ifShow: hasPermission(['handleLook_visitorlist']),
             onClick: handleLook.bind(null, record)
           }
         ]
@@ -231,7 +238,7 @@ export default defineComponent({
         return [
           {
             label: '登记',
-            ifShow:  hasPermission(['handlecancel_visitorlist']),
+            ifShow: hasPermission(['handlecancel_visitorlist']),
             popConfirm: {
               title: '是否确认登记',
               placement: 'left',
@@ -241,7 +248,7 @@ export default defineComponent({
           },
           {
             label: '取消',
-            ifShow:  hasPermission(['handlecancel_visitorlist']),
+            ifShow: hasPermission(['handlecancel_visitorlist']),
             popConfirm: {
               title: '是否确认取消',
               placement: 'left',
@@ -251,12 +258,12 @@ export default defineComponent({
           },
           {
             label: '修改',
-            ifShow:  hasPermission(['handleEdit_visitorlist']),
+            ifShow: hasPermission(['handleEdit_visitorlist']),
             onClick: handleEdit.bind(null, record)
           },
           {
             label: '查看',
-            ifShow:  hasPermission(['handleLook_visitorlist']),
+            ifShow: hasPermission(['handleLook_visitorlist']),
             onClick: handleLook.bind(null, record)
           }
         ]
@@ -329,13 +336,17 @@ export default defineComponent({
     }
 
     function handlecancel(record, status) {
+      openFullLoading()
       //Status 5 因为是取消所以固定死
       visitorStatusEditApi({ Status: status, VisitorId: record.VisitorId }).then(res => {
         if (res == 0) {
+          message.success('操作成功')
           reload()
         } else {
           message.error('操作失败')
         }
+        closeFullLoading()
+
         // console.log(res)
       })
     }

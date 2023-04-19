@@ -106,16 +106,17 @@ export const dynamicInfoItems: DynamicInfoItem[] = [
 
 export const groupItems: GroupItem[] = [
   {
-    title: '设备触发',
-    icon: 'carbon:logo-github',
+    title: '条件触发',
+    icon: 'ps:cpu',
     color: '',
+    size:'15px',
     desc: '不要等待机会，而要创造机会。',
     group: '开源组',
     date: '2021-04-01',
   },
   {
     title: '定时触发',
-    icon: 'ion:logo-vue',
+    icon: 'clarity:alarm-clock-line',
     color: '#3fb27f',
     desc: '现在的你决定将来的你。',
     group: '算法组',
@@ -123,7 +124,7 @@ export const groupItems: GroupItem[] = [
   },
   {
     title: '手动触发',
-    icon: 'ion:logo-html5',
+    icon: 'material-symbols:fingerprint',
     color: '#e18525',
     desc: '没有什么才能比努力更重要。',
     group: '上班摸鱼',

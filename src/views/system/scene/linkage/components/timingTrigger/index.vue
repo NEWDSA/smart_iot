@@ -58,9 +58,10 @@ export default defineComponent({
     }
 
     watch(() => props.InfoObj, (newVal, oldVal) => {
-      console.log(typeof (CompObj.value), CompObj.value)
-        console.log(typeof (setObj.value), setObj.value)
+      // console.log(typeof (CompObj.value), CompObj.value)
+      //   console.log(typeof (setObj.value), setObj.value)
       // if (props.InfoObj != '') {
+        console.log(newVal,'newValnewValnewValnewValnewValnewVal')
         var oobj = JSON.parse(props.InfoObj)
         CompObj.value = oobj.EchoItems
         setObj.value = oobj.OperationItems

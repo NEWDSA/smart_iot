@@ -64,8 +64,8 @@ onMounted(() => {
   value1.value = dayjs(new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf())
 
   getBoardNum(null, null)
-  getBoardNum(-2, '0')
-  getBoardNum(-3, '1')
+  getBoardNum(-2, '1')
+  getBoardNum(-3, '0')
 })
 
 function getBoardNum(type, index, pp) {

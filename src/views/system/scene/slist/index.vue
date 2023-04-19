@@ -5,7 +5,14 @@
         <!-- 隔代事件传递 -->
         <a-input v-model:value="Name1" @pressEnter="searchScence" placeholder="请输入场景名称" />
         <Button @click="searchScence" type="primary">搜索</Button>
+        <Button @click="searchScenceC">重置</Button>
       </a-col>
+      <a-col class="bg_search" style="right:100px">
+        <a-button type="primary" preIcon="ic:baseline-plus" class="ml-5" @click="addScene()">
+          创建场景
+        </a-button>
+      </a-col>
+
       <Tabs>
         <template v-for="item in achieveList" :key="item.key">
           <TabPane :tab="item.name">
@@ -20,6 +27,17 @@
 import { Tag, Tabs, Row, Col, Button } from 'ant-design-vue';
 import { defineComponent, computed, ref, unref } from 'vue';
 import { CollapseContainer } from '@/components/Container/index';
+import { useGo } from '@/hooks/web/usePage';
+import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
+
+// 设备登录
+const titles = ref([])
+registerTopAreaRef(titles)
+const current = ref("")
+registerCurrentAreaRef(current)
+const devices = ref([])
+registerDevicesRef(devices)
+connect()
 
 import card from './card.vue';
 import { achieveList } from './data';
@@ -40,10 +58,18 @@ export default defineComponent({
     const tabInfo = ref(null); //获取组件的ref
     const Name1 = ref('');
     const Name2 = ref('');
+    const go = useGo();
     async function searchScence(value) {
-      Name2.value=Name1.value
+      Name2.value = Name1.value
+    }
+    async function searchScenceC(value) {
+      Name2.value = ''
+
     }
 
+    function addScene() {
+      go('/scene/linkage')
+    }
 
     return {
       prefixCls: 'account-center',
@@ -51,7 +77,9 @@ export default defineComponent({
       Name1,
       Name2,
       tabInfo,
-      searchScence
+      searchScence,
+      searchScenceC,
+      addScene
     };
   },
 });
@@ -75,8 +103,8 @@ export default defineComponent({
     .bg_search {
       position: absolute;
       display: flex;
-      left: 700px;
-      z-index: 9999;
+      right: 250px;
+      z-index: 999;
     }
 
     &__avatar {

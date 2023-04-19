@@ -3,7 +3,7 @@
     <div class="px-5">
       <div class="flex justify-between items-center">
         <div class="text-lg">工单信息详情</div>
-        <Icon icon="heroicons:pencil-square-solid" :size="24" @click="editStatusFun" v-if="editStatus == false" />
+        <Icon icon="heroicons:pencil-square-solid" :size="24" @click="editStatusFun" v-if="editStatus == false && mySelf == 2 && workObj[3].value == 1" />
       </div>
 
       <div class="centents">
@@ -114,7 +114,7 @@
 import Icon from '@/components/Icon';
 import { ref, onMounted, reactive, watch } from 'vue';
 import { TaskTicketInfoApi, TaskTicketEditApi } from '@/api/sys/workorder'
-import { message, Select } from 'ant-design-vue';
+import { message, Select,Button } from 'ant-design-vue';
 import { useModal } from '@/components/Modal';
 import userDrawer from '@/views/facilityset/facilitylist/components/userDrawer.vue'
 import dayjs from 'dayjs'
@@ -124,11 +124,15 @@ const [registerMyTable, { openModal }] = useModal();
 
 const props = defineProps({
   // 工单ID
+  DeviceId: { type: Number || String, default: 1000025128043 },
   workOrderId: { type: Number || String, default: null },
+  workTitle: { type: String, default: null },
+  workContent: { type: String, default: null },
+  mySelf: { type: Number || String, default: 1 }
 })
 
-const workTitle = ref('')
-const workContent = ref('')
+// const workTitle = ref('')
+// const workContent = ref('')
 const workObj = ref([
   {
     lable: '工单号',
@@ -223,9 +227,12 @@ watch(() => props.workOrderId, () => {
   // props.workOrderId != null ?  : ''
 })
 
-const getTaskTicketInfo = () => {
+const getTaskTicketInfo = (idd) => {
   console.log('work')
-  TaskTicketInfoApi({ 'Id': props.workOrderId }).then(res => {
+  TaskTicketInfoApi({ 'Id': idd ? idd : props.workOrderId }).then(res => {
+    // if(res[0]?.Status == 2){
+    //   editStatus.value = false
+    // }
     workObj.value[0].value = res[0]?.Id
     workObj.value[1].value = res[0]?.Basic?.CreatedAt.seconds
     workObj.value[2].value = res[0]?.CreatorName
@@ -245,8 +252,8 @@ const getTaskTicketInfo = () => {
     workObj.value[13].value = res[0]?.Basic?.UpdatedAt.seconds
 
 
-    workTitle.value = res[0]?.Title
-    workContent.value = res[0]?.Content
+    // workTitle.value = res[0]?.Title
+    // workContent.value = res[0]?.Content
   })
 }
 
@@ -284,17 +291,17 @@ function bulkPermission(data, value, dataW) {
 }
 
 function hadlkOkInput() {
-  if (SGRvalue.value == '') {
-    message.warn('请选择关注人')
-    return;
-  }
+  // if (SGRvalue.value == '') {
+  //   message.warn('请选择关注人')
+  //   return;
+  // }
   var obj = {
     Detail: {
       Id: Number(props.workOrderId),
       Priority: EPriority.value,
       Followers: SGRvalue.value,
-      Title: workTitle.value,
-      Content: workContent.value,
+      Title: props.workTitle,
+      Content: props.workContent,
     }
   }
 

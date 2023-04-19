@@ -87,7 +87,7 @@
     <!-- 用户列表 -->
     <userDrawer @register="registerMyTablee" @success="bulkPermissionn" />
     <!-- 设备 -->
-    <deviceModal @register="registerMyTableee" @success="bulkPermissionnn"/>
+    <deviceModal @register="registerMyTableee" @success="bulkPermissionnn" />
 </template>
 
 <script lang="ts">
@@ -98,7 +98,7 @@ import { getwarnFormConfig } from './workData';
 import { TaskTicketSaveApi } from '@/api/sys/workorder'
 import { message, Select, Button } from 'ant-design-vue';
 import Icon from '@/components/Icon';
-import {getDeptInfoList} from '@/api/demo/system'
+import { getDeptInfoList } from '@/api/demo/system'
 
 import AccountTable from './AccountTable.vue';
 import userDrawer from '@/views/facilityset/facilitylist/components/userDrawer.vue';
@@ -110,7 +110,7 @@ const [registerMyTableee, { openModal: openModal3 }] = useModal();
 
 export default defineComponent({
     name: 'DeptModal',
-    components: { BasicModal, BasicForm, AccountTable, Select, Button, Icon, userDrawer,deviceModal  },
+    components: { BasicModal, BasicForm, AccountTable, Select, Button, Icon, userDrawer, deviceModal },
     emits: ['success', 'register'],
     setup(_, { emit }) {
         const warnId = ref('');
@@ -135,7 +135,7 @@ export default defineComponent({
         });
 
 
-        
+
         const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
             resetFields();
             // 重置
@@ -157,6 +157,18 @@ export default defineComponent({
                 ...data.record,
             });
 
+            updateSchema({
+                field: 'TemplateId',
+                componentProps: {
+                    onChange: (e,key) => {
+                        console.log(e,key)
+                        setFieldsValue({
+                            TemplateName: key.label
+                        });
+                    }
+                },
+            });
+
         });
 
         const options = ref([
@@ -176,7 +188,7 @@ export default defineComponent({
                 // console.log(values)
                 console.log('values', values);//Date.parse(data)
                 // && SGRvalue.value.length && Devicevalue.value.length
-                if (SZvalue.value.length && SRvalue.value.length ) {
+                if (SZvalue.value.length || SRvalue.value.length) {
                     values.AcceptanceGroup = SZvalue.value
                     values.Acceptor = SRvalue.value
                     values.Followers = SGRvalue.value
@@ -202,72 +214,72 @@ export default defineComponent({
                 }
 
 
-                await TaskTicketSaveApi({ ...values }).then(res=>{
+                await TaskTicketSaveApi({ ...values }).then(res => {
                     // if(res?.code == 0){
-                        message.success('新建成功')
-                        closeModal();
-                        emit('success');
+                    message.success('新建成功')
+                    closeModal();
+                    emit('success');
                     // }else{
                     //     message.error(res)
                     // }
                 })
                 // console.log(values);
                 // if(res)
-                
+
             } finally {
                 setModalProps({ confirmLoading: false });
             }
         }
 
         function showSZu() {
-            openModal(true,{
-                data:SZvalue.value
+            openModal(true, {
+                data: SZvalue.value
             });
         }
 
         function showSRen() {
-            if(SZvalue.value.length>0){
+            // if (SZvalue.value.length > 0) {
                 openModal2(true, {
-                type: 'S',
-                data:SRvalue.value
-            });
-            }else{
-                message.warn('请先选择受理组')
-            }
+                    type: 'S',
+                    data: SRvalue.value
+                });
+            // } else {
+            //     message.warn('请先选择受理组')
+            // }
 
-            
+
         }
 
         function showGRen() {
             openModal2(true, {
                 type: 'G',
-                data:SGRvalue.value
+                data: SGRvalue.value
             });
         }
 
-        function showDevice(){
+        function showDevice() {
             openModal3(true, {
-                data:Devicevalue.value
+                data: Devicevalue.value
             });
         }
 
         async function bulkPermission(data) {
             SZvalue.value = data
             SZvalueW.value = []
-            if(data.length >0){
-                for(let i=0;i<data.length;i++){
-                    await getDeptInfoList(data[i]).then(res=>{
+            if (data.length > 0) {
+                for (let i = 0; i < data.length; i++) {
+                    await getDeptInfoList(data[i]).then(res => {
                         SZvalueW.value.push(res.DeptName)
                     })
                 }
             }
-            
+
             // SZvalueW.value = dataW
             // console.log(data)
         }
 
         function bulkPermissionn(data, type, dataW) {
-            console.log(data,dataW)
+            console.log(data, dataW)
             if (type == 'S') {
                 SRvalue.value = data
                 SRvalueW.value = dataW
@@ -278,8 +290,8 @@ export default defineComponent({
             }
         }
 
-        function bulkPermissionnn(data,dataW){
-            console.log(dataW,'Devicevalue')
+        function bulkPermissionnn(data, dataW) {
+            console.log(dataW, 'Devicevalue')
             Devicevalue.value = data
             DevicevalueW.value = dataW
         }
@@ -308,9 +320,10 @@ export default defineComponent({
 
         return {
             registerModal, registerForm, getTitle, handleSubmit, tree, registerMyTable, bulkPermission, options, SZvalue, SRvalue,
-            SGRvalue, showSZu, showSRen, showGRen, registerMyTablee, bulkPermissionn, SZvalueW, SRvalueW, SGRvalueW,warnId,showDevice,
-            registerMyTableee,bulkPermissionnn,Devicevalue,DevicevalueW
+            SGRvalue, showSZu, showSRen, showGRen, registerMyTablee, bulkPermissionn, SZvalueW, SRvalueW, SGRvalueW, warnId, showDevice,
+            registerMyTableee, bulkPermissionnn, Devicevalue, DevicevalueW
         };
     },
 });
 </script>
+

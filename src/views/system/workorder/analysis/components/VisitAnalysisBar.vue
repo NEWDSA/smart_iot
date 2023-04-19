@@ -20,13 +20,15 @@
     <div class="text-3xl">{{ todayData.value }}</div>
     <div class="flex items-center mt-3">
 
-      环比 
-       <div class="ml-4" v-if="Number(todayData.ratio) != 0">
+      环比
+      <div class="ml-4" v-if="Number(todayData.ratio) != 0">
         <Icon icon="mdi:triangle" color="red" v-if="Number(todayData.ratio) > 0"></Icon>
         <Icon icon="mdi:triangle-down" color="green" v-if="Number(todayData.ratio) < 0"></Icon>
       </div>
-      <div class="ml-2" :class="Number(todayData.ratio) > 0 ? 'text-red-500' : Number(todayData.ratio) < 0 ? 'text-green-500' : ''">{{ todayData.ratio }} %</div> 
-     
+      <div class="ml-2"
+        :class="Number(todayData.ratio) > 0 ? 'text-red-500' : Number(todayData.ratio) < 0 ? 'text-green-500' : ''">{{
+          todayData.ratio }} %</div>
+
     </div>
   </div>
   <div ref="chartRef" :style="{ height, width }"></div>
@@ -66,24 +68,48 @@ function getTrendRatio() {
     todayData.value.value = res.LatelyData
     todayData.value.ratio = res.RingGrowth
     let xAxisdata: any = []
+    let xAxisdatas: any = []
     let seriesdata: any = []
 
     if (type.value == 1) {
       for (let i = res.TrendForDay.length - 1; i > -1; i--) {
-        xAxisdata.push(res.TrendForDay[i].TimeAxis)
+
+        // xAxisdata.push(res.TrendForDay[i].TimeAxis)
+        if (i == 0) {
+          xAxisdata.push('今日')
+          // return
+        } else {
+          xAxisdata.push(' ')
+        }
+        xAxisdatas.push(res.TrendForDay[i].TimeAxis)
+
         seriesdata.push(res.TrendForDay[i].Quantity)
       }
     }
     if (type.value == 2) {
       for (let i = res.TrendForWeek.length - 1; i > -1; i--) {
-        xAxisdata.push(res.TrendForWeek[i].TimeAxis)
+        // xAxisdata.push(res.TrendForWeek[i].TimeAxis)
+         if (i == 0) {
+            xAxisdata.push('今日')
+            // return
+          } else {
+            xAxisdata.push(' ')
+          }
+          xAxisdatas.push(res.TrendForWeek[i].TimeAxis)
         seriesdata.push(res.TrendForWeek[i].Quantity)
       }
     }
 
     if (type.value == 3) {
       for (let i = res.TrendForMonth.length - 1; i > -1; i--) {
-        xAxisdata.push(res.TrendForMonth[i].TimeAxis)
+        // xAxisdata.push(res.TrendForMonth[i].TimeAxis)
+        if (i == 0) {
+            xAxisdata.push('今日')
+            // return
+          } else {
+            xAxisdata.push(' ')
+          }
+          xAxisdatas.push(res.TrendForMonth[i].TimeAxis)
         seriesdata.push(res.TrendForMonth[i].Quantity)
       }
     }
@@ -99,6 +125,10 @@ function getTrendRatio() {
             width: 1,
             color: '#019680'
           }
+        },
+        formatter: function (data) {
+          // console.log(data)
+          return data[0].dimensionNames[data[0].dataIndex] + '： ' + data[0].data
         }
       },
       grid: { left: '1%', right: '1%', top: '2  %', bottom: 0, containLabel: true },
@@ -110,7 +140,7 @@ function getTrendRatio() {
         },
         axisLabel: {//坐标轴刻度标签的相关设置。
           interval: 0,
-          rotate: -45,
+          // rotate: -45,
           formatter: function (params: string) {
             var newParamsName = "";
             var paramsNameNumber = params.length;
@@ -159,6 +189,7 @@ function getTrendRatio() {
       },
       series: [
         {
+          dimensions: xAxisdatas,
           data: seriesdata,
           type: 'bar',
           barMaxWidth: 80
@@ -176,6 +207,19 @@ function getTrendRatio() {
 function changeCharTime(ctype: Number) {
   type.value = ctype
   getTrendRatio()
+}
+
+function changeData(time: number) {
+  var date = new Date(time * 1000);
+  // var Y = date.getFullYear() + '-';
+  var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+  var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+
+  // var h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
+  // var m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
+  // var s = (date.getSeconds() < 10 ? '0' + (date.getSeconds()) : date.getSeconds());
+  var strDate = M + D;
+  return strDate
 }
 
 const height = ref('400px')

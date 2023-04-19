@@ -12,6 +12,7 @@ var topAreas;
 var currentArea;
 var devices;
 var jessibucaPlayers = {}
+var DeviceId;
 
 export {
     connect,
@@ -29,6 +30,7 @@ function connect() {
     ws = new WebSocket(webHttp);
     ws.onopen = login;
     ws.onmessage = function (evt) {
+        console.log(evt, 'evtevtevtevtevtevtevtevtevtevtevtevtevtevtevt')
         var msg = JSON.parse(evt.data);
         // console.log(msg)
         // debugger;
@@ -71,14 +73,19 @@ function connect() {
                             }
                         }
                     })
-                    devices.value = msg.response
-                    // console.log(msg)
+                    if (msg.response) {
+                        devices.value = msg.response
+                        console.log(devices.value, '1')
+                    }
+
                 }
             }
         } else if ('event' in msg) {
             if (msg.event == 'device.status') {
+                // devices.value = {}
+                console.log(devices.value, '2')
                 devices.value = msg
-                // debugger;
+                console.log(devices.value, '2')
                 // var i = 0;
                 // for (; i < devices.value.length; i++) {
                 //     if (devices.value[i].device.id == msg.deviceId) {
@@ -131,6 +138,17 @@ function connect() {
             }
         };
     }
+    ws.onclose = () => {
+        // const titles = []
+        // registerTopAreaRef(titles)
+        // const current = ""
+        // registerCurrentAreaRef(current)
+        // const devices = []
+        // registerDevicesRef(devices)
+        connect()
+
+        subscribeDeviceStatusNew(DeviceId)
+    };
 }
 
 function video_stop(e) {
@@ -193,8 +211,8 @@ function subscribeDeviceStatus() {
     ws.send(JSON.stringify(cmd))
 }
 
-function subscribeDeviceStatusNew(device:number) {
-   
+function subscribeDeviceStatusNew(device: number) {
+    DeviceId = device
     var cmd = {
         command: "subscribe",
         "session-id": token,
@@ -260,3 +278,18 @@ function send_device_command(e, device, model, field, vfield) {
     // console.log('JSON.stringify(cmd)',JSON.stringify(cmd))
     ws.send(JSON.stringify(cmd))
 }
+
+export function send_device_command_right_away(ruleId) {
+    var cmd = {
+        command: "rule",
+        "session-id": token,
+        parameters: {
+            token: token,
+            ruleId: ruleId,
+            operation: "execute"
+        }
+    }
+    // console.log('JSON.stringify(cmd)',JSON.stringify(cmd))
+    ws.send(JSON.stringify(cmd))
+}
+

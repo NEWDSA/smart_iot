@@ -52,7 +52,12 @@ function getBarData(time) {
       console.log(456456)
     }
     console.log(res)
-    var num = res?.ExceptionAlertTotal || 0 + res?.FaultAlertTotal || 0 + res?.OtherAlertTotal || 0
+    console.log(res.ExceptionAlertTotal,res.FaultAlertTotal)
+    console.log(res.ExceptionAlertTotal + res.FaultAlertTotal)
+    var a = res.ExceptionAlertTotal ? res.ExceptionAlertTotal : 0
+    var b = res.FaultAlertTotal ? res.FaultAlertTotal : 0
+    var c = res.OtherAlertTotal ? res.OtherAlertTotal : 0
+    var num =  a+b+c
     // console.log(num)
     if (num == 0) {
       show.value = true

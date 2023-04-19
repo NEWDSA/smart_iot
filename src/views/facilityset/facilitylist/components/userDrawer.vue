@@ -1,6 +1,6 @@
 <template>
-    <BasicModal v-bind="$attrs" @register="registerModal" title="选择用户" @ok="handleSubmit" width="800px">
-        <BasicTable @register="registerTab">
+    <BasicModal v-bind="$attrs" @register="registerModal" title="选择用户" @ok="handleSubmit" width="1200px">
+        <BasicTable @register="registerTab" :maxHeight="500">
             <!-- <template #toolbar>
       <a-button type="primary" @click="expandAll">展开全部</a-button>
       <a-button type="primary" @click="collapseAll">折叠全部</a-button>
@@ -98,3 +98,8 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.ant-modal {
+    top: 30px;
+}
+</style>

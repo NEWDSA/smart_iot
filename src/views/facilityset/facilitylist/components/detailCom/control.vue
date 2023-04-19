@@ -12,10 +12,10 @@
                 <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
                     Th.value.value == false ? '关闭'
-                        : '打开'
+                    : '打开'
                 }}</div>
 
-                <div class="w-1/4"  v-if="ModelId == 'curtain'">
+                <div class="w-1/4" v-if="ModelId == 'curtain'">
                     <div class="flex">
                         <div class="px-2 rounded mr-3" @click="buttomCut(1, Th)"
                             :class="Th.value.value == 1 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
@@ -31,7 +31,7 @@
                     </div>
                 </div>
 
-                <div class="w-1/4"  v-else>
+                <div class="w-1/4" v-else>
                     <div class="flex">
                         <div class="px-2 rounded mr-3" @click="buttomCut(1, Th)"
                             :class="Th.value.value == 1 ? 'bg-blue-600 text-white' : 'border-soild border border-blue-600 text-blue-600'">
@@ -48,7 +48,7 @@
                 <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
                     returnVlaue(Th.model,
-                    Th.value.value)
+                        Th.value.value)
                 }}</div>
                 <div class="w-1/4">
                     <div class="fasility-set-select">
@@ -95,12 +95,21 @@
             </div>
 
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'camera'">
-                <div class="w-1/4">{{ Th.model.name }}</div>
+                <div class="w-1/4">{{ Th.model.name || '监控视频' }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }}</div>
-                <div class="w-1/4 flex">
-                    <div class="px-2 rounded mr-3 bg-blue-600 text-white" @click="buttomCut(false, Th)">
-                        关闭
+                <div class="w-2/4">
+                    <div class="ui_form_item flexbox">
+                        <figure class="mb5">
+                            <img :id="DeviceId + '-cover'" width="100%" :src="camearImg" class="loading_gif success"
+                                data--lazy-load-img-state="success" :device="DeviceId" :model="Th.model"
+                                :field="Th.model.field" vfield="" @click="sendDeviceCommand($event, Th.model.field)" />
+                        </figure>
                     </div>
+
+                    <div class="player" :id="DeviceId + '-player'"></div>
+
+                    <button type="button" style="display:none" :device="DeviceId" :id="DeviceId + '-closeButton'"
+                        @click="videoStop" class="ui_btn ui_inline" size="xs">关闭</button>
                 </div>
             </div>
 
@@ -115,7 +124,7 @@
                 <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
                     Th.value.value == false ? '关闭'
-                        : '打开'
+                    : '打开'
                 }}</div>
 
                 <div class="w-1/4" v-if="ModelId == 'curtain'">
@@ -124,7 +133,7 @@
                             :class="Th.value.value == 1 ? 'bg-gray-500 text-white' : 'border-soild border border-grey-600 text-grey-600'">
                             全开</div>
 
-                        <div class="px-2 rounded mr-3" 
+                        <div class="px-2 rounded mr-3"
                             :class="Th.value.value == 0 ? 'bg-gray-500 text-white' : 'border-soild border border-grey-600 text-grey-600'">
                             停止</div>
 
@@ -151,12 +160,11 @@
                 <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
                     returnVlaue(Th.model,
-                    Th.value.value)
+                        Th.value.value)
                 }}</div>
                 <div class="w-1/4">
                     <div class="fasility-set-select">
-                        <Select :value="returnVlaue(Th.model, Th.value.value)" class="w-25" @change="SelectCut"
-                            disabled>
+                        <Select :value="returnVlaue(Th.model, Th.value.value)" class="w-25" @change="SelectCut" disabled>
                             <div :value="item.name" v-for="(item, index2) in Th.model['select-item']" :key="item.value"
                                 :field="Th.model.field">
                                 {{ item.value }}
@@ -169,7 +177,7 @@
             <div class="w-full flex p-2 border-b border-gray-100 border-solid" v-if="Th.model.view == 'slide'">
                 <div class="w-1/4">{{ Th.model.name }}</div>
                 <div class="w-1/4 overflow-hidden overflow-ellipsis whitespace-nowrap">{{ Th.value.value }} {{
-                    Th.model.field == "percentage" ? '%' : '121'
+                    Th.model.field == "percentage" ? '%' : ''
                 }}</div>
                 <div class="w-1/4">
                     <div class="flex items-center">
@@ -216,15 +224,18 @@
 
 <script setup>
 import { ref, reactive, watch, onDeactivated } from 'vue';
-import { Select, Input } from 'ant-design-vue';
+import { Select, Input, Button } from 'ant-design-vue';
 import { Icon } from '/@/components/Icon';
 import { useLoading } from '/@/components/Loading';
-import { send_device_command } from '@/utils/iot'
-
+import { send_device_command, video_stop } from '@/utils/iot'
+import { facilityStateApi } from '@/api/facility/facility'
 // 请求
-import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef, devices } from '@/utils/iot'
+import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
 import { number } from 'vue-types';
+import camearImg from './camera.jpg'
 
+// const showCamearImg = ref('./camera.jpg')
+// showCamearImg.value = camearImg
 const props = defineProps({
     DeviceModel: {
         type: String,
@@ -242,12 +253,34 @@ const props = defineProps({
         type: Number,
         default: 0
     },
+    DeviceStatus: {
+        type: Array,
+        // default: []
+        required: true
+    }
 })
 // 数组
 const model = ref()
 if (props.DeviceModel) {
+    console.log(props.DeviceId)
     model.value = JSON.parse(props.DeviceModel)
-    console.log('model', JSON.parse(props.DeviceModel))
+    for (let i = 0; i < model.value.length; i++) {
+        facilityStateApi({
+            Field:model.value[i].model.field,
+            DeviceId:props.DeviceId
+        }).then(res=>{
+            if(res.Code == 200 && res.Data != ''){
+                if(model.value[i].model.field == 'switch'){
+                    model.value[i].value.value = res.Data == 1 ? true : false
+                }else{
+                 model.value[i].value.value = res.Data
+                }
+            }else{
+                // 不处理
+            }
+        })
+    }
+    // console.log('model', JSON.parse(props.DeviceModel))
 }
 // console.log(props.DeviceModel)
 // watch(()=>props.DeviceModel,(newVal,oldVal)=>{
@@ -280,19 +313,38 @@ const [openWrapLoading, closeWrapLoading] = useLoading({
     },
 });
 
-watch(() => devices.value, (newVal, oldVal) => {
-    console.log('devices.value', devices.value)
-    for (var j in devices.value.properties) {
+// watch(() => devices.value, (newVal, oldVal) => {
+//     // debugger;
+
+//     console.log('devices.value', devices.value)
+//     for (var j in devices.value.properties) {
+//         for (let i = 0; i < model.value.length; i++) {
+//             console.log('比较', model.value[i].model.field, j)
+//             if (model.value[i].model.field == j) {
+//                 model.value[i].value.value = devices.value.properties[j].value
+//             }
+//         }
+//     }
+// }, {
+//     deep: true
+// })
+
+watch(() => props.DeviceStatus, (newVal, oldVal) => {
+    // debugger;
+
+    console.log('props.DeviceStatusprops.DeviceStatusprops.DeviceStatus', props.DeviceStatus)
+    for (var j in props.DeviceStatus.properties) {
         for (let i = 0; i < model.value.length; i++) {
-            console.log('比较', model.value[i].model.field, j)
+            console.log('比较', model.value[i].model.field ,  j)
             if (model.value[i].model.field == j) {
-                model.value[i].value.value = devices.value.properties[j].value
+                model.value[i].value.value = props.DeviceStatus.properties[model.value[i].model.field].value
             }
         }
     }
 }, {
     deep: true
 })
+
 
 // 个别设备登录 subscribeDeviceStatusNew
 
@@ -363,6 +415,13 @@ function returnVlaue(data, id) {
         }
     }
 }
+function sendDeviceCommand(e, field) {
+    console.log(e)
+    send_device_command(e, props.DeviceId, props.ModelId, field, 'value')
+}
+function videoStop(e) {
+    video_stop(e.target)
+}
 </script>
 
 <style lang="less">
@@ -381,5 +440,23 @@ function returnVlaue(data, id) {
     .ant-select-arrow {
         color: rgb(28, 92, 255) !important;
     }
+}
+
+.player {
+    background: rgba(13, 14, 27, 0.7);
+    width: 100%;
+    height: calc(100vh - 600px);
+    display: none;
+}
+
+@media (max-width: 720px) {
+    .player {
+        width: 90%;
+        height: 52.7vw;
+    }
+}
+
+.ui_form_item img {
+    width: 50%;
 }
 </style>

@@ -1,14 +1,18 @@
 <template>
   <PageWrapper title="场景联动详情" contentBackground>
     <template #extra>
-      <a-button type="primary" @click="saveThings"> 保存设置 </a-button>
+
     </template>
     <div class="lg:flex">
       <div class="lg:w-7/10 w-full !mr-4 enter-y">
-        <span class="flex mb-4">
-          <Icon icon="carbon:3d-cursor" color="#888888" size="30" />
-          <span class="text-lg ml-4">场景名称</span>
-        </span>
+        <div class="flex mb-4 justify-between mt-3">
+          <span class="flex mb-4">
+            <Icon icon="carbon:3d-cursor" color="#888888" size="30" />
+            <span class="text-lg ml-4">场景名称</span>
+          </span>
+          <a-button type="primary" @click="saveThings"> 保存设置 </a-button>
+
+        </div>
         <a-input class="" placeholder="会议室温控场景应用" v-model:value="SceneName" />
         <span class="flex mt-4 mb-4">
           <Icon icon="carbon:3d-cursor" color="#888888" size="30" />
@@ -18,16 +22,16 @@
 
         <ProjectCard @mychange="myevent" :loading="loading" class="enter-y" :selectedIndexPo="CardType" />
         <!-- 条件触发 -->
-        <template v-if="CardType == 0">
+        <template v-if="CardType == 1">
           <!-- <evenTrigger/> -->
           <even-trigger ref="child" :InfoObj="InfoObj.Content" />
         </template>
         <!-- 定时触发 -->
-        <template v-if="CardType == 1">
+        <template v-if="CardType == 2">
           <timing-trigger ref="setTime" :InfoObj="InfoObj.Content" />
         </template>
         <!-- 手动触发 -->
-        <template v-if="CardType == 2">
+        <template v-if="CardType == 3">
           <hand-trigger ref="hand" :InfoObj="InfoObj.Content" />
         </template>
 
@@ -96,11 +100,12 @@ export default defineComponent({
     const resultListAct: any = ref(null);
     const top = ref<number>(10);
     const loading = ref(true);
-    const CardType = ref(0);
+    const CardType = ref(1);
     const child: any = ref(null);
     const setTime: any = ref(null);
     const hand: any = ref(null);
     const SceneName = ref()
+    const Status = ref()
     function dd(value) {
       console.log(value, '?...value...?')
     }
@@ -158,11 +163,32 @@ export default defineComponent({
 
       // console.log(mergedData, 'mergedDatamergedDatamergedData')
       let EndDD: any = {}
+      if (SceneName.value == '') {
+        message.warn('请输入场景名称');
+        return;
+      }
       EndDD.Name = SceneName.value
       // EndDD.TriggerMode = 
       let mergedData: any = {};
       console.log(CardType.value)
-      if (CardType.value == 0) {
+      if (CardType.value == 1) {
+        console.log(child.value.myData.EndData(), child.value.actionData.EndData())
+        if (child.value.myData.EndData() === false && child.value.actionData.EndData() === false) {
+          message.warn('请选择条件以及动作');
+          return;
+        }
+        if (child.value.myData.EndData() == 1) {
+          message.warn('请选择完整条件')
+          return;
+        }
+        if (child.value.myData.EndData() == 2) {
+          message.warn('请选择完整条件')
+          return;
+        }
+        if (child.value.actionData.EndData() == 1) {
+          message.warn('请选择完整动作')
+          return;
+        }
         if (child.value.myData.EndData().length == 0) {
           message.warn('请选择触发条件');
           return;
@@ -175,13 +201,22 @@ export default defineComponent({
         mergedData.ConditionItems.ConditionType = Number(mergedData.ConditionItems.ConditionType)
         mergedData.EchoItems = child.value.myData.EndData()
         mergedData.OperationItems = child.value.actionData.EndData()
-        mergedData.OperationItems.OperationType = Number(mergedData.OperationItems.OperationType)
+        // mergedData.OperationItems.OperationType = Number(mergedData.OperationItems.OperationType)
 
-        for (let i = 0; i < mergedData.OperationItems.length; i++) {
-          mergedData.OperationItems[i].DeviceParams = {}
-          mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]
-          // enddata[i].push(FfromArr[i])
-        }
+        mergedData.OperationMode = child.value.actionData.bcIndex
+        // for (let i = 0; i < mergedData.OperationItems.length; i++) {
+        //   mergedData.OperationItems[i].DeviceParams = {}
+
+        //   if (!mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]) {
+        //     if (mergedData.OperationItems[i].DeviceField == 'switch') {
+        //       // console.log(mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField])
+        //       mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = false
+        //     }
+        //   } else {
+        //     mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]
+        //   }
+        //   // enddata[i].push(FfromArr[i])
+        // }
 
 
         //   console.log(child.value.myData.EndData()
@@ -190,15 +225,33 @@ export default defineComponent({
         //   , '..dfdrererEndData()EndData()EndData()...')
         mergedData.TriggerType = child.value.myData.isShake == false ? 1 : 0
 
-        mergedData.OperationMode = child.value.actionData.bcIndex
-
         mergedData.EntryType = 'trigger'
         EndDD.Content = JSON.stringify(mergedData)
-        EndDD.DeviceIds = unique(child.value.myData.DeviceIdArr)
+        EndDD.DeviceIds = [...unique(child.value.myData.DeviceIdArr), ...unique(child.value.actionData.DeviceIdArr)]
+        if (child.value.myData.VisitorIdArr.length > 0) {
+          EndDD.VisitorTypeIds = [...unique(child.value.myData.VisitorIdArr)]
+        } else {
+
+        }
+        console.log('child.value.myData.RegionIdArr', child.value.myData.RegionIdArr)
+        if (child.value.myData.RegionIdArr.length > 0) {
+          EndDD.RegionIds = [...unique(child.value.myData.RegionIdArr)]
+        } else {
+
+        }
       }
-      if (CardType.value == 1) {
-        if (setTime.value.myData.EndData().length == 0) {
+      if (CardType.value == 2) {
+        console.log(setTime.value.myData.EndData(),'setTime.value.myData.EndData()')
+        if (!setTime.value.myData.EndData() || setTime.value.myData.EndData().length == 0) {
           message.warn('请选择定时条件');
+          return;
+        }
+        if (setTime.value.actionData.EndData() === false) {
+          message.warn('请选择执行动作');
+          return;
+        }
+        if (setTime.value.actionData.EndData() == 1) {
+          message.warn('请选择完整动作')
           return;
         }
         if (setTime.value.actionData.EndData().length == 0) {
@@ -211,7 +264,7 @@ export default defineComponent({
         mergedData.ConditionItems = null
         mergedData.EchoItems = setTime.value.myData.EndData()
         mergedData.OperationItems = setTime.value.actionData.EndData()
-        mergedData.OperationItems.OperationType = Number(mergedData.OperationItems.OperationType)
+        // mergedData.OperationItems.OperationType = Number(mergedData.OperationItems.OperationType)
         if (obj.circulationNum == '2') {
           mergedData.CronDay = obj.ExecuteDateWeek
         } else {
@@ -233,11 +286,19 @@ export default defineComponent({
           }
         }
 
-        for (let i = 0; i < mergedData.OperationItems.length; i++) {
-          mergedData.OperationItems[i].DeviceParams = {}
-          mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]
-          // enddata[i].push(FfromArr[i])
-        }
+        // for (let i = 0; i < mergedData.OperationItems.length; i++) {
+        //   mergedData.OperationItems[i].DeviceParams = {}
+
+        //   if (!mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]) {
+        //     if (mergedData.OperationItems[i].DeviceField == 'switch') {
+        //       // console.log(mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField])
+        //       mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = false
+        //     }
+        //   } else {
+        //     mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]
+        //   }
+        //   // enddata[i].push(FfromArr[i])
+        // }
 
         mergedData.OperationMode = setTime.value.actionData.bcIndex
 
@@ -245,18 +306,50 @@ export default defineComponent({
         EndDD.Content = JSON.stringify(mergedData)
         EndDD.DeviceIds = unique(setTime.value.actionData.DeviceIdArr)
       }
-      if (CardType.value == 2) {
-        EndDD.Content = JSON.stringify(mergedData)
-        EndDD.DeviceIds = unique(child.value.myData.DeviceIdArr)
-      }
+      if (CardType.value == 3) {
+        if (hand.value.actionData.EndData() == false) {
+          // message.warn('请选择执行动作');
+          return;
+        }
 
-      EndDD.VisitorTypeId = 1
-      EndDD.RegionIds = []
+        if (hand.value.actionData.EndData() == 1) {
+          message.warn('请选择完整动作')
+        }
+
+        mergedData.OperationItems = hand.value.actionData.EndData()
+        if (mergedData.OperationItems == false) {
+          return;
+        }
+        // console.log(mergedData.OperationItems)
+        // debugger;
+        // for (let i = 0; i < mergedData.OperationItems.length; i++) {
+        //   mergedData.OperationItems[i].DeviceParams = {}
+
+        //   if (!mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]) {
+        //     if (mergedData.OperationItems[i].DeviceField == 'switch') {
+        //       // console.log(mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField])
+        //       mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = false
+        //     }
+        //   } else {
+        //     mergedData.OperationItems[i].DeviceParams[mergedData.OperationItems[i].DeviceField] = mergedData.OperationItems[i][mergedData.OperationItems[i].DeviceField]
+        //   }
+        //   // enddata[i].push(FfromArr[i])
+        // }
+        mergedData.OperationMode = hand.value.actionData.bcIndex
+        mergedData.EntryType = 'manual'
+        EndDD.Content = JSON.stringify(mergedData)
+        EndDD.DeviceIds = unique(hand.value.actionData.DeviceIdArr)
+      }
+      // EndDD.VisitorTypeId = 1
+      // EndDD.RegionIds = []
       EndDD.TriggerMode = CardType.value
       // console.log(InfoObj.value)
+      if (Status.value != '') {
+        EndDD.Status = Status.value
+
+      }
       if (InfoObj.value != '' && InfoObj.value != 'I') {
         EndDD.RuleId = InfoObj.value.RuleId
-
         RuleEditApi(EndDD).then(res => {
           if (res == 0) {
             message.success('修改成功')
@@ -429,6 +522,10 @@ export default defineComponent({
       return newArr;
     }
     onMounted(() => {
+      // CardType.value = null
+      SceneName.value = ''
+      Status.value = ''
+      InfoObj.value = ''
       // 此处可以得到用户ID
       const sceneId = ref(route.params?.id);
       console.log(sceneId)
@@ -441,11 +538,10 @@ export default defineComponent({
     async function getRuleInfo(id) {
       await RuleInfoApi({ 'Id': Number(id) }).then(res => {
         // debugger;
-        CardType.value = res[0].TriggerMode ? res[0].TriggerMode : 0
+        CardType.value = res[0].TriggerMode ? res[0].TriggerMode : 1
         SceneName.value = res[0].Name
-
+        Status.value = res[0]?.Status
         nextTick(() => {
-
           InfoObj.value = res[0]
           console.log(InfoObj.value)
         })
@@ -475,6 +571,7 @@ export default defineComponent({
       // saveThingsAct,
       resultListAct,
       SceneName,
+      Status,
       unique,
       getRuleInfo,
       InfoObj
