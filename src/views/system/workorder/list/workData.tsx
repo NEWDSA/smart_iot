@@ -154,7 +154,7 @@ export function getFormConfig() {
         label: '工单状态',
         component: 'Select',
         componentProps: {
-          placeholder: '请选择访客状态',
+          placeholder: '请选择工单状态',
           options: [
             { label: '受理中', value: 1 },
             { label: '已完结', value: 2 },
@@ -184,8 +184,11 @@ export function getFormConfig() {
         ifShow: ({ values }) => {
           return values.Search !== 'NoticeTime'
         },
-        labelWidth: '20px',
+        labelWidth: '5px',
         component: 'Input',
+        componentProps: {
+          placeholder: '请输入关键字',
+        },
         colProps: { span: 6 },
       },
       {
@@ -196,6 +199,9 @@ export function getFormConfig() {
         },
         labelWidth: '20px',
         component: 'DatePicker',
+        componentProps: {
+          placeholder: '请选择时间',
+        },
         colProps: { span: 6 },
       },
     ],
@@ -360,7 +366,8 @@ export const searchFormSchema: FormSchema[] = [
   // },
   {
     field: 'RegionId',
-    label: '',
+    label: ' ',
+    labelWidth:5,
     component: 'TreeSelect',
     colProps: { span: 5 },
     componentProps: {
@@ -375,9 +382,10 @@ export const searchFormSchema: FormSchema[] = [
   },
   {
     field: 'TypeId',
-    label: '',
+    label: ' ',
+    labelWidth:5,
     component: 'TreeSelect',
-    colProps: { span: 5 },
+    colProps: { span: 6 },
     componentProps: {
       placeholder: '请选择设备类型',
       fieldNames: {
@@ -390,12 +398,13 @@ export const searchFormSchema: FormSchema[] = [
   },
   {
     field: 'DeviceName',
-    label: '设备名称',
+    label: ' ',
+    labelWidth:5,
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 7 },
     componentProps: () => {
       return {
-        placeholder: '请输入手机号',
+        placeholder: '请输入设备名称',
       }
     }
   }

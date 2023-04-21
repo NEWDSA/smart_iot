@@ -9,7 +9,7 @@
                 <div class="flex items-center">
                   <img :src="scenesm" alt="">
 
-                  <span class="truncate ... ml-2">{{ item.Name }}</span>
+                  <span class="font-bold truncate ... ml-2 w-full text-lg">{{ item.Name }}</span>
                 </div>
 
                 <Tag
@@ -317,7 +317,7 @@ export default defineComponent({
 
       .icon {
         margin-top: -5px;
-        font-size: 22px;
+        // font-size: 22px;
       }
     }
 
@@ -338,7 +338,7 @@ export default defineComponent({
 
     &-download {
       float: right;
-      font-size: 20px !important;
+      // font-size: 20px !important;
       color: @primary-color;
     }
   }

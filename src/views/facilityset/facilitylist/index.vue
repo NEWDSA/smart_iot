@@ -2,7 +2,7 @@
   <PageWrapper contentFullHeight title="设备列表">
 
     <div>
-      <div class="p-2 bg-white">
+      <div class="py-2 px-5 bg-white">
 
         <div class="my-4 items-center">
           <div class="flex">

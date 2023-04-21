@@ -9,6 +9,7 @@ export const schemas: FormSchema[] = [
         component: 'Input',
         label: '设备ID',
         labelWidth: '20px',
+        colProps: { span: 4 },
         componentProps: {
             placeholder: '请输入设备ID',
         },
@@ -17,6 +18,7 @@ export const schemas: FormSchema[] = [
         field: 'DeviceName',
         component: 'Input',
         label: '设备名称',
+        colProps: { span: 4 },
         labelWidth: '20px',
         componentProps: {
             placeholder: '请输入设备名称',
@@ -27,7 +29,7 @@ export const schemas: FormSchema[] = [
         label: '设备状态',
         labelWidth: '20px',
         component: 'Select',
-        colProps: { span: 3 },
+        colProps: { span: 4 },
         componentProps: {
             placeholder: '请选择状态',
             options: [
@@ -64,7 +66,7 @@ export const schemas: FormSchema[] = [
         label: '设备区域',
         labelWidth: '20px',
         component: 'TreeSelect',
-        colProps: { span: 3 },
+        colProps: { span: 4 },
         componentProps: {
             placeholder: '请选择区域',
             fieldNames: {

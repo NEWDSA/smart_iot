@@ -41,18 +41,7 @@
                 </div>
 
                 <div class="my-4">
-                    <a-button type="primary" size="large" @click="openmodal" v-if="WorkorderDetail?.Status == 1"
-                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
-                        转交
-                    </a-button>
-                    <a-button type="primary" size="large" class="ml-4" @click="workOver" v-if="WorkorderDetail?.Status == 1"
-                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
-                        完结
-                    </a-button>
-                    <a-button type="primary" size="large" class="ml-4" @click="againOpen"
-                        v-if="WorkorderDetail?.Status == 2" :disabled="WorkorderDetail?.Status == 1 || mySelf == 1">
-                        重新受理
-                    </a-button>
+
                 </div>
 
                 <div style="width:95%">
@@ -61,10 +50,10 @@
                 </div>
 
                 <div class="mt-5">
-                    <Upload v-model:file-list="fileList" name="file" :multiple="true" :disabled="WorkorderDetail?.Status == 2 || mySelf == 1"
-                        :action="fileUrl() + 'file/upload'" @change="handleChange" :maxCount="9"
-                        :headers="{
-                            'Authorization':getToken()
+                    <Upload v-model:file-list="fileList" name="file" :multiple="true"
+                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1" :action="fileUrl() + 'file/upload'"
+                        @change="handleChange" :maxCount="9" :headers="{
+                            'Authorization': getToken()
                         }">
                         <a-button :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
                             <Icon icon="uil:upload" size="14px"></Icon>
@@ -76,11 +65,23 @@
                 <div class="my-4">
                     <a-button type="primary" size="large" @click="hadlkOk"
                         :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
-                        保存
+                        更新
                     </a-button>
                     <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel" ghost
                         :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
                         取消
+                    </a-button>
+                    <a-button type="primary" size="large" class="ml-4" @click="openmodal"
+                        v-if="WorkorderDetail?.Status == 1" :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
+                        转交
+                    </a-button>
+                    <a-button type="primary" size="large" class="ml-4" @click="workOver" v-if="WorkorderDetail?.Status == 1"
+                        :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
+                        完结
+                    </a-button>
+                    <a-button type="primary" size="large" class="ml-4" @click="againOpen"
+                        v-if="WorkorderDetail?.Status == 2" :disabled="WorkorderDetail?.Status == 1 || mySelf == 1">
+                        重新受理
                     </a-button>
                 </div>
                 <div class="">
@@ -93,10 +94,12 @@
                                 <div class="flex items-center flex-wrap">
                                     <!-- <Tag color="green">{{ item.Status == 1 ? '新建工单进度' : item.Status == 2 ? '转交工单' :
                                         item.Status == 3 ? '工单完结' : '更新工单进度' }}</Tag> -->
-                                        <Tag :color="item.Status == 1 ? 'blue' : item.Status == 2 ? 'orange' :
-                                        item.Status == 3 ? 'green' : 'red'">{{ item.Status == 1 ? '创建' : item.Status == 2 ? '转交' :
-                                        item.Status == 3 ? '完结' : '更新' }}</Tag>
-                                    <div class="mx-5"></div>
+                                    <Tag :color="item.Status == 1 ? 'blue' : item.Status == 2 ? 'orange' :
+                                        item.Status == 3 ? 'green' : 'red'">{{ item.Status == 1 ? '创建' : item.Status ==
+        2 ? '转交' :
+        item.Status == 3 ? '完结' : '更新' }}</Tag>
+
+                                    <div class="mx-5 font-bold"> {{ item.CreatorName }}</div>
                                     <div class="mr-5 text-gray-500">{{ checkTime(item.Basic?.CreatedAt.seconds) }}</div>
                                     <div class="mr-5 text-gray-500">{{ item.Remarks }}</div>
                                 </div>
@@ -104,6 +107,22 @@
 
                             <div>
                                 {{ item.Operation }}
+                            </div>
+                            <div v-if="item.FilesUrl">
+                                <div class="mt-3 font-semibold">附件：</div>
+                                <Upload v-model:file-list="item.FilesUrl" name="file"
+                                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76" @change="handleChange">
+
+                                    <template #itemRender="{ file, actions }">
+                                        <Space>
+                                            <span :style="file.status === 'error' ? 'color: red' : ''"
+                                                class="font-semibold">{{ file.name
+                                                }}</span>
+                                            <a href="javascript:;" @click="actions.download" class="ml-5">下载</a>
+                                            <!-- <a href="javascript:;" @click="actions.remove">delete</a> -->
+                                        </Space>
+                                    </template>
+                                </Upload>
                             </div>
                         </CollapsePanel>
 
@@ -245,7 +264,7 @@ export default defineComponent({
                 }
             }
 
-            TaskTicketHandOverApi(obj,Number(WorkorderId.value)).then(res => {
+            TaskTicketHandOverApi(obj, Number(WorkorderId.value)).then(res => {
                 if (res == 0) {
                     message.success('转交成功')
                 } else {
@@ -271,11 +290,11 @@ export default defineComponent({
 
         }
 
-        function getTaskTicketAuth(id){
-            TaskTicketAuthApi(id).then(res=>{
-                if(res==false){
+        function getTaskTicketAuth(id) {
+            TaskTicketAuthApi(id).then(res => {
+                if (res == false) {
                     mySelf.value = 1
-                }else{
+                } else {
                     mySelf.value = 2
                 }
             })
@@ -309,6 +328,27 @@ export default defineComponent({
         function getTaskTicketProgressList(id) {
             TaskTicketProgressListApi({ "TaskTicketId": id }).then(res => {
                 CollList.value = res
+                for (let i = 0, val; val = CollList.value[i++];) {
+                    if (val.Files) {
+                        // console.log(CollList.value[i].Files)
+                        CollList.value[i - 1].FilesUrl = []
+                        // $set( CollList.value[i], 'FilesUrl', [])
+                        // CollList.value[i]['FilesUrl'] = []
+                        console.log(CollList.value[i])
+                        for (let y = 0, vall; vall = val.Files[y++];) {
+                            var a = vall.split('/')
+                            // console.log(a)
+                            // message.error(a[2])
+                            CollList.value[i - 1].FilesUrl.push({
+                                uid: y,
+                                name: a[2],
+                                // status: 'done',
+                                url: fileUrl() + vall
+                                // thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ
+                            })
+                        }
+                    }
+                }
             })
         }
         // const [registerTimeTable] = useTable({
@@ -343,7 +383,7 @@ export default defineComponent({
             }
             if (fileList.value.length > 0) {
                 obj.Detail.Files = []
-                for(let i=0,val;val = fileList.value[i++];){
+                for (let i = 0, val; val = fileList.value[i++];) {
                     // console.log(val)
                     obj.Detail.Files.push(val.response.Data)
                 }
@@ -354,7 +394,7 @@ export default defineComponent({
                 message.error('请输入内容')
                 return;
             }
-            TaskTicketProgressSaveApi(obj,Number(WorkorderId.value)).then(res => {
+            TaskTicketProgressSaveApi(obj, Number(WorkorderId.value)).then(res => {
                 if (res == 0) {
                     var Id = WorkorderId.value
                     WorkorderId.value = ''
@@ -390,7 +430,7 @@ export default defineComponent({
                 obj.Detail.Operation = value.value
             }
 
-            TaskTicketCloseApi(obj,Number(WorkorderId.value)).then(res => {
+            TaskTicketCloseApi(obj, Number(WorkorderId.value)).then(res => {
                 if (res == 0) {
                     var Id = WorkorderId.value
                     // WorkorderId.value = 33
@@ -421,7 +461,7 @@ export default defineComponent({
                 }
             }
 
-            TaskTicketEditApi(obj,Number(WorkorderId.value)).then(res => {
+            TaskTicketEditApi(obj, Number(WorkorderId.value)).then(res => {
                 EWorkorderDetailTitle.value = ''
                 EWorkorderDetailContent.value = ''
                 editStatus.value = false
@@ -458,8 +498,8 @@ export default defineComponent({
         }
 
         function changeTab(e) {
-       
-            var o = isInArray(annoListRefIndex.value,e)
+
+            var o = isInArray(annoListRefIndex.value, e)
 
             annoListRef.value[o].getTaskTicketInfo(e != 2 ? Number(WorkorderId.value) : Number(DeviceId.value))
         }

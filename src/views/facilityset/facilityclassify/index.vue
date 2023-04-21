@@ -132,7 +132,7 @@ export default defineComponent({
       // titleHelpMessage: '树形组件不能和序列号列同时存在',
       columns: getBasicColumns(),
       indentSize: 80,
-      pagination:false
+      pagination: false
       // dataSource: toRaw(TreeTableData),
       // rowKey: 'id',
     })
@@ -202,6 +202,9 @@ export default defineComponent({
           } else {
             message.error('修改成功')
             FengfacilityTypeTree();
+
+            addmodel.value.handleClock()
+            addmodel.value.visible = false
           }
           // reload()
         })
@@ -223,6 +226,9 @@ export default defineComponent({
           } else {
             message.error('新增成功')
             FengfacilityTypeTree();
+
+            addmodel.value.handleClock()
+            addmodel.value.visible = false
           }
           // reload()
         })
@@ -243,14 +249,16 @@ export default defineComponent({
           } else {
             message.error('新增成功')
             FengfacilityTypeTree();
+
+            addmodel.value.handleClock()
+            addmodel.value.visible = false
           }
           // reload()
         })
       }
 
       // message.success('操作成功')
-      addmodel.value.handleClock()
-      addmodel.value.visible = false
+
 
     }
 

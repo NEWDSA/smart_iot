@@ -22,6 +22,7 @@ enum Api {
     ruleDelete = '/rule/delete',
 
     fileUpload = '/file/upload',
+    fileDownload = '/file/download',
 
     regionList = '/region/list', //区域列表
     regionInfo = '/region/info'   // 区域详情
@@ -155,3 +156,12 @@ export const seeFileApi = (params) =>
     }, {
         isTransformResponse: true
     });
+
+// 下载文件
+export const fileDownloadApi = (params) =>
+    realHttp.get({
+        url: Api.fileDownload + '?fileUrl='+params,
+    }, {
+        isTransformResponse: true
+    });
+    

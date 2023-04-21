@@ -69,6 +69,7 @@ export const searchFormSchema: FormSchema[] = [
   {
     field: 'NickName',
     label: '用户名',
+    labelWidth:60,
     component: 'Input',
     colProps: { span: 8 },
     componentProps: () => {
@@ -78,11 +79,12 @@ export const searchFormSchema: FormSchema[] = [
           console.log(e)
         }
       }
-    }
+    } 
   },
   {
     field: 'PhoneNumber',
     label: '手机号',
+    labelWidth:60,
     component: 'Input',
     colProps: { span: 8 },
     componentProps: () => {

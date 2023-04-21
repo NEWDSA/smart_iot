@@ -90,7 +90,7 @@ function getTrendRatio() {
       for (let i = res.TrendForWeek.length - 1; i > -1; i--) {
         // xAxisdata.push(res.TrendForWeek[i].TimeAxis)
          if (i == 0) {
-            xAxisdata.push('今日')
+            xAxisdata.push('本周')
             // return
           } else {
             xAxisdata.push(' ')
@@ -104,7 +104,7 @@ function getTrendRatio() {
       for (let i = res.TrendForMonth.length - 1; i > -1; i--) {
         // xAxisdata.push(res.TrendForMonth[i].TimeAxis)
         if (i == 0) {
-            xAxisdata.push('今日')
+            xAxisdata.push('本月')
             // return
           } else {
             xAxisdata.push(' ')

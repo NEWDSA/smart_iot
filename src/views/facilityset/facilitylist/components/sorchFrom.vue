@@ -76,11 +76,17 @@ export default defineComponent({
 }
 
 .ant-form-item-label{
-    text-align: center;
+    text-align: left;
+    padding-left:10px ;
 }
 
 .ant-form-item-control-input-content {
     display: flex;
+    width: 100%;
+}
+.ant-form-item-control-input-content >div {
+    // display: flex;
+    width: 100%;
 }
 </style>
   

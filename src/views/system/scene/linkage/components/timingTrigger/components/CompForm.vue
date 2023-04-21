@@ -93,9 +93,9 @@ const schemas: FormSchema[] = [{
         value: '7',
       }
     ],
-    maxTagCount:2,
+    maxTagCount: 2,
   },
-  colProps: { span: 4 },
+  colProps: { span: 8 },
   ifShow: ({ values }) => {
     return values.ConditionItems == 1;
   }
@@ -122,7 +122,7 @@ const schemas: FormSchema[] = [{
       state.dialogVisible = true
       selectedNumbers.value = cselectedNumbers.value
     },
-    maxTagCount:2,
+    maxTagCount: 2,
     // options: [
     //   {
     //     label: '1',
@@ -149,7 +149,7 @@ const schemas: FormSchema[] = [{
   label: ' ',
   labelWidth: '10px',
   colProps: {
-    span: 3
+    span: 5
   },
   componentProps: {
     placeholder: '请选择',
@@ -171,7 +171,7 @@ const schemas: FormSchema[] = [{
   label: ' ',
   labelWidth: '10px',
   colProps: {
-    span: 3
+    span: 4
   },
   componentProps: {
     format: 'HH:mm',
@@ -188,7 +188,7 @@ const schemas: FormSchema[] = [{
   label: ' ',
   labelWidth: '10px',
   colProps: {
-    span: 3
+    span: 4
   },
   componentProps: {
     format: 'HH:mm',
@@ -205,7 +205,7 @@ const schemas: FormSchema[] = [{
   label: '~',
   labelWidth: '10px',
   colProps: {
-    span: 3
+    span: 4
   },
   componentProps: {
     format: 'HH:mm',
@@ -262,7 +262,7 @@ const schemas: FormSchema[] = [{
   labelWidth: '10px',
   defaultValue: '1',
   colProps: {
-    span: 3
+    span: 5
   },
   componentProps: {
     placeholder: '请选择',
@@ -353,7 +353,33 @@ export default defineComponent({
     }
     function EndData() {
       const values = getFieldsValue()
+      if (values.ConditionItems == 1) {
+        if (!values.ExecuteDate) {
+          return 1
+        }
+      } else {
+        if (!values.ExecuteDateWeek) {
+          return 1
+        }
+      }
+
+      if (!values.ExecuteNum) {
+        return 1
+      }
+
+      if (values.ExecuteNum == 1) {
+        if (!values.ExecuteTime) {
+          return 1
+        }
+      } else if (values.ExecuteNum == 2) {
+        if (!values.StartTime || !values.EndTime || !values.circulationTime ||
+          !values.circulationUnit) {
+          return 1
+        }
+      }
+      
       return values
+      // return values
       // let Str: String;
       // if (values.ConditionItems == 1) {
 
