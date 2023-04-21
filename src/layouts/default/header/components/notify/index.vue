@@ -10,7 +10,7 @@
             <TabPane>
               <template #tab>
                 {{ item.name }}
-                <span v-if="item.list">({{ item.total }})</span>
+                <span v-if="item.list && item.total!=='0'">({{ item.total }})</span>
               </template>
               <NoticeLists :Datalist="item.list" :params="item" :Total="myTotal" @changePage="changePage"
                 @title-click="onNoticeClick" />
@@ -29,14 +29,13 @@
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref, onMounted } from 'vue'
+import { computed, defineComponent, ref, onMounted, watch } from 'vue'
 import { Popover, Tabs, Badge } from 'ant-design-vue'
 import { BellOutlined } from '@ant-design/icons-vue'
 import { tabListData } from './data'
 import NoticeLists from './NoticeList.vue'
 import { NoticeList, NoticeAllRead } from '@/api/demo/system';
 import { useDesign } from '@/hooks/web/useDesign'
-import { useUserStore } from '@/store/modules/user'
 import { useGo } from '@/hooks/web/usePage';
 import { useLoading } from '@/components/Loading';
 import emitter from '@/utils/mybus'
@@ -56,8 +55,7 @@ export default defineComponent({
       tip: '加载中...',
     });
     const count = computed(() => {
-      console.log(listData.value[0],'...listData...?')
-      listData.value[0].list.length > 0 ? isdot.value = true : isdot.value = false;
+      listData.value[0]?.list === undefined ? isdot.value = false : listData.value[0].list.length > 0 ? isdot.value = true : isdot.value = false;
       // return listData.value.length;
     })
     onMounted(async () => {
@@ -66,25 +64,21 @@ export default defineComponent({
     })
     function onNoticeClick(record) {
       // 页面添加一个load
-      
       go('/messagecenter/msgCenter')
     }
     function handleClickChange() {
       // clicked.value = !clicked.value;
     }
-    function AllRead() {
-      var NoticeId: any = [];
-      Datalist.value.forEach((item) => {
-        NoticeId.push(item.NoticeId)
-      })
+    async function AllRead() {
       try {
-        NoticeAllRead()
+        await NoticeAllRead()
       } finally {
-        // emit('getData');
-        emitter.emit('getData');
-        // location.reload();
-        //调用页面的刷新方法
-
+        await emitter.emit('getData');
+        listData.value.map((item) => {
+          item.list = [];
+          item.total='0';
+        })
+        console.log(listData.value)
       }
     }
     function SeeMore() {

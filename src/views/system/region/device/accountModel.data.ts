@@ -32,10 +32,9 @@ export const columns: BasicColumn[] = [
     dataIndex: 'DeviceStatus',
     width: 120,
     customRender: ({ record }) => {
-      const status = record.DeviceStatus
-      const enable = ~~status === 2
-      const color = enable ? 'green' : 'red'
-      const text = enable ? '正常' : '停用'
+      const status = record.NetworkStatus
+      const color= ~~status===2 ?'gray':~~status===1?'green':~~status===3?'yellow':~~status===4?'red':~~status===5?'blue':''
+      const text =  ~~status===2 ?'离线':~~status===1?'在线':~~status===3?'异常':~~status===4?'故障':~~status===5?'运行':''
       return h(Tag, { color: color }, () => text)
     }
   }
@@ -71,7 +70,7 @@ export const searchFormSchema: FormSchema[] = [
   },
   {
     field: 'DeviceName',
-    label: '可添加设备',
+    label: '设备名称',
     component: 'Input',
     colProps: { span: 6 },
     componentProps: () => {

@@ -28,6 +28,7 @@ export default defineComponent({
     const isUpdate = ref(true);
     const isModifiy = ref(0);
     const RegionId = ref('');
+    const UserId=ref();
     const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
       labelWidth: 100,
       baseColProps: { span: 24 },
@@ -45,17 +46,21 @@ export default defineComponent({
           ...data.record,
         });
       }
+      UserId.value=data.record.UserId;
+      console.log(data.record);
     });
 
     async function handleSubmit() {
       try {
         const values = await validate();
-        const value2 = props.data;
-        const param = (({UserId
-        }) => ({ UserId}))(value2)
+        // const value2 = props.data;
+        // const param = (({UserId
+        // }) => ({ UserId}))(value2)
+        // values.UserId=data
+        values.UserId=UserId.value;
         setModalProps({ confirmLoading: true });
         // 调用接口进行密码修改
-        Object.assign(values, param);
+        Object.assign(values);
         updatePwd({
           ...values
         })

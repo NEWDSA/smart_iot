@@ -11,12 +11,13 @@
 
     <template #overlay>
       <Menu @click="handleMenuClick">
-        <MenuItem
+        <!-- <MenuItem
           key="doc"
           :text="t('layout.header.dropdownItemDoc')"
           icon="ion:document-text-outline"
           v-if="getShowDoc"
-        />
+        /> -->
+        <MenuItem key="userCenter" text="用户中心"  icon="ion:person" />
         <MenuDivider v-if="getShowDoc" />
         <MenuItem
           v-if="getUseLockPage"
@@ -41,7 +42,6 @@ import type { MenuInfo } from 'ant-design-vue/lib/menu/src/interface'
 
 import { defineComponent, computed } from 'vue'
 
-import { DOC_URL } from '@/settings/siteSetting'
 
 import { useUserStore } from '@/store/modules/user'
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting'
@@ -51,11 +51,10 @@ import { useModal } from '@/components/Modal'
 
 import headerImg from '@/assets/images/header.jpg'
 import { propTypes } from '@/utils/propTypes'
-import { openWindow } from '@/utils'
-
 import { createAsyncComponent } from '@/utils/factory/createAsyncComponent'
+import { useGo } from '@/hooks/web/usePage';
 
-type MenuEvent = 'logout' | 'doc' | 'lock'
+type MenuEvent = 'logout' | 'userCenter' | 'lock'
 
 export default defineComponent({
   name: 'UserDropdown',
@@ -74,7 +73,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { getShowDoc, getUseLockPage } = useHeaderSetting()
     const userStore = useUserStore()
-
+    const go = useGo();
     const getUserInfo = computed(() => {
       const { realName = '', avatar, desc } = userStore.getUserInfo || {}
       return { realName, avatar: avatar || headerImg, desc }
@@ -93,15 +92,17 @@ export default defineComponent({
 
     // open doc
     function openDoc() {
-      openWindow(DOC_URL)
+     go('/usersettings/userCenter')
+      // openWindow(DOC_URL)
     }
+
 
     function handleMenuClick(e: MenuInfo) {
       switch (e.key as MenuEvent) {
         case 'logout':
           handleLoginOut()
           break
-        case 'doc':
+        case 'userCenter':
           openDoc()
           break
         case 'lock':

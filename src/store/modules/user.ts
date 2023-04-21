@@ -23,7 +23,8 @@ interface UserState {
   roleList: RoleEnum[],
   Permissions:any[],
   sessionTimeout?: boolean
-  lastUpdateTime: number
+  lastUpdateTime: number,
+  msgData:[]
 }
 
 export const useUserStore = defineStore({
@@ -39,7 +40,8 @@ export const useUserStore = defineStore({
     // Whether the login expired
     sessionTimeout: false,
     // Last fetch time
-    lastUpdateTime: 0
+    lastUpdateTime: 0,
+    msgData:[]
   }),
   getters: {
     getUserInfo(): UserInfo {
@@ -56,7 +58,11 @@ export const useUserStore = defineStore({
     },
     getLastUpdateTime(): number {
       return this.lastUpdateTime
+    },
+    getMsgData():[]{
+      return this.msgData
     }
+
   },
   actions: {
     setToken(info: string | undefined) {
@@ -100,6 +106,10 @@ export const useUserStore = defineStore({
         return Promise.reject(error)
       }
     },
+    // async getMsgData(data){
+    //     //设置msg数据
+    //     this.msgData=data;
+    // },
     async afterLoginAction(goHome?: boolean): Promise<GetUserInfoModel | null> {
       if (!this.getToken) return null
       // get user info

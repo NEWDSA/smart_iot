@@ -92,7 +92,7 @@ export const accountFormSchema: FormSchema[] = [
     required: true,
   },
   {
-    field: 'dept',
+    field: 'DeptId',
     label: '所属部门',
     component: 'TreeSelect',
     componentProps: {

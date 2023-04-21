@@ -11,7 +11,6 @@ import { defineComponent, ref, unref, onMounted } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
 import { getDeptList, BulkDept } from '@/api/demo/system';
-import { cwd } from 'process';
 
 export default defineComponent({
   name: 'AccountModal',

@@ -37,7 +37,7 @@
         </template>
       </template>
     </BasicTable>
-
+    <!-- 编辑用户资料 -->
     <AccountModal @register="registerModal" @success="handleSuccess" />
     <AccountTable @register="registerMyTable" @success="handleSuccess" />
     <pwdModal @register="registerpwdModal" @success="pwdSuccess" />
@@ -68,6 +68,7 @@ export default defineComponent({
     const [registerModal, { openModal }] = useModal();
     const [registerpwdModal, { openModal: openModal3 }] = useModal();
     const [registerMyTable, { openModal: openModal2 }] = useModal();
+
     const searchInfo = reactive<Recordable>({});
     const checkedKeys = ref<Array<string | number>>([]);
     const currentModal = shallowRef<Nullable<ComponentOptions>>(null);
@@ -80,7 +81,7 @@ export default defineComponent({
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord,clearSelectedRowKeys }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, deleteTableDataRecord, clearSelectedRowKeys }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
@@ -176,15 +177,19 @@ export default defineComponent({
       await clearSelectedRowKeys();
     }
     function handleEditPwd(record: Recordable) {
-      // 弹出修改用户密码框
-      currentModal.value = pwdModal;
-      myData.value = record;
-      nextTick(() => {
-        modalVisible.value = true;
+      openModal3(true, {
+        record,
+        isUpdate: true
       })
+      // 弹出修改用户密码框
+      // currentModal.value = pwdModal;
+      // myData.value = record;
+      // nextTick(() => {
+      //   modalVisible.value = true;
+      // })
     }
     async function handleSelect(DeptId) {
-      console.log(DeptId,'...DeptId...')
+      console.log(DeptId, '...DeptId...')
       searchInfo.DeptId = DeptId;
       await reload();
     }

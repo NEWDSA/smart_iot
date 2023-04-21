@@ -51,6 +51,14 @@ export default defineComponent({
           defaultValue: Object.keys(resd).length > 0 ? result.RoleIds.toString() : '',
           componentProps: { treeData: result.Roles }
         })
+        const treeData = await getDeptDrop().then((res) => {
+          return res.TreeSelect
+        });
+        updateSchema({
+          field: 'DeptId',
+          defaultValue: data.record.DeptId,
+          componentProps: { treeData }
+        });
 
       } else {
         const { List } = await getAllRoleList()
@@ -59,7 +67,7 @@ export default defineComponent({
           field: 'RoleIds',
           componentProps: { treeData: List }
         })
-        setFieldsValue({DeptId:data.DeptId});
+        setFieldsValue({ DeptId: data.DeptId });
         const treeData = await getDeptDrop().then((res) => {
           return res.TreeSelect
         });
@@ -80,7 +88,7 @@ export default defineComponent({
         // 判断是为数组
         if (values.RoleIds instanceof Array) { Object.assign(values, { RoleIds: values.RoleIds }); }
         else {
-          Object.assign(values, { RoleIds: [values.RoleIds] })
+          Object.assign(values, { RoleIds: [Number(values.RoleIds)] })
         }
         !unref(isUpdate) ? await createAccountList(values) : await modifiAccountList({ ...values, UserId: UserId.value })
         closeModal();

@@ -65,8 +65,9 @@ export default defineComponent({
         const values = await validate();
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
+        console.log(values.menuIds,'..rrerere....')
         values.RoleSort === null || values.RoleSort === undefined ? values.RoleSort = 0 : values.RoleSort;
-        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: check.value })
+        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: values.menuIds.checked})
         emit('success');
 
       } finally {
@@ -74,9 +75,10 @@ export default defineComponent({
       }
     }
     function onCheck(checkedKeys, e) {
-      check.value = [...checkedKeys, ...e.halfCheckedKeys];
-      console.log(checkedKeys, e.halfCheckedKeys, '...checked...');
-      console.log(check.value, '...check.value....')
+      console.log(checkedKeys,'...checkedKeys...');
+      // check.value = [...checkedKeys, ...e.halfCheckedKeys];
+      // console.log(checkedKeys, e.halfCheckedKeys, '...checked...');
+      // console.log(check.value, '...check.value....')
 
 
     }

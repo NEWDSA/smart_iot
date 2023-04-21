@@ -152,7 +152,7 @@ const setting: ProjectConfig = {
   // 是否使用全局错误捕获
   useErrorHandle: false,
   // 是否开启回到顶部
-  useOpenBackTop: true,
+  useOpenBackTop: false,
   //  是否可以嵌入iframe页面
   canEmbedIFramePage: true,
   // 切换界面的时候是否删除未关闭的message及notify
