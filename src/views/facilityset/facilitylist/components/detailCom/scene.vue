@@ -25,7 +25,7 @@
                         <div class="flex items-center">
                             <img :src="scenesm" alt="">
 
-                            <div class="font-bold truncate ... ml-2 w-6/10">
+                            <div class="font-bold truncate ... ml-2 text-lg w-6/10">
                                 {{ Scene.Name }}
                             </div>
                         </div>
@@ -49,15 +49,16 @@
                         }}</span>
                     </div>
                     <!-- <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div> -->
-                    <div class="text-gray-500 truncate ...">关联设备 <span class="text-black">{{
+                    <div class="text-gray-500 truncate ... w-8/10" style="line-height: 36px;">关联设备 <span class="text-black">{{
                         Scene.DeviceNames
                     }}</span></div>
                     <!-- <div class="text-gray-500">触发方式 <span class="text-black">{{
                         Scene.TriggerMode == 1 ? '设备触发' : Scene.TriggerMode == 2 ? '定时触发' : '手动触发'
                     }}</span></div> -->
-                    <!-- <div class="text-gray-500">关联区域 <span class="text-black">{{
-                        checkVisitorType(Scene.VisitorTypeId)
-                    }}</span></div> -->
+                    <div class="text-gray-500 truncate ... w-8/10" style="line-height: 36px;">关联区域 <span class="text-black">{{
+                        Scene.RegionNames
+                    }}</span></div>
+
 
                     <div class="bottom-but flex items-center mt-5 justify-end">
                         <!-- <Modal
@@ -320,7 +321,7 @@ body {
 
             .icon {
                 margin-top: -5px;
-                font-size: 22px;
+                // font-size: 22px;
             }
         }
 
@@ -329,13 +330,13 @@ body {
         }
 
         &-num {
-            margin-left: 24px;
+            // margin-left: 24px;
             line-height: 36px;
             color: @text-color-secondary;
 
             span {
-                margin-left: 5px;
-                font-size: 18px;
+                // margin-left: 5px;
+                // font-size: 18px;
             }
         }
 

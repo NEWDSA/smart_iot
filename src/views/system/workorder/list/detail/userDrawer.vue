@@ -1,5 +1,5 @@
 <template>
-    <BasicModal v-bind="$attrs" @register="registerModal" title="选择可控设备的成员分组" @ok="handleSubmit" width="800px">
+    <BasicModal v-bind="$attrs" @register="registerModal" title="选择用户" @ok="handleSubmit" width="800px">
         <BasicTable @register="registerTab">
             <!-- <template #toolbar>
       <a-button type="primary" @click="expandAll">展开全部</a-button>

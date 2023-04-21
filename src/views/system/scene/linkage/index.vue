@@ -246,6 +246,10 @@ export default defineComponent({
           message.warn('请选择定时条件');
           return;
         }
+        if (setTime.value.myData.EndData() == 1) {
+          message.warn('请选择完整定时条件');
+          return;
+        }
         if (setTime.value.actionData.EndData() === false) {
           message.warn('请选择执行动作');
           return;

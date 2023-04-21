@@ -1,8 +1,8 @@
 <template>
   <div class="md:flex">
-    <Card size="default" :loading="loading" title="" class=" w-full !md:mt-0">
+    <Card size="default" :loading="loading" title="" class=" w-full !md:mt-0 pppo">
 
-      <div class="flex items-center" style="justify-content: end;">
+      <div class="flex items-center mb-3" style="justify-content: end;">
         <DatePicker v-model:value="value1" @change="changeData"></DatePicker>
         <!-- <Tag color="#222222">{{ 1 }}</Tag> -->
       </div>
@@ -146,3 +146,8 @@ const deviceList = ref([
 const value1 = ref<Dayjs>()
 
 </script>
+<style lang="less">
+.pppo .ant-card-body{
+  padding-top:15px !important;
+}
+</style>

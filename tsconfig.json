@@ -37,7 +37,8 @@
     "build/**/*.ts",
     "build/**/*.d.ts",
     "mock/**/*.ts",
-    "vite.config.ts"
-  ],
+    "vite.config.ts",
+    "src/**/js/*.js", 
+    "src/assets/js/decoder.js", "src/assets/js/jessibuca.js", "src/assets/js/lui.js"  ],
   "exclude": ["node_modules", "dist", "**/*.js"]
 }

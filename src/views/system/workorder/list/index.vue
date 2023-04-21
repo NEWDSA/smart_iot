@@ -128,17 +128,17 @@ export default defineComponent({
             showIndexColumn: false,
             handleSearchInfoFn: (e) => {
                 console.log(e)
-                if (e.Search || e.Search != undefined || e.SearchValue != '' || e.SearchValue != undefined) {
+                if (e.Search || e.Search != null) {
                     if (e.Search == 'TaskTicketNo' || e.Search == 'Title') {
                         e[e.Search] = e.SearchValue
                     } else {
                         e[e.Search] = new Date(e.NoticeTime).getTime() / 1000;
                     }
-
+                    e.Search = null
+                    e.SearchValue = null
                 }
-                e.Search = undefined
-                e.SearchValue = undefined
-
+                e.Search = null
+                    e.SearchValue = null
             }
         })
 
