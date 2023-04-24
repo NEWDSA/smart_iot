@@ -101,7 +101,7 @@
         更多+
     </div>
 </div> -->
-        <div v-else class="w-100 mb-5">
+        <div v-else class="w-100 mb-5 mt-3">
             <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5" style="height:195px;">
                 暂无联动
             </div>
@@ -116,7 +116,7 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
 import { Input, Pagination, message, Popconfirm, Tag } from 'ant-design-vue';
-import Icon from '@/components/Icon';
+import Icon from '@/components/Icon'; 
 import { ruleDeleteApi } from '@/api/visitor/visitor'
 import { facilityRuleListApi, ruleEnableApi, ruleDisableApi } from '@/api/facility/facility'
 // import { any } from 'vue-types';

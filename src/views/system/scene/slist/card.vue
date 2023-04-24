@@ -23,10 +23,10 @@
                 }}</span>
               </div>
               <div :class="`${prefixCls}__card-num truncate ...`" style="width: 70%;">
-                关联设备：<span class="text-gray-600" v-if="item?.DeviceIds">{{ item.DeviceNames }}</span>
+                关联设备 <span class="text-black" v-if="item?.DeviceIds">{{ item.DeviceNames }}</span>
               </div>
               <div :class="`${prefixCls}__card-num truncate ...`" style="width: 70%;">
-                关联区域：<span class="text-gray-600" v-if="item?.RegionNames">{{ item.RegionNames || '暂无' }}</span>
+                关联区域 <span class="text-black" v-if="item?.RegionNames">{{ item.RegionNames || '暂无' }}</span>
               </div>
               <div class="bottom-but flex items-center mt-2 justify-end">
 
@@ -235,10 +235,10 @@ export default defineComponent({
     }
 
     function executeRule(id, status) {
-      if (status == 1) {
-        message.warn('设备启用中，请禁用后再试。')
-        return;
-      }
+      // if (status == 1) {
+      //   message.warn('设备启用中，请禁用后再试。')
+      //   return;
+      // }
       // console.log(dataList.value)
       send_device_command_right_away(id)
     }

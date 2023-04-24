@@ -76,7 +76,7 @@ const transform: AxiosTransform = {
     let timeoutMsg = ''
 
     // 如果code==0没data
-    const hasSuccesss = !Data && Reflect.has(data, 'Code') && Code === ResultEnum.SUCCESS // 后端接口数据
+    const hasSuccesss = !Data && Reflect?.has(data, 'Code') && Code === ResultEnum?.SUCCESS // 后端接口数据
     if (hasSuccesss) {
       return 0
     }

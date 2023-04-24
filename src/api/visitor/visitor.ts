@@ -158,10 +158,17 @@ export const seeFileApi = (params) =>
     });
 
 // 下载文件
-export const fileDownloadApi = (params) =>
-    realHttp.get({
-        url: Api.fileDownload + '?fileUrl='+params,
+export function fileDownloadApi(params) {
+    return realHttp.get({
+        url: Api.fileDownload + '?fileUrl=' + params,
     }, {
-        isTransformResponse: true
-    });
-    
+        errorMessageMode: 'message'
+    })
+}
+
+// export const fileDownloadApi = (params) =>
+//     realHttp.get({
+//         url: Api.fileDownload + '?fileUrl=' + params,
+//     }, {
+//         isTransformResponse: true
+//     });

@@ -132,7 +132,7 @@
         <div class="p-5">
           <div class="text-base">当前设备包含关联场景，是否停用关联场景？</div>
           <div class="flex mt-3" style="justify-content: end;">
-             <!-- <div class="bg-blue-600 text-white rounded px-4 py-1 mr-2" @click="stopClick">停用</div> -->
+            <!-- <div class="bg-blue-600 text-white rounded px-4 py-1 mr-2" @click="stopClick">停用</div> -->
             <div class="bg-blue-600 text-white rounded px-4 py-1 mr-2" style="border:1px solid rgba(37, 99, 234)"
               @click="stopCheck">查看关联</div>
             <div class="text-blue-600 rounded px-4 py-1" style="border:1px solid rgba(37, 99, 235,1)" @click="stopClock">
@@ -148,7 +148,7 @@
 import { ref, reactive, defineComponent } from 'vue';
 import { Select, Modal, TreeSelect } from 'ant-design-vue';
 import { useGo } from '@/hooks/web/usePage';
-import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, ruleDisableApi, facilityCheckRuleApi, facilityRegionListApi, facilityDisableRuleApi, facilityRelieveApi } from '@/api/facility/facility';
+import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityCheckRuleApi, facilityRegionListApi, facilityDisableRuleApi, facilityRelieveApi,  } from '@/api/facility/facility';
 
 import SearchFrom from './components/sorchFrom.vue';
 import { message } from 'ant-design-vue';
@@ -159,7 +159,7 @@ import { PageWrapper } from '@/components/Page';
 import { usePermission } from '@/hooks/web/useButtonPermission';
 export default defineComponent({
   name: 'Facilitylist',
-  components: { Select, Modal, TreeSelect, Loading, EditModel, PageWrapper,SearchFrom },
+  components: { Select, Modal, TreeSelect, Loading, EditModel, PageWrapper, SearchFrom },
   setup() {
     const go = useGo();
     const { hasPermission } = usePermission();
@@ -478,7 +478,7 @@ export default defineComponent({
         //   },
         // )
         facilityList.push({            //push设备类别下的小tab栏，初始化
-          facilityTab: {  },          //TypeId: -1, TypeName: "待分类设备"
+          facilityTab: {},          //TypeId: -1, TypeName: "待分类设备"
           facility: []
         })
         // 固定添加结束
@@ -566,14 +566,14 @@ export default defineComponent({
       //   message.warn('请输入内容')
       //   return;
       // }
-      if(value){
-        for(let i in value){
+      if (value) {
+        for (let i in value) {
           SelectFacilityListObj[i] = value[i]
         }
-      }else{
+      } else {
         // console.log('充值')
         // SelectFacilityListObj = reactive({})
-        for(let i in SelectFacilityListObj){
+        for (let i in SelectFacilityListObj) {
           delete SelectFacilityListObj[i]
         }
         // delete SelectFacilityListObj.
@@ -714,9 +714,9 @@ export default defineComponent({
             // })
           }
 
-          // ruleDisableApi({ 'Id': id }).then(res => {
-          //   console.log(res)
-          // })
+          facilityDisableApi({ 'Id': id }).then(res => {
+            console.log(res)
+          })
           message.success('操作成功')
 
         } else if (res == 1) {
