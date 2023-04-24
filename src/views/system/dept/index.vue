@@ -2,7 +2,7 @@
   <PageWrapper contentFullHeight title="部门管理">
     <BasicTable :canResize="true" @register="registerTable">
       <template #tableTitle>
-        <a-button preIcon="mdi:plus" @click="handleCreate" type="primary">创建部门</a-button>
+        <a-button v-if="hasPermission(['addDepart_Depart'])" preIcon="mdi:plus" @click="handleCreate" type="primary">创建部门</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -10,14 +10,17 @@
             {
               icon: 'clarity:note-edit-line',
               onClick: handleEdit.bind(null, record),
+              ifShow: hasPermission(['handleEdit_Depart'])
             },
             {
               icon: 'ion:add-circle-outline',
-              onClick:handelChildren.bind(null,record)
+              onClick:handelChildren.bind(null,record),
+              ifShow: hasPermission(['handelChildren_Depart'])
             },
             {
               icon: 'ant-design:delete-outlined',
               color: 'error',
+              ifShow: hasPermission(['handleDelete_Depart']),
               popConfirm: {
                 title: '是否确认删除',
                 placement: 'left',
@@ -39,12 +42,13 @@ import { getDeptList, DelDept } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import { useModal } from '@/components/Modal';
 import DeptModal from './DeptModal.vue';
+import { usePermission } from '@/hooks/web/useButtonPermission';
 import { getBasicColumns, searchFormSchema } from './dept.data';
 export default defineComponent({
   name: 'DeptManagement',
   components: { PageWrapper, BasicTable, DeptModal, TableAction },
   setup() {
-
+    const { hasPermission } = usePermission();
     const [registerModal, { openModal }] = useModal();
     let source = 0;
     let target = 0;
@@ -138,6 +142,7 @@ export default defineComponent({
       handleDelete,
       handleSuccess,
       handelChildren,
+      hasPermission,
       getData,
       source,
       target

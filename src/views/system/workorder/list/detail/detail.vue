@@ -45,6 +45,7 @@
                 </div>
 
                 <div style="width:95%">
+                  <!-- 2是完结 1 不是自己 -->
                     <a-textarea v-model:value="value" placeholder="在这里输入你的跟进结果" :rows="4"
                         :disabled="WorkorderDetail?.Status == 2 || mySelf == 1" />
                 </div>

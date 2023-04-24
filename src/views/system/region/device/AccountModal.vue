@@ -1,7 +1,7 @@
 <template>
-  <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle"
+  <BasicModal @visible-change="ModelStatus" width="70%"  v-bind="$attrs" @register="registerModal" :title="getTitle"
     @ok="handleSubmit">
-    <BasicTable ref="tableRef" @register="registerTable" :searchInfo="searchInfo">
+    <BasicTable :scroll="{x:null,y:nulll}" height="300px" ref="tableRef" @register="registerTable" :searchInfo="searchInfo">
     </BasicTable>
     <!-- footer -->
     <template #insertFooter>
