@@ -108,7 +108,7 @@
                             <div>
                                 {{ item.Operation }}
                             </div>
-                            <div v-if="item.FilesUrl">
+                            <div v-if="item.Files?.length>0 &&item.Files[0] != ''">
                                 <div class="mt-3 font-semibold">附件：</div>
                                 <Upload v-model:file-list="item.FilesUrl" name="file"
                                     action="https://www.mocky.io/v2/5cc8019d300000980a055e76" @change="handleChange">
@@ -267,6 +267,7 @@ export default defineComponent({
             TaskTicketHandOverApi(obj, Number(WorkorderId.value)).then(res => {
                 if (res == 0) {
                     message.success('转交成功')
+                    getTaskTicketProgressList(Number(WorkorderId.value))
                 } else {
                     message.error(res)
                 }
