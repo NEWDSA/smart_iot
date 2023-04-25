@@ -210,6 +210,7 @@ export default defineComponent({
     async function handleSuccess() {
       await reload();
     }
+    // 权限设置
     function handleEditPwd(record: Recordable) {
       setSelectedRowKeys([record.DeviceId]);
       if (getSelectRowKeys().length > 0 && getSelectRowKeys().length <= 1) {

@@ -76,27 +76,32 @@ export default defineComponent({
   emits: ['changePage'],
   setup(props, { emit }) {
     const { selectedIndex, params } = props;
-    const myselectedIndex = ref(null);
+    const myselectedIndex: any = ref(null);
+    // 
+    selectedIndex !== null ? myselectedIndex.value = selectedIndex : ''
     const pagenation = reactive({
       current: params.current,
       total: params.Total,
       PageSize: params.PageSize,
       onChange: changePage
     })
-
+    console.log(myselectedIndex.value,'...myselectedIndex...')
     watch(() => props.params, (newValue, oldValue) => {
       pagenation.current = newValue.current;
-      pagenation.PageSize=newValue.PageSize;
+      pagenation.PageSize = newValue.PageSize;
+      myselectedIndex.value=props.selectedIndex;
+      console.log(props,'...change...')
       pagenation.total = newValue.Total;
     })
     function changePage(e) {
+      console.log(myselectedIndex.value,selectedIndex,'changepAGE')
       emit('changePage', e);
 
     }
     function handleTitleClick(item, index) {
 
       myselectedIndex.value = index;
-      props.onTitleClick && props.onTitleClick(item,index);
+      props.onTitleClick && props.onTitleClick(item, index);
     }
     onMounted(async () => {
 

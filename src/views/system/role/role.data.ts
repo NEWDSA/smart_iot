@@ -24,10 +24,12 @@ export const columns: BasicColumn[] = [
     width: 120,
     ifShow: hasPermission(['status_Role']),
     customRender: ({ record }) => {
+      console.log(record,'...record...?');
       if (!Reflect.has(record, 'pendingStatus')) {
         record.pendingStatus = false
       }
       return h(Switch, {
+        disabled:record.RoleId == 1,
         checked: record.Status === '0',
         checkedChildren: '已启用',
         unCheckedChildren: '已禁用',

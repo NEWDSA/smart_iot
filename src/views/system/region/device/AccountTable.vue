@@ -2,14 +2,14 @@
   <BasicModal v-bind="$attrs" @register="registerModal" title="选择区域" @ok="handleSubmit">
     <BasicTree :checkStrictly="true" ref="treeRef" :checkedKeys="checkedMenu" title="区域列表" toolbar checkable search
       treeWrapperClassName="h-[calc(100%-35px)] overflow-auto" :clickRowToExpand="false" :treeData="treeData"
-      :fieldNames="{ key: 'Id', title: 'Name' }" @check="handleSelect" />
+      :fieldNames="{ key: 'RegionId', title: 'RegionName' }" @check="handleSelect" />
   </BasicModal>
 </template>
 <script lang="ts">
 import { defineComponent, ref, onMounted, toRaw, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
-import { getDeptDrop } from '@/api/demo/system';
+import { getReginList } from '@/api/demo/region';
 // import { DeviceIdDepartMent } from '@/api/demo/system';
 import { devicePermission } from '@/api/demo/region';
 export default defineComponent({
@@ -25,8 +25,10 @@ export default defineComponent({
     const checkedMenu = ref<Array<string | number>>([]);
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       myResult.value = toRaw(data.DeviceId);
-      const { TreeSelect } = await getDeptDrop();
-      treeData.value = TreeSelect;
+      // 接口调用错误
+      // const { TreeSelect } = await getDeptDrop();
+      const { Detail } = await getReginList()
+      treeData.value = Detail;
     });
     function getTree() {
       const tree = unref(treeRef);

@@ -5,7 +5,7 @@
         <a-button v-if="hasPermission(['AddRole_Role'])" type="primary" @click="handleCreate"> 新增角色 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'action'">
+        <template v-if="column.key === 'action' && record.RoleKey!=='admin' ">
           <TableAction :actions="[
             {
               ifShow: hasPermission(['handleEdit_Role']),

@@ -11,29 +11,31 @@
         <template v-if="column.key === 'DeptName'">
           {{ record.DeptName }}
         </template>
-        <template v-if="column.key === 'action'">
+        <template v-if="column.key === 'action' && record.UserId !== 1
+          ">
           <TableAction :actions="[
-            {
-              icon: 'ant-design:delete-outlined',
-              color: 'error',
-              tooltip: '删除此账号',
-              popConfirm: {
-                title: '是否确认删除',
-                placement: 'left',
-                confirm: handleDelete.bind(null, record),
+              {
+                icon: 'ant-design:delete-outlined',
+                color: 'error',
+                tooltip: '删除此账号',
+                popConfirm: {
+                  title: '是否确认删除',
+                  placement: 'left',
+                  confirm: handleDelete.bind(null, record),
+                },
               },
-            },
-            {
-              icon: 'clarity:note-edit-line',
-              tooltip: '编辑用户资料',
-              onClick: handleEdit.bind(null, record),
-            },
-            {
-              icon: 'ri:lock-password-fill',
-              tooltip: '修改密码',
-              onClick: handleEditPwd.bind(null, record)
-            }
-          ]" />
+              {
+                icon: 'clarity:note-edit-line',
+                tooltip: '编辑用户资料',
+                onClick: handleEdit.bind(null, record),
+              },
+              {
+                icon: 'ri:lock-password-fill',
+                tooltip: '修改密码',
+                onClick: handleEditPwd.bind(null, record)
+              }
+            ]
+            " />
         </template>
       </template>
     </BasicTable>
