@@ -11,8 +11,10 @@
     <div class="board">
       <div class="board_item">
         <div style="padding: 10px">
-          <Icon @click="SelectUser" icon="ion:ios-share-alt" :size="20" />
-          <Icon @click="DelMsg" icon="material-symbols:delete-outline-rounded" :size="20" />
+          <!-- Message_Auth_NEXT_ITEM -->
+          <Icon v-if="hasPermission(['Message_Auth_Transfer'])" @click="SelectUser" icon="ion:ios-share-alt" :size="20" />
+          <Icon v-if="hasPermission(['Message_Auth_DELETE'])" @click="DelMsg"
+            icon="material-symbols:delete-outline-rounded" :size="20" />
         </div>
       </div>
       <template v-if="infoDetail?.Detail">
@@ -22,7 +24,7 @@
         <!-- 主题 -->
         <div class="p-3 text-xl">{{ infoDetail.Detail?.NoticeTitle }}</div>
         <div class="p-3 text-base"><span style="color: #2a96f3">{{ infoDetail?.Detail?.RegionalLocation }}-{{
-          infoDetail.DeviceName }}</span>:<span>{{ infoDetail?.Detail?.Content }}</span></div>
+          infoDetail.DeviceName }}</span>：<span>{{ infoDetail?.Detail?.Content }}</span><sapn v-if="infoDetail.Detail.Type == 2">，设备ID：{{infoDetail?.Detail.DeviceId  }}</sapn> </div>
         <!-- 报警类型 -->
         <div v-if="infoDetail.Detail.Type == 1" class="p-3 text-base">{{
           infoDetail?.Detail.AlertType == 1
@@ -32,36 +34,37 @@
             : infoDetail?.Detail.AlertType == 3
               ? '其他告警'
               : ''
-        }}<span>，设备ID:{{ infoDetail.DeviceId }}</span></div>
+        }}<span>，设备ID：{{ infoDetail.DeviceId }}</span></div>
         <!-- 告警级别 -->
         <div v-if="infoDetail.Detail.Type == 1" class="p-3 text-base">告警级别：{{
           infoDetail.Detail?.Level == 1
-          ? '低,请尽快处理'
+          ? '低，请尽快处理'
           : infoDetail.Detail?.Level == 2
-            ? '一般,请尽快处理'
+            ? '一般，请尽快处理'
             : infoDetail.Detail?.Level == 3
-              ? '紧急,请尽快处理'
+              ? '紧急，请尽快处理'
               : infoDetail.Detail?.Level == 4
-                ? '非常紧急,请尽快处理'
+                ? '非常紧急，请尽快处理'
                 : ''
         }}</div>
         <div v-if="infoDetail.Detail.Type == 2" class="p-3 text-base">
-          系统自动上报，优先级:{{ infoDetail?.Detail.AlertType == 1
+          系统自动上报，优先级：{{ infoDetail?.Detail.AlertType == 1
             ? '异常告警'
             : infoDetail?.Detail.AlertType == 2
               ? '故障告警'
               : infoDetail?.Detail.AlertType == 3
                 ? '其他告警'
                 : '' }}
-                工单号:{{ infoDetail?.Detail.TaskTicketNo
- }},
-          
+          工单号：{{ infoDetail?.Detail.TaskTicketNo
+          }}，
+
         </div>
-        <div v-if="infoDetail.Detail.Type == 2" class="p-3 text-base">请尽快处理!</div>
+        <div v-if="infoDetail.Detail.Type == 2" class="p-3 text-base">请尽快处理！</div>
         <!-- 跳转按钮 -->
-        <Button style="background: rgb(22, 93, 255)" @click="goDetail(infoDetail)" class="m-5"
-          type="primary">查看详情</Button>
-        <Button style="background: rgb(22, 93, 255)" @click="nextItem" class="m-5" type="primary">下一条</Button>
+        <Button style="background: rgb(22, 93, 255)" v-if="hasPermission(['Message_Auth_SEE_BTN'])"
+          @click="goDetail(infoDetail)" class="m-5" type="primary">查看详情</Button>
+        <Button style="background: rgb(22, 93, 255)" v-if="hasPermission(['Message_Auth_NEXT_ITEM'])" @click="nextItem"
+          class="m-5" type="primary">下一条</Button>
       </template>
       <template v-else>
         <div class="nobrad">
@@ -78,6 +81,7 @@
 import { defineComponent, reactive, ref, onMounted, h, watch } from 'vue'
 import { NoticeList, DelNotice, NoticeRead } from '@/api/demo/system'
 import { PageWrapper } from '@/components/Page'
+import { usePermission } from '@/hooks/web/useButtonPermission';
 import { Tabs } from 'ant-design-vue'
 import { useGo } from '@/hooks/web/usePage'
 import { NoticeInfo } from '@/api/demo/system'
@@ -108,6 +112,7 @@ export default defineComponent({
   setup() {
     const ListRef = ref()
     const itemIndex = ref()
+    const { hasPermission } = usePermission();
     const go = useGo()
     const settingList: any = ref([])
     const userStore = useUserStore()
@@ -294,6 +299,7 @@ export default defineComponent({
       }
     }
     return {
+      hasPermission,
       ListRef,
       prefixCls: 'account-setting',
       contentStyle: {

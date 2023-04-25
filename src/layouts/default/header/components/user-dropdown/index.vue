@@ -17,7 +17,7 @@
           icon="ion:document-text-outline"
           v-if="getShowDoc"
         /> -->
-        <MenuItem key="userCenter" text="用户中心"  icon="ion:person" />
+        <MenuItem key="userCenter" text="个人中心"  icon="ion:person" />
         <MenuDivider v-if="getShowDoc" />
         <MenuItem
           v-if="getUseLockPage"

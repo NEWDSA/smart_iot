@@ -9,7 +9,7 @@
           color="#d6d6d6"
         />
       </div>
-      <img :src="sourceValue" v-if="sourceValue" alt="avatar" />
+      <img :src="sourceValue" v-if="sourceValue" alt="avatar">
     </div>
     <a-button
       :class="`${prefixCls}-upload-btn`"
@@ -19,6 +19,8 @@
     >
       {{ btnText ? btnText : t('component.cropper.selectImage') }}
     </a-button>
+     <!-- 插槽 -->
+     <slot name="header"></slot>
 
     <CopperModal
       @register="register"

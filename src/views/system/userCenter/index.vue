@@ -1,8 +1,14 @@
 <template>
-  <PageWrapper contentFullHeight title="修改个人信息">
+  <PageWrapper contentFullHeight title="个人中心">
     <a-card bordered>
       <div class="flex p-4 rounded-1 justify-items-center">
-        <CropperAvatar :uploadApi="uploadApi" :width="100" :showBtn="false" @change="cropperOk" :value="avatar" />
+        <CropperAvatar ref="Avatar" :uploadApi="uploadApi" :width="100" :showBtn="false" @change="cropperOk"
+          :value="avatar">
+          <template #header>
+            <img @click="UploadImg" class=" absolute left-120px bottom-40px" src="@/assets/images/camera.png"
+              style="width:32px;height:32px;" />
+          </template>
+        </CropperAvatar>
         <a-descriptions class="ml-4" size="small" :column="2">
           <a-descriptions-item label="用户ID"> {{ info.UserId
           }}</a-descriptions-item>
@@ -12,7 +18,7 @@
           </a-descriptions-item>
           <a-descriptions-item label="所属部门">{{ info.Dept.DeptName }}</a-descriptions-item>
           <a-descriptions-item label="手机号码">
-            {{ info.PhoneNumber === '' || info.PhoneNumber == null ? '暂无数据' : info.PhoneNumber }}
+            <span class="mr-8px">{{ info.PhoneNumber === '' || info.PhoneNumber == null ? '暂无数据' : info.PhoneNumber }}</span>
             <a @click="handleCopy(info.PhoneNumber)" v-if="info.PhoneNumber">复制</a>
           </a-descriptions-item>
           <a-descriptions-item label="角色类型">{{ info.Roles[0].RoleName === '' || info.Roles[0].RoleName === null ?
@@ -25,24 +31,23 @@
     <a-card class="!mt-5 ">
       <!-- 默认选中修改密码 -->
       <div @click="changeStauts(1)"
-        :class="checkStatus == 1 ? 'bg-gray-300 inline-block text-blue-500 p-1 rounded-xl' : 'inline-block ml-6 text-black p-1 rounded-xl'">
+        :class="checkStatus == 1 ? 'bg-gray-300 inline-block text-blue-500 p-1 rounded-xl' : '  inline-block text-black p-1 rounded-xl'">
         修改信息
       </div>
       <div @click="changeStauts(2)"
-        :class="checkStatus == 2 ? ' bg-gray-300 inline-block text-blue-500 p-1 rounded-xl' : 'inline-block ml-6 text-black p-1 rounded-xl'">
+        :class="checkStatus == 2 ? 'bg-gray-300 inline-block text-blue-500 p-1 ml-6  rounded-xl' : 'inline-block ml-6 text-black p-1 rounded-xl'">
         修改密码
       </div>
       <div class="mt-3">
-        <BasicForm v-if="checkStatus == 1" @register="register" />
+        <BasicForm v-show="checkStatus == 1" @register="register" />
         <Row class="enter-x mb-4">
           <Row :md="8" :xs="8">
             <InputPassword visibilityToggle v-if="checkStatus == 2" type="password" v-model:value="password"
               placeholder="请输入密码" />
           </Row>
         </Row>
-        <div class="ml-2">
+        <div :class="checkStatus == 1 ? 'ml-25' : ''">
           <a-button type="primary" @click="handleSubmit"> 保存 </a-button>
-          <a-button class="!ml-4" @click="resetFields"> 重置 </a-button>
         </div>
       </div>
 
@@ -59,8 +64,6 @@ import { Tabs, Descriptions, Card, Button, Input, Tag, Row, Col } from 'ant-desi
 import { CollapseContainer } from '@/components/Container';
 import { CropperImage, CropperAvatar } from '@/components/Cropper';
 import { uploadApi } from '@/api/sys/upload';
-// import { getUserInfo } from '@/api/sys/user';
-// modifiAccountList
 import { modifiAccountList, updatePwd } from '@/api/demo/system';
 import { useUserStore } from '@/store/modules/user';
 import { BasicForm, useForm } from '@/components/Form';
@@ -69,6 +72,7 @@ import { useCopyToClipboard } from '@/hooks/web/useCopyToClipboard';
 import { useMessage } from '@/hooks/web/useMessage';
 import { fileUrl } from '@/utils/file/fileUrl';
 import dayjs from 'dayjs';
+
 export default defineComponent({
   name: 'AccountDetail',
   components: {
@@ -88,6 +92,7 @@ export default defineComponent({
     const formData = ref();
     const password = ref();
     const url = ref(fileUrl());
+    const Avatar = ref();
     const { clipboardRef, copiedRef } = useCopyToClipboard();
     const info = ref(userStore.getUserInfo?.user);
     const avatar = ref(info.value.Avatar || '');
@@ -115,6 +120,9 @@ export default defineComponent({
       // showAvatar.value = fileUrl() + source.data.Data
       avatar.value = fileUrl() + source.data.Data
     }
+    function UploadImg() {
+      Avatar.value.openModal();
+    }
     function handleBackLogin() {
 
     }
@@ -122,7 +130,7 @@ export default defineComponent({
 
       clipboardRef.value = info;
       if (unref(copiedRef)) {
-        createMessage.warning('copy success！');
+        createMessage.warning('复制成功！');
       }
     }
     function changeStauts(value) {
@@ -131,19 +139,16 @@ export default defineComponent({
     async function handleSubmit() {
       switch (checkStatus.value) {
         case 1:
-          try {
-            const values = await validate();
-            values.Avatar = avatar.value;
-            modifiAccountList({ ...values, UserId: info.value.UserId });
-            // 提示修改成功
-          } finally {
-            // 刷新页面
-            createMessage.info('修改成功!');
-          }
+          // try {
+          const values = await validate();
+          values.Avatar = avatar.value;
+          const result = await modifiAccountList({ ...values, UserId: info.value.UserId });
+          // 刷新页面
+          result.Msg == 'ok' ? createMessage.info('修改成功!') : ''
           break;
         case 2:
           try {
-         
+
             updatePwd({
               UserId: info.value.UserId,
               NewPassword
@@ -160,7 +165,7 @@ export default defineComponent({
 
     }
 
-    return { register, changeStauts, handleSubmit, resetFields, password, url, formData, checkStatus, currentKey, dayjs, info, avatar, valueRef, uploadApi: uploadApi as any, cropperOk, goBack, handleCopy, handleBackLogin };
+    return { register, changeStauts, Avatar, UploadImg, handleSubmit, resetFields, password, url, formData, checkStatus, currentKey, dayjs, info, avatar, valueRef, uploadApi: uploadApi as any, cropperOk, goBack, handleCopy, handleBackLogin };
   },
 });
 </script>
