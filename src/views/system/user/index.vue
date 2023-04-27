@@ -4,8 +4,8 @@
     <BasicTable @register="registerTable" :clickToRowSelect="clickToRowSelect" class="w-3/4 xl:w-4/5"
       :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleBulk">批量调动</a-button>
-        <a-button type="primary" @click="handleCreate">添加用户</a-button>
+        <a-button v-if="hasPermission(['BatchMob_User'])"  type="primary" @click="handleBulk">批量调动</a-button>
+        <a-button v-if="hasPermission(['AddUser_User'])" type="primary" @click="handleCreate">添加用户</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'DeptName'">
@@ -15,6 +15,7 @@
           ">
           <TableAction :actions="[
               {
+                ifShow: hasPermission(['handleDelete_User']),
                 icon: 'ant-design:delete-outlined',
                 color: 'error',
                 tooltip: '删除此账号',
@@ -25,11 +26,13 @@
                 },
               },
               {
+                ifShow: hasPermission(['handleEdit_User']),
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑用户资料',
                 onClick: handleEdit.bind(null, record),
               },
               {
+                ifShow: hasPermission(['handleEditPwd_User']),
                 icon: 'ri:lock-password-fill',
                 tooltip: '修改密码',
                 onClick: handleEditPwd.bind(null, record)
@@ -52,7 +55,7 @@ import { useMessage } from '@/hooks/web/useMessage';
 import { getAccountList, delAccount } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
-
+import { usePermission } from '@/hooks/web/useButtonPermission';
 import { useModal } from '@/components/Modal';
 import AccountModal from './AccountModal.vue';
 import AccountTable from './AccountTable.vue';
@@ -64,6 +67,7 @@ export default defineComponent({
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction, pwdModal },
   setup() {
     const go = useGo();
+    const { hasPermission } = usePermission();
     const myData: any = ref('');
     const lastSelectedKey = ref();
     const update = getCurrentInstance() as ComponentInternalInstance | null
@@ -212,6 +216,7 @@ export default defineComponent({
       openModal2,
       openModal3,
       pwdSuccess,
+      hasPermission,
       lastSelectedKey,
       clickToRowSelect,
       pagination,

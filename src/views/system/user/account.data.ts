@@ -142,6 +142,9 @@ export const accountFormSchema: FormSchema[] = [
     field: 'RoleIds',
     component: 'TreeSelect',
     componentProps: {
+      allowClear:true,
+      showCheckedStrategy:'TreeSelect.SHOW_ALL',
+      treeCheckable:true,
       fieldNames: {
         label: 'RoleName',
         key: 'RoleId',

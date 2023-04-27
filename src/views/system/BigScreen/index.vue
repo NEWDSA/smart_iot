@@ -1,26 +1,24 @@
 <template>
-  <!-- <PageWrapper  fixedHeight> -->
   <v-scale-screen width="1920" fullScreen height="1080">
     <a-layout class="layout">
-      <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
-        v-model:collapsed="collapsed">
+      <a-layout-header style="height: 11%" class="header">
         <img src="@/assets/images/LOGO-title.png" />
-        <ul style="height: 100%">
-          <li style="height: 33%">
-            <div class="boxall" style="height: 100%">
+        <div class="ml-auto" id="showTime">{{ currentTime }}</div>
+      </a-layout-header>
+      <a-layout>
+        <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
+          v-model:collapsed="collapsed">
+          <ul style="height: 100%">
+            <div class="boxall" style="height: 33%">
               <div class="alltitle"> 全局预览 </div>
               <!--  -->
               <div class="yq" id="yq">2634</div>
               <!-- 设备运行负载 -->
             </div>
-          </li>
-          <li style="height: 33%">
-            <div class="boxall" style="height: 100%">
+            <div class="boxall" style="height: 33%">
               <div class="alltitle"> 数据统计 </div>
             </div>
-          </li>
-          <li style="height: calc(33% - 70px)">
-            <div class="boxall" style="height: 100%">
+            <div class="boxall" style="height: 33%">
               <div class="alltitle"> 访客信息 </div>
               <div class="topRec_List">
                 <dl>
@@ -64,52 +62,137 @@
                 </div>
               </div>
             </div>
-          </li>
-        </ul>
-      </a-layout-sider>
-      <a-layout>
-        <a-layout-header style="height: 11%" class="header">
-          <div class="ml-auto" id="showTime">{{ currentTime }}</div>
-        </a-layout-header>
-        <a-layout-content class="content">
-          <div class="bg-jianzhu"></div>
-        </a-layout-content>
-        <a-layout-footer class="footer" style="height: 20%; padding: 10px 0px 2px">
-          <ul>
-            <li class="float-left w-1/2">
-              <div class="boxall" style="height: 160px">
-                <div class="alltitle"> 负载信息 </div>
-              </div>
-            </li>
-            <li class="float-left w-1/2">
-              <div class="boxall" style="height: 160px">
-                <div class="alltitle"> 环境数据监测 </div>
-                <div style="width:100%;height: 100%;" ref="chartRef3"></div>
-              </div>
-            </li>
           </ul>
-        </a-layout-footer>
+        </a-layout-sider>
+        <a-layout-content class="content">
+          <div class="boxall" style="height: 100%">
+            <div class="bg-jianzhu">
+              <div @click="showFire" class="fire fire1">
+                <img src="@/assets/images/fire.png" />
+                <div class="device-box">
+                  <div class="device-title">灯光1</div>
+                  <div class="device-con">设备运行正常，已运行1h32mins
+                  </div>
+                </div>
+              </div>
+              <div @click="showFire" class="fire fire2">
+                <img src="@/assets/images/fire.png" />
+                <div class="device-box">
+                  <div class="device-title">灯光2</div>
+                  <div class="device-con">设备运行正常，已运行1h32mins
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="flex absolute bottom-1/4">
+              <div class="flex flex-wrap flex-col">
+                <div class="rounded-1 border-gray-500 border bg-dark-100"
+                  style="width: fit-content; height: fit-content;">
+                  <Icon :size="40" icon="ion:ios-lightbulb-outline" />
+                </div>
+                <span>灯光</span>
+              </div>
+              <div class="flex flex-wrap flex-col">
+                <div class="rounded-1 border-gray-500 border bg-dark-100"
+                  style="width: fit-content; height: fit-content;">
+                  <Icon :size="40" icon="ion:ios-lightbulb-outline" />
+                </div>
+                <span>冰箱</span>
+              </div>
+              <div class="flex flex-wrap flex-col">
+                <div class="rounded-1 border-gray-500 border bg-dark-100"
+                  style="width: fit-content; height: fit-content;">
+                  <Icon :size="40" icon="ion:ios-lightbulb-outline" />
+                </div>
+                <span>2222</span>
+              </div>
+
+            </div>
+          </div>
+
+
+        </a-layout-content>
+        <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
+          v-model:collapsed="collapsed">
+          <!-- <ul style="height: 100%"> -->
+            <!-- <li style="height: calc(50% - 20px)"> -->
+              <div class="boxall" style="height: 100%">
+                <div class="alltitle"> 设备列表 </div>
+                <div class="boxnav" style="height: 100%">
+                  <div class="" ref="chartRef" style="height:100%" id="echart2"></div>
+                </div>
+              </div>
+            <!-- </li> -->
+          
+          <!-- </ul> -->
+        </a-layout-sider>
       </a-layout>
-      <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
-        v-model:collapsed="collapsed">
-        <div style="height: 80px"> </div>
-        <ul style="height: 100%">
-          <li style="height: calc(50% - 20px)">
-            <div class="boxall" style="height: 100%">
-              <div class="alltitle"> 设备列表 </div>
-              <div class="boxnav" style="height: ">
-                <div class="" ref="chartRef" style="height: 406px" id="echart2"></div>
+      <a-layout-footer class="footer" style="height: 20%; padding: 10px 0px 2px">
+        <ul>
+          <li class="float-left w-1/3">
+            <div class="boxall" style="height: 160px">
+              <div class="alltitle"> 负载信息 </div>
+              <div class="reception">
+                <div class="recetit">
+                  <strong>40人</strong>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <!-- <span></span>
+                    <span class="changecolor"></span>
+                    <span class="changecolor"></span> -->
+                  <span class="changecolor"></span>
+                  <span class="changecolor"></span>
+                  <p>本月新办户数</p>
+                </div>
+                <div class="recetit">
+                  <strong>40人</strong>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <!-- <span></span>
+                    <span class="changecolor"></span>
+                    <span class="changecolor"></span> -->
+                  <span class="changecolor"></span>
+                  <span class="changecolor"></span>
+                  <p>本月新办户数</p>
+                </div>
+                <div class="recetit">
+                  <strong>40人</strong>
+                  <span></span>
+                  <span></span>
+                  <!-- <span></span>
+                    <span class="changecolor"></span>
+                    <span class="changecolor"></span> -->
+                  <span class="changecolor"></span>
+                  <span class="changecolor"></span>
+                  <span class="changecolor"></span>
+                  <span class="changecolor"></span>
+                  <p>本月新办户数</p>
+                </div>
               </div>
             </div>
           </li>
-          <li style="height: calc(50% - 50px)">
-            <div class="boxall" style="height: 100%">
-              <div class="alltitle"> GPS地理位置分析 </div>
-              <div style="width: 100%; height: 100%" ref="chartRef2"></div>
+          <li class="float-left w-1/3">
+            <div class="boxall" style="height: 160px">
+              <div class="alltitle"> 环境数据监测 </div>
+              <div style="width:100%;height: 100%;" ref="chartRef3"></div>
             </div>
           </li>
+          <li class="float-left w-1/3">
+            <!-- <li style="height: calc(50% - 50px)"> -->
+              <div class="boxall" style="height: 100%">
+                <div class="alltitle"> GPS地理位置分析 </div>
+                <div style="width: 100%; height: 100%" ref="chartRef2"></div>
+              </div>
+            <!-- </li> -->
+          </li>
         </ul>
-      </a-layout-sider>
+      </a-layout-footer>
+
     </a-layout>
   </v-scale-screen>
 </template>
@@ -117,8 +200,11 @@
 <script setup lang="ts">
 import { ref, Ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
+import { Icon } from '@/components/Icon';
+// import { SvgIcon } from '@/components/Icon';
 // import VScaleScreen from 'v-scale-screen';
 // import autofit from 'vue-autofit'
+import $ from 'jquery'
 import { useECharts } from '@/hooks/web/useECharts';
 import mapsrc from '@/utils/city/zhuhai.json' //引入珠海市地图数据
 const chartRef = ref<HTMLDivElement | null>(null);
@@ -409,15 +495,21 @@ setOptions3({
 })
 
 onMounted(() => {
-
-
   setInterval(() => {
     currentTime.value = dayjs().format('YYYY/MM/DD HH:mm:ss');
     // 滚动效果
-
-
   })
 })
+// 显示隐藏内容
+function showFire() {
+  $('.device-box').show()
+  // if ($(this).find('.device-box').css('display') == 'none') {
+  //   $('.device-box').hide();
+  //   $(this).find('.device-box').show();
+  // } else {
+  //   $(this).find('.device-box').hide();
+  // }
+}
 </script>
 
 <style lang="less" scoped>
@@ -520,7 +612,8 @@ onMounted(() => {
 
 .sider {
   background-color: #001529;
-  padding: 16px;
+  // padding: 16px;
+  padding: 0 16px 0 16px;
 }
 
 .bg-jianzhu {
@@ -531,14 +624,16 @@ onMounted(() => {
   bottom: 0;
   margin: 0 auto;
   // background: url(../img/bg.png) no-repeat;
-  background: url(@/assets/images/bg.png) no-repeat;
-  background-position: 21rem;
-  background-size: 58%;
+  background: url(@/assets/images/modules1.png) no-repeat;
+  background-position-x: 21rem;
+  background-position-y: 6rem;
+  background-size: 55%;
 }
 
 .content {
-  background-color: #fff;
-  padding: 16px;
+  background-color: #001529;
+  height: 66%;
+  // padding: 16px;
 }
 
 .footer {
@@ -655,5 +750,134 @@ onMounted(() => {
 
 .topRec_List li div:nth-child(3) {
   width: 20%;
+}
+
+.reception {
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 5px 20px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.recetit {
+  float: left;
+  width: 88px;
+  float: left;
+  margin-right: 15px;
+}
+
+.recetit:nth-last-child(1) {
+  margin-right: 0px;
+}
+
+.recetit strong {
+  color: #f5f77c;
+  font-size: 15px;
+}
+
+.recetit span {
+  display: block;
+  text-align: center;
+  margin-bottom: 6px;
+  width: 72px;
+  height: 8px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  background-color: #0b4e78;
+  margin-left: 8px;
+}
+
+.recetit .changecolor {
+  background-color: #05fff9;
+}
+
+.recetit p {
+  color: #fff;
+  font-size: 12px;
+}
+
+.fire {
+  width: 1.66rem;
+  height: 1.66rem;
+  position: absolute;
+
+  cursor: pointer;
+  // 使用动画实现效果
+  // animation: jump 0.5s infinite alternate ease-in-out;
+
+}
+
+@keyframes jump {
+  from {
+    top: 480px;
+  }
+
+  to {
+    top: 490px;
+  }
+}
+
+.fire img {
+  width: 100%;
+  height: 100%;
+}
+
+.fire1 {
+  top: 480px;
+  right: 670px;
+  animation: jump 0.5s infinite alternate ease-in-out;
+  // top: 400px;
+  // right: 36.82rem;
+  // bottom: 10.18rem;
+}
+
+.fire2 {
+  top: 290px;
+  right: 850px;
+  animation: jump1 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes jump1 {
+  from {
+    top: 290px;
+  }
+
+  to {
+    top: 300px;
+  }
+}
+
+.device-box {
+  width: 7.8rem;
+  height: 4.68rem;
+  background: url("@/assets/images/device-box.png") no-repeat;
+  background-size: 100% 100%;
+  position: absolute;
+  top: -4.3rem;
+  left: -7.4rem;
+  z-index: 9999;
+  display: none;
+}
+
+.device-title {
+  font-size: 0.44rem;
+  font-weight: bold;
+  color: #fff;
+  padding-top: 0.6rem;
+  line-height: 0.8rem;
+  text-align: center;
+}
+
+.device-con {
+  font-size: 0.4rem;
+  color: #fff;
+  letter-spacing: 0;
+  line-height: 0.6rem;
+  padding: 0 0.4rem;
+  text-align: left;
 }
 </style>
