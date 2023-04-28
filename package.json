@@ -47,6 +47,7 @@
     "echarts": "^5.4.0",
     "intro.js": "^6.0.0",
     "jquery": "^3.6.4",
+    "lib-flexible": "^0.3.2",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.0",
     "mockjs": "^1.1.0",

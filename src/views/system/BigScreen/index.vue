@@ -1,81 +1,74 @@
 <template>
-  <v-scale-screen width="1920" fullScreen height="1080">
-    <a-layout class="layout">
-      <a-layout-header style="height: 11%" class="header">
+  <a-layout id="show_screen" class="layout">
+    <a-layout-header class="header">
+      <div class="brand">
         <img src="@/assets/images/LOGO-title.png" />
-        <div class="ml-auto" id="showTime">{{ currentTime }}</div>
-      </a-layout-header>
-      <a-layout>
-        <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
-          v-model:collapsed="collapsed">
-          <ul style="height: 100%">
-            <div class="boxall" style="height: 33%">
-              <div class="alltitle"> 全局预览 </div>
-              <!--  -->
-              <div class="yq" id="yq">2634</div>
-              <!-- 设备运行负载 -->
+      </div>
+
+      <FullscreenOutlined class="brand" role="close" @click="handleFullScreen" />
+      <div class="ml-auto" id="showTime">{{ currentTime }}</div>
+    </a-layout-header>
+    <a-layout>
+      <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
+        v-model:collapsed="collapsed">
+        <div class="boxall1">
+          <div class="alltitle"> 全局预览 </div>
+          <div class="yq" id="yq">2634</div>
+        </div>
+        <div class="boxall1">
+          <div class="alltitle text-left"> 数据统计 </div>
+          <div style="width: 90%; height: 85%;" ref="chartRef4"></div>
+        </div>
+        <div class="boxall2">
+          <div class="alltitle"> 访客信息 </div>
+          <div class="topRec_List">
+            <dl>
+              <dd>资源名称</dd>
+              <dd>调用方</dd>
+              <dd>调用时间</dd>
+            </dl>
+            <div class="maquee">
+              <ul>
+                <li>
+                  <div>审计局主要职责</div>
+                  <div>审计局</div>
+                  <div>08:20:26</div>
+                </li>
+                <li>
+                  <div>残联主要职责</div>
+                  <div>残联</div>
+                  <div>08:20:36</div>
+                </li>
+                <li>
+                  <div>委老干部局主要职责</div>
+                  <div>老干部局</div>
+                  <div>08:20:46</div>
+                </li>
+                <li>
+                  <div>公安局主要职责</div>
+                  <div>公安局</div>
+                  <div>08:20:56</div>
+                </li>
+                <li>
+                  <div>更多精美大屏</div>
+                  <div>关注公众号</div>
+                  <div>DreamCoders</div>
+                </li>
+                <li>
+                  <div>交通运输局主要职责</div>
+                  <div>完全免费分享</div>
+                  <div>08:21:07</div>
+                </li>
+              </ul>
             </div>
-            <div class="boxall" style="height: 33%">
-              <div class="alltitle"> 数据统计 </div>
-            </div>
-            <div class="boxall" style="height: 33%">
-              <div class="alltitle"> 访客信息 </div>
-              <div class="topRec_List">
-                <dl>
-                  <dd>资源名称</dd>
-                  <dd>调用方</dd>
-                  <dd>调用时间</dd>
-                </dl>
-                <div class="maquee">
-                  <ul>
-                    <li>
-                      <div>审计局主要职责</div>
-                      <div>审计局</div>
-                      <div>08:20:26</div>
-                    </li>
-                    <li>
-                      <div>残联主要职责</div>
-                      <div>残联</div>
-                      <div>08:20:36</div>
-                    </li>
-                    <li>
-                      <div>委老干部局主要职责</div>
-                      <div>老干部局</div>
-                      <div>08:20:46</div>
-                    </li>
-                    <li>
-                      <div>公安局主要职责</div>
-                      <div>公安局</div>
-                      <div>08:20:56</div>
-                    </li>
-                    <li>
-                      <div>更多精美大屏</div>
-                      <div>关注公众号</div>
-                      <div>DreamCoders</div>
-                    </li>
-                    <li>
-                      <div>交通运输局主要职责</div>
-                      <div>完全免费分享</div>
-                      <div>08:21:07</div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </ul>
-        </a-layout-sider>
-        <a-layout-content class="content">
-          <div class="boxall" style="height: 100%">
-            <div class="bg-jianzhu">
-              <div @click="showFire" class="fire fire1">
-                <img src="@/assets/images/fire.png" />
-                <div class="device-box">
-                  <div class="device-title">灯光1</div>
-                  <div class="device-con">设备运行正常，已运行1h32mins
-                  </div>
-                </div>
-              </div>
-              <div @click="showFire" class="fire fire2">
+          </div>
+        </div>
+      </a-layout-sider>
+      <a-layout-content id="myboxall" class="content">
+        <div class="boxall" style="height: 100%">
+          <div id="jianzhu" class="bg-jianzhu">
+            <div class="my_setting">
+              <div @click="showFire" id="fire2" class="fire fire2">
                 <img src="@/assets/images/fire.png" />
                 <div class="device-box">
                   <div class="device-title">灯光2</div>
@@ -83,137 +76,138 @@
                   </div>
                 </div>
               </div>
-
-            </div>
-            <div class="flex absolute bottom-1/4">
-              <div class="flex flex-wrap flex-col">
-                <div class="rounded-1 border-gray-500 border bg-dark-100"
-                  style="width: fit-content; height: fit-content;">
-                  <Icon :size="40" icon="ion:ios-lightbulb-outline" />
+              <div @click="showFire" id="fire1" class="fire fire1">
+                <img src="@/assets/images/fire.png" />
+                <div class="device-box">
+                  <div class="device-title">灯光1</div>
+                  <div class="device-con">设备运行正常，已运行1h32mins
+                  </div>
                 </div>
-                <span>灯光</span>
               </div>
-              <div class="flex flex-wrap flex-col">
-                <div class="rounded-1 border-gray-500 border bg-dark-100"
-                  style="width: fit-content; height: fit-content;">
-                  <Icon :size="40" icon="ion:ios-lightbulb-outline" />
-                </div>
-                <span>冰箱</span>
-              </div>
-              <div class="flex flex-wrap flex-col">
-                <div class="rounded-1 border-gray-500 border bg-dark-100"
-                  style="width: fit-content; height: fit-content;">
-                  <Icon :size="40" icon="ion:ios-lightbulb-outline" />
-                </div>
-                <span>2222</span>
-              </div>
-
             </div>
           </div>
-
-
-        </a-layout-content>
-        <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
-          v-model:collapsed="collapsed">
-          <!-- <ul style="height: 100%"> -->
-            <!-- <li style="height: calc(50% - 20px)"> -->
-              <div class="boxall" style="height: 100%">
-                <div class="alltitle"> 设备列表 </div>
-                <div class="boxnav" style="height: 100%">
-                  <div class="" ref="chartRef" style="height:100%" id="echart2"></div>
-                </div>
+          <div class="flex absolute bottom-1/30">
+            <div class="flex flex-wrap flex-col p-2">
+              <div class="rounded-1 border-gray-500 border bg-dark-100" style="width: fit-content; height: fit-content;">
+                <Icon :size="40" icon="ion:ios-lightbulb-outline" />
               </div>
-            <!-- </li> -->
-          
-          <!-- </ul> -->
-        </a-layout-sider>
-      </a-layout>
-      <a-layout-footer class="footer" style="height: 20%; padding: 10px 0px 2px">
-        <ul>
-          <li class="float-left w-1/3">
-            <div class="boxall" style="height: 160px">
-              <div class="alltitle"> 负载信息 </div>
-              <div class="reception">
-                <div class="recetit">
-                  <strong>40人</strong>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <!-- <span></span>
-                    <span class="changecolor"></span>
-                    <span class="changecolor"></span> -->
-                  <span class="changecolor"></span>
-                  <span class="changecolor"></span>
-                  <p>本月新办户数</p>
-                </div>
-                <div class="recetit">
-                  <strong>40人</strong>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <!-- <span></span>
-                    <span class="changecolor"></span>
-                    <span class="changecolor"></span> -->
-                  <span class="changecolor"></span>
-                  <span class="changecolor"></span>
-                  <p>本月新办户数</p>
-                </div>
-                <div class="recetit">
-                  <strong>40人</strong>
-                  <span></span>
-                  <span></span>
-                  <!-- <span></span>
-                    <span class="changecolor"></span>
-                    <span class="changecolor"></span> -->
-                  <span class="changecolor"></span>
-                  <span class="changecolor"></span>
-                  <span class="changecolor"></span>
-                  <span class="changecolor"></span>
-                  <p>本月新办户数</p>
-                </div>
-              </div>
+              <span>灯光</span>
             </div>
-          </li>
-          <li class="float-left w-1/3">
-            <div class="boxall" style="height: 160px">
-              <div class="alltitle"> 环境数据监测 </div>
-              <div style="width:100%;height: 100%;" ref="chartRef3"></div>
-            </div>
-          </li>
-          <li class="float-left w-1/3">
-            <!-- <li style="height: calc(50% - 50px)"> -->
-              <div class="boxall" style="height: 100%">
-                <div class="alltitle"> GPS地理位置分析 </div>
-                <div style="width: 100%; height: 100%" ref="chartRef2"></div>
+            <div class="flex flex-wrap flex-col p-2">
+              <div class="rounded-1 border-gray-500 border bg-dark-100" style="width: fit-content; height: fit-content;">
+                <Icon :size="40" icon="ion:ios-lightbulb-outline" />
               </div>
-            <!-- </li> -->
-          </li>
-        </ul>
-      </a-layout-footer>
+              <span>冰箱</span>
+            </div>
+            <div class="flex flex-wrap flex-col p-2">
+              <div class="rounded-1 border-gray-500 border bg-dark-100" style="width: fit-content; height: fit-content;">
+                <Icon :size="40" icon="ion:ios-lightbulb-outline" />
+              </div>
+              <span>2222</span>
+            </div>
 
+          </div>
+        </div>
+      </a-layout-content>
+      <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
+        v-model:collapsed="collapsed">
+        <div class="boxall" style="height: 100%">
+          <div class="alltitle"> 设备列表 </div>
+          <div class="boxnav" style="height: 100%">
+            <!--  -->
+            <div class="" ref="chartRef" style="height:6.35rem /* 508/80 */;" id="echart2"></div>
+          </div>
+        </div>
+      </a-layout-sider>
     </a-layout>
-  </v-scale-screen>
+    <a-layout-footer class="footer">
+      <div class="flex">
+        <div class="float-left" style="padding-left: 16px;padding-right: 16px; width: 20%;">
+          <div class="boxall">
+            <div class="alltitle"> 负载信息 </div>
+            <div class="reception">
+              <div class="recetit">
+                <strong>40%</strong>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <p>上午</p>
+              </div>
+              <div class="recetit">
+                <strong>50%</strong>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <p>下午</p>
+              </div>
+              <!-- <div class="recetit">
+                <strong>40人</strong>
+                <span></span>
+                <span></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <span class="changecolor"></span>
+                <p>本月新办户数</p>
+              </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="float-left" style="flex: auto;">
+          <div class="boxall">
+            <div class="alltitle text-left"> 环境数据监测 </div>
+            <div style="width:100%;height:2.5rem;" ref="chartRef3"></div>
+          </div>
+        </div>
+        <div class="other_left">
+          <div class="boxall">
+            <div class="alltitle text-left"> GPS地理位置分析 </div>
+            <div style="width: 100%; height:2.5rem /* 200/80 */;" ref="chartRef2"></div>
+          </div>
+        </div>
+      </div>
+    </a-layout-footer>
+  </a-layout>
 </template>
 
 <script setup lang="ts">
 import { ref, Ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import { Icon } from '@/components/Icon';
+import 'lib-flexible';
 // import { SvgIcon } from '@/components/Icon';
 // import VScaleScreen from 'v-scale-screen';
 // import autofit from 'vue-autofit'
-import $ from 'jquery'
+
+import $ from 'jquery';
+import { FullscreenExitOutlined, FullscreenOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import { useECharts } from '@/hooks/web/useECharts';
 import mapsrc from '@/utils/city/zhuhai.json' //引入珠海市地图数据
 const chartRef = ref<HTMLDivElement | null>(null);
 const chartRef2 = ref<HTMLDivElement | null>(null);
 const chartRef3 = ref<HTMLDivElement | null>(null);
+const chartRef4 = ref<HTMLDivElement | null>(null);
 
 const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>);
 const { setOptions: setOptions2, echarts: echart2 } = useECharts(chartRef2 as Ref<HTMLDivElement>);
 const { setOptions: setOptions3, echarts: echart3 } = useECharts(chartRef3 as Ref<HTMLDivElement>);
+const { setOptions: setOptions4, echarts: echart4 } = useECharts(chartRef4 as Ref<HTMLDivElement>);
+// const isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen || document.msFullscreenElement
+
+
+
 echart2.registerMap('zhuhai', mapsrc); //注册地图
 
 const currentTime = ref(dayjs().format('YYYY/MM/DD HH:mm:ss'));
@@ -493,15 +487,102 @@ setOptions3({
   }
   ]
 })
+// 设置
+setOptions4({
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: { type: 'shadow' }
+  },
+  grid: {
+    left: '0%',
+    top: '10px',
+    right: '0%',
+    bottom: '4%',
+    containLabel: true
+  },
+  xAxis: [{
+    type: 'category',
+    data: ['浙江', '上海', '江苏', '广东', '北京', '深圳', '安徽'],
+    axisLine: {
+      show: true,
+      lineStyle: {
+        color: "rgba(255,255,255,.1)",
+        width: 1,
+        type: "solid"
+      },
+    },
+    axisTick: {
+      show: false,
+    },
+    axisLabel: {
+      interval: 0,
+      // rotate:50,
+      show: true,
+      splitNumber: 15,
+      textStyle: {
+        color: "rgba(255,255,255,.6)",
+        fontSize: '12',
+      },
+    },
+  }],
+  yAxis: [{
+    type: 'value',
+    axisLabel: {
+      //formatter: '{value} %'
+      show: true,
+      textStyle: {
+        color: "rgba(255,255,255,.6)",
+        fontSize: '12',
+      },
+    },
+    axisTick: {
+      show: false,
+    },
+    axisLine: {
+      show: true,
+      lineStyle: {
+        color: "rgba(255,255,255,.1	)",
+        width: 1,
+        type: "solid"
+      },
+    },
+    splitLine: {
+      lineStyle: {
+        color: "rgba(255,255,255,.1)",
+      }
+    }
+  }],
+  series: [
+    {
 
+      type: 'bar',
+      data: [1500, 1200, 600, 200, 300, 300, 900],
+      barWidth: '35%', //柱子宽度
+      // barGap: 1, //柱子之间间距
+      itemStyle: {
+        normal: {
+          color: '#27d08a',
+          opacity: 1,
+          barBorderRadius: 5,
+        }
+      }
+    }
+
+  ]
+})
 onMounted(() => {
+
+  // jz?.style.backgroundSize = result;
   setInterval(() => {
     currentTime.value = dayjs().format('YYYY/MM/DD HH:mm:ss');
     // 滚动效果
   })
 })
 // 显示隐藏内容
-function showFire() {
+function showFire(e) {
+  e?.target.id
+  // 进行判断
+  console.log(e,'...打印e...详情..');
   $('.device-box').show()
   // if ($(this).find('.device-box').css('display') == 'none') {
   //   $('.device-box').hide();
@@ -510,14 +591,77 @@ function showFire() {
   //   $(this).find('.device-box').hide();
   // }
 }
+// 点击全屏事件
+function handleFullScreen() {
+  //  实现全屏方法
+
+  const elem = document.getElementById('show_screen') as HTMLElement;
+  elem.requestFullscreen();
+  document.addEventListener('fullscreenchange', (e) => {
+    console.log(elem, '...fullscreen...')
+    if (document.fullscreenElement === elem) {
+
+      const mywidth = document.getElementById('myboxall')
+
+
+      console.log(mywidth?.clientHeight, '...mywidth...');
+
+      // 进入全屏状态
+      // do something...
+      // elem.requestFullscreen();
+    } else {
+      // elem.requestFullscreen();
+      // elem.
+    }
+  })
+}
 </script>
 
 <style lang="less" scoped>
+.other_left {
+  padding-left: .2rem /* 16/80 */;
+  padding-right: .2rem /* 16/80 */;
+  width: 20%;
+  // style="padding-left: 16px;padding-right: 16px; width: 20%;"
+}
+.brand {
+  position: relative;
+  margin-right: auto;
+  // style="position: relative;left: -30px;"
+}
+
+.alltitle {
+  padding: .125rem /* 10/80 */;
+  text-align: left;
+  // padding: 0.25rem;
+  color: #ffffff;
+}
+
+.topRec_List {
+  height: 90%;
+}
+
 .layout {
   position: relative;
-  /* top: -20px; */
-  /* min-height: 100vh; */
-  height: calc(100vh - 80px);
+  height: 10.975rem
+    /* 878/80 */
+  ;
+}
+
+:v-deep .ayout.ant-layout-has-sider>.ant-layout-content {
+  width: 13.3rem
+    /* 1064/80 */
+  ;
+}
+
+.my_setting {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // box-sizing: border-box;
+  // border: 1px solid pink;
 }
 
 .header {
@@ -525,7 +669,12 @@ function showFire() {
   align-items: center;
   background-color: #001529;
   color: #fff;
-  padding: 0 16px;
+  // padding: 0 1.6rem
+  /* 16/10 */
+  ;
+  height: 1.3125rem
+    /* 105/80 */
+  ;
 }
 
 .count-base,
@@ -546,16 +695,27 @@ function showFire() {
 }
 
 .yq {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 5px auto;
+  width: 1.25rem
+    /* 100/80 */
+  ;
+  height: 1.25rem
+    /* 100/80 */
+  ;
+  // width: 100px;
+  // height: 100px;
+  margin: 0 auto .0625rem auto
+    /* 5/80 */
+  ;
+  // margin: 0 auto 5px auto;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 30px;
+  // font-size: 30px;
+  font-size: .375rem /* 30/80 */;
   font-family: electronicFont;
-  color: #fff32b;
+  // color: #fff32b;
+  color: #0e73f7;
 }
 
 .yq:before {
@@ -613,59 +773,124 @@ function showFire() {
 .sider {
   background-color: #001529;
   // padding: 16px;
-  padding: 0 16px 0 16px;
+  // height: calc(100% - 2.7875rem);/* 223/80 */
+
+  padding: 0 .2rem
+    /* 16/80 */
+    0 .2rem
+    /* 16/80 */
+  ;
 }
 
 .bg-jianzhu {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 0 auto;
-  // background: url(../img/bg.png) no-repeat;
+  // top: 0;
+  // left: 0;
+  // right: 0;
+  // bottom: 0;
+  width: 13.3rem !important;
+  height: 5.75rem
+    /* 460/80 */
+  ;
+  // margin: 0 auto;
   background: url(@/assets/images/modules1.png) no-repeat;
-  background-position-x: 21rem;
-  background-position-y: 6rem;
-  background-size: 55%;
+
+
+  background-position-x: 1.25rem
+    /* 100/80 */
+  ;
+  background-position-y: .375rem
+    /* 30/80 */
+  ;
+  background-size: 60%;
+
 }
 
 .content {
   background-color: #001529;
-  height: 66%;
+  width: 13.3rem !important
+    /* 1064/80 */
+  ;
+  // height: calc(100% - 2.7875rem);/* 223/80 */
+
   // padding: 16px;
 }
 
 .footer {
   background-color: #001529;
   color: #fff;
-  // padding: 50 50px;
+  padding: inherit;
   text-align: center;
+  height: 2.8125rem
+    /* 225/80 */
+  ;
+  // height: 30%;
 }
 
 .boxall {
-  border: 1px solid rgba(25, 186, 139, 0.17);
+  border: .0125rem /* 1/80 */ solid rgba(25, 186, 139, 0.17);
   padding: 0 0.2rem 0.2rem 0.2rem;
   background: rgba(255, 255, 255, 0.04) url(@/assets/images/line.png);
   background-size: 100% auto;
   position: relative;
   margin-bottom: 0.15rem;
   z-index: 10;
+  overflow: hidden;
 }
 
-.boxall:before,
+.boxall1 {
+  border: .0125rem /* 1/80 */ solid rgba(25, 186, 139, 0.17);
+  padding: 0 0.2rem 0.2rem 0.2rem;
+  background: rgba(255, 255, 255, 0.04) url(@/assets/images/line.png);
+  background-size: 100% auto;
+  position: relative;
+  margin-bottom: 0.15rem;
+  z-index: 10;
+  // height:2.175rem /* 174/80 */;
+  height: 33%;
+  overflow: hidden;
+
+}
+
+.boxall2 {
+  border: .0125rem /* 1/80 */ solid rgba(25, 186, 139, 0.17);
+  padding: 0 0.2rem 0.2rem 0.2rem;
+  background: rgba(255, 255, 255, 0.04) url(@/assets/images/line.png);
+  background-size: 100% auto;
+  position: relative;
+  margin-bottom: 0.15rem;
+  z-index: 10;
+  // height:2.175rem /* 174/80 */;
+  height: 30%;
+  overflow: hidden;
+
+}
+
+
+.boxall1:before,
+.boxall2::before,
 .boxfoot:before {
-  border-left: 2px solid #02a6b5;
+  border-left: .025rem
+    /* 2/80 */
+    solid #02a6b5;
   left: 0;
 }
 
 .boxall:before,
-.boxall:after {
+.boxfoot:before {
+  border-left: .025rem
+    /* 2/80 */
+    solid #02a6b5;
+  left: 0;
+}
+
+.boxall:before
+ {
   position: absolute;
-  width: 0.5rem;
-  height: 0.5rem;
+  width: .125rem /* 10/80 */;
+  height: .125rem;
   content: '';
-  border-top: 2px solid #02a6b5;
+  border-top: .025rem /* 2/80 */ solid #02a6b5;
   top: 0;
 }
 
@@ -704,13 +929,15 @@ function showFire() {
 }
 
 .maquee {
-  height: 195px;
+  // height: 195px;
+  height: 90%;
 }
 
 
 .topRec_List ul {
   width: 100%;
-  height: 195px;
+  height: 90%;
+  // height: 195px;
   animation: marquee 10s linear infinite;
   overflow: hidden;
 }
@@ -759,7 +986,6 @@ function showFire() {
   box-sizing: border-box;
   padding: 5px 20px;
   text-align: center;
-  overflow: hidden;
 }
 
 .recetit {
@@ -822,62 +1048,128 @@ function showFire() {
 }
 
 .fire img {
-  width: 100%;
-  height: 100%;
+  width: .375rem
+    /* 30/80 */
+  ;
+  height: .375rem
+    /* 30/80 */
+  ;
+  // width: 100%;
+  // height: 100%;
 }
 
 .fire1 {
-  top: 480px;
-  right: 670px;
-  animation: jump 0.5s infinite alternate ease-in-out;
+  top: 1.75rem
+    /* 140/80 */
+  ;
+  right: 7.375rem
+    /* 590/80 */
+  ;
+  animation: jump1 0.5s infinite alternate ease-in-out;
+  // top: 480px;
+  // right: 670px;
+  // animation: jump 0.5s infinite alternate ease-in-out;
   // top: 400px;
   // right: 36.82rem;
   // bottom: 10.18rem;
 }
 
-.fire2 {
-  top: 290px;
-  right: 850px;
-  animation: jump1 0.5s infinite alternate ease-in-out;
-}
-
 @keyframes jump1 {
   from {
-    top: 290px;
+    top: 1.75rem;
+    /* 140/80 */
+    ;
   }
 
   to {
-    top: 300px;
+    top: 2rem
+      /* 160/80 */
+    ;
+  }
+}
+
+.fire2 {
+  top: 3.5rem
+    /* 280/80 */
+  ;
+  right: 5.5rem
+    /* 440/80 */
+  ;
+  animation: jump2 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes jump2 {
+  from {
+    top: 3.5rem
+      /* 280/80 */
+    ;
+  }
+
+  to {
+    top: 3.625rem
+      /* 290/80 */
   }
 }
 
 .device-box {
-  width: 7.8rem;
-  height: 4.68rem;
+  width: 1.5rem
+    /* 120/80 */
+  ;
+  height: 1.5rem
+    /* 120/80 */
+  ;
+  font-size: .2rem
+    /* 16/80 */
+  ;
   background: url("@/assets/images/device-box.png") no-repeat;
   background-size: 100% 100%;
   position: absolute;
-  top: -4.3rem;
-  left: -7.4rem;
+  // top: -4.3rem;
+  // left: -7.4rem;
   z-index: 9999;
   display: none;
 }
 
 .device-title {
-  font-size: 0.44rem;
+  font-size: .2rem;
   font-weight: bold;
   color: #fff;
-  padding-top: 0.6rem;
-  line-height: 0.8rem;
+  // padding-top: 0.6rem;
+  // line-height: 0.8rem;
   text-align: center;
 }
 
 .device-con {
-  font-size: 0.4rem;
+  font-size: .2rem;
   color: #fff;
   letter-spacing: 0;
-  line-height: 0.6rem;
-  padding: 0 0.4rem;
+  // line-height: 0.6rem;
+  // padding: 0 0.4rem;
   text-align: left;
 }
-</style>
+
+@media screen and (max-width: 768px) {
+  /* 在屏幕宽度小于等于 768px 时应用的样式 */
+}
+
+/*屏幕大于等于 768px */
+@media screen and (min-width: 1020px) {
+
+  // 1000 * 568
+  .bg-jianzhu {
+    // border: 4px solid yellow;
+
+  }
+
+  // .fire2 {
+  //   top: 3.5rem
+  //     /* 280/80 */
+  //   ;
+  //   right: 5.5rem
+  //     /* 440/80 */
+  //   ;
+  //   box-sizing: border-box;
+  //   border: 1px solid pink;
+  //   animation: jump2 0.5s infinite alternate ease-in-out;
+  // }
+}</style>

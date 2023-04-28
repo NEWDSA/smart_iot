@@ -104,7 +104,6 @@ export default defineComponent({
       go(`/system/detail/${record.RoleId}`)
     }
     async function handleSuccess() {
-      // 
       createMessage.info('操作成功');
       await reload();
     }
