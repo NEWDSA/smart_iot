@@ -605,6 +605,7 @@ export default defineComponent({
       })
 
       SelectGetfacilityList(true)
+      facilityTabIndex.value = 0
       console.log('搜索设备')
     }
 

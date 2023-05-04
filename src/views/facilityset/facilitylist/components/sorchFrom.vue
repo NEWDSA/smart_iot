@@ -29,7 +29,7 @@ export default defineComponent({
             },
             // submitFunc
             submitButtonOptions: {
-                text: '筛选',
+                text: '查询',
             },
             submitFunc: customSubmitFunc,
             resetFunc: customResmitFunc

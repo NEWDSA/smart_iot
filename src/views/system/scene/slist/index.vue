@@ -8,7 +8,7 @@
         <Button @click="searchScenceC">重置</Button>
       </a-col>
       <a-col class="bg_search" style="right:100px">
-        <a-button type="primary" preIcon="ic:baseline-plus" class="ml-5" @click="addScene()">
+        <a-button type="primary" preIcon="ic:baseline-plus" class="ml-5" @click="addScene()" v-if="hasPermission(['scene_Add_Btn'])">
           创建场景
         </a-button>
       </a-col>
@@ -29,7 +29,7 @@ import { defineComponent, computed, ref, unref } from 'vue';
 import { CollapseContainer } from '@/components/Container/index';
 import { useGo } from '@/hooks/web/usePage';
 import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
-
+import { usePermission } from '@/hooks/web/useButtonPermission';
 // 设备登录
 const titles = ref([])
 registerTopAreaRef(titles)
@@ -59,6 +59,7 @@ export default defineComponent({
     const Name1 = ref('');
     const Name2 = ref('');
     const go = useGo();
+    const { hasPermission } = usePermission();
     async function searchScence(value) {
       Name2.value = Name1.value
     }
@@ -79,7 +80,8 @@ export default defineComponent({
       tabInfo,
       searchScence,
       searchScenceC,
-      addScene
+      addScene,
+      hasPermission
     };
   },
 });
