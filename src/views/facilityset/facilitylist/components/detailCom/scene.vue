@@ -25,7 +25,7 @@
                         <div class="flex items-center">
                             <img :src="scenesm" alt="">
 
-                            <div class="font-bold truncate ... ml-2 text-lg w-8/10">
+                            <div class="font-bold truncate ... ml-2 text-lg w-6/10">
                                 {{ Scene.Name }}
                             </div>
                         </div>

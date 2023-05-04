@@ -140,7 +140,7 @@ export default defineComponent({
     const addmodel = ref() //获取子组件
 
     // 打开弹窗
-    async function openModal(type, data) {
+    function openModal(type, data) {
       console.log('45', type)
       // 编辑
       if (type) {
@@ -150,10 +150,9 @@ export default defineComponent({
           if (!data.ParentId) {
             addmodel.value.parent = false
           } else {
-            console.log(data.ParentId)
             addmodel.value.parentSelect[0].selectId = data.ParentId
-            addmodel.value.parentSelect[0].selectValue = await checkSlectVlaue(data.ParentId,TreeTableData)
-            // console.log(checkSlectVlaue(data.ParentId))
+            addmodel.value.parentSelect[0].selectValue = checkSlectVlaue(data.ParentId)
+            console.log(checkSlectVlaue(data.ParentId))
             getSelect(data.ParentId)
             // console.log(addmodel.value.parentSelect[0].select)
             // addmodel.value.parentSelect[0].select = checkAddSlect('TOP')
@@ -201,7 +200,7 @@ export default defineComponent({
             // console.log(a)
             message.error(a[2])
           } else {
-            message.success('修改成功')
+            message.error('修改成功')
             FengfacilityTypeTree();
 
             addmodel.value.handleClock()
@@ -225,7 +224,7 @@ export default defineComponent({
             // console.log(a)
             message.error(a[2])
           } else {
-            message.success('新增成功')
+            message.error('新增成功')
             FengfacilityTypeTree();
 
             addmodel.value.handleClock()
@@ -248,7 +247,7 @@ export default defineComponent({
             // console.log(a)
             message.error(a[2])
           } else {
-            message.success('新增成功')
+            message.error('新增成功')
             FengfacilityTypeTree();
 
             addmodel.value.handleClock()
@@ -323,7 +322,6 @@ export default defineComponent({
           message.error(a[2])
           return;
         } else {
-          message.success('删除成功')
           FengfacilityTypeTree();
         }
       })
@@ -345,34 +343,21 @@ export default defineComponent({
 
     }
 
-    function checkSlectVlaue(id,options) {
-      
-      for (let option of options) {
-        if (option.TypeId === id) {
-          return option.TypeName;
-        } else if (option.children && option.children.length > 0) {
-          let result = checkSlectVlaue(id, option.children);
-          if (result) {
-            return result;
+    function checkSlectVlaue(id) {
+      // console.log(id)
+      for (var i = 0; i < TreeTableData.length; i++) {
+        if (TreeTableData[i].TypeId == id) {
+          return TreeTableData[i].TypeName
+        }
+        if (TreeTableData[i].children) {
+          for (var y = 0; y < TreeTableData[i].children.length; y++) {
+            if (TreeTableData[i].children[y].TypeId == id) {
+              return TreeTableData[i].children[y].TypeName
+            }
           }
         }
       }
-      return null;
     }
-
-
-    // if (TreeTableData[i].TypeId == id) {
-    //   return TreeTableData[i].TypeName
-    // }
-    // if (TreeTableData[i].children) {
-    //   for (var y = 0; y < TreeTableData[i].children.length; y++) {
-    //     if (TreeTableData[i].children[y].TypeId == id) {
-    //       return TreeTableData[i].children[y].TypeName
-    //     }
-    //   }
-    // }
-    // }
-    // }
 
     function getSelect(id) {
       facilityTypeSameGradeApi({ 'ParentId': id }).then(res => {

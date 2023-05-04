@@ -40,6 +40,6 @@
     "vite.config.ts",
     "src/**/js/*.js", 
     "src/**/js/**.wasm",
-    "src/assets/js/jessibuca.js", "src/assets/js/lui.js"],
+    "src/assets/js/decoder.js", "src/assets/js/jessibuca.js", "src/assets/js/lui.js","src/assets/js/decoder.wasm"],
   "exclude": ["node_modules", "dist", "**/*.js"]
 }

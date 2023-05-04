@@ -1,11 +1,24 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="register" :title="t('component.cropper.modalTitle')" width="800px"
-    @cancel="handlecancel" :canFullscreen="false" @ok="handleOk" :okText="t('component.cropper.okText')">
+  <BasicModal
+    v-bind="$attrs"
+    @register="register"
+    :title="t('component.cropper.modalTitle')"
+    width="800px"
+    :canFullscreen="false"
+    @ok="handleOk"
+    :okText="t('component.cropper.okText')"
+  >
     <div :class="prefixCls">
       <div :class="`${prefixCls}-left`">
         <div :class="`${prefixCls}-cropper`">
-          <CropperImage v-if="src" :src="src" height="300px" :circled="circled" @cropend="handleCropend"
-            @ready="handleReady" />
+          <CropperImage
+            v-if="src"
+            :src="src"
+            height="300px"
+            :circled="circled"
+            @cropend="handleCropend"
+            @ready="handleReady"
+          />
         </div>
 
         <div :class="`${prefixCls}-toolbar`">
@@ -16,32 +29,67 @@
           </Upload>
           <Space>
             <Tooltip :title="t('component.cropper.btn_reset')" placement="bottom">
-              <a-button type="primary" preIcon="ant-design:reload-outlined" size="small" :disabled="!src"
-                @click="handlerToolbar('reset')" />
+              <a-button
+                type="primary"
+                preIcon="ant-design:reload-outlined"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('reset')"
+              />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_rotate_left')" placement="bottom">
-              <a-button type="primary" preIcon="ant-design:rotate-left-outlined" size="small" :disabled="!src"
-                @click="handlerToolbar('rotate', -45)" />
+              <a-button
+                type="primary"
+                preIcon="ant-design:rotate-left-outlined"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('rotate', -45)"
+              />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_rotate_right')" placement="bottom">
-              <a-button type="primary" preIcon="ant-design:rotate-right-outlined" size="small" :disabled="!src"
-                @click="handlerToolbar('rotate', 45)" />
+              <a-button
+                type="primary"
+                preIcon="ant-design:rotate-right-outlined"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('rotate', 45)"
+              />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_scale_x')" placement="bottom">
-              <a-button type="primary" preIcon="vaadin:arrows-long-h" size="small" :disabled="!src"
-                @click="handlerToolbar('scaleX')" />
+              <a-button
+                type="primary"
+                preIcon="vaadin:arrows-long-h"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('scaleX')"
+              />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_scale_y')" placement="bottom">
-              <a-button type="primary" preIcon="vaadin:arrows-long-v" size="small" :disabled="!src"
-                @click="handlerToolbar('scaleY')" />
+              <a-button
+                type="primary"
+                preIcon="vaadin:arrows-long-v"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('scaleY')"
+              />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_zoom_in')" placement="bottom">
-              <a-button type="primary" preIcon="ant-design:zoom-in-outlined" size="small" :disabled="!src"
-                @click="handlerToolbar('zoom', 0.1)" />
+              <a-button
+                type="primary"
+                preIcon="ant-design:zoom-in-outlined"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('zoom', 0.1)"
+              />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_zoom_out')" placement="bottom">
-              <a-button type="primary" preIcon="ant-design:zoom-out-outlined" size="small" :disabled="!src"
-                @click="handlerToolbar('zoom', -0.1)" />
+              <a-button
+                type="primary"
+                preIcon="ant-design:zoom-out-outlined"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('zoom', -0.1)"
+              />
             </Tooltip>
           </Space>
         </div>
@@ -65,7 +113,7 @@
 <script lang="ts">
 import type { CropendResult, Cropper } from './typing'
 
-import { defineComponent, ref,watch } from 'vue'
+import { defineComponent, ref } from 'vue'
 import CropperImage from './Cropper.vue'
 import { Space, Upload, Avatar, Tooltip } from 'ant-design-vue'
 import { useDesign } from '@/hooks/web/useDesign'
@@ -81,9 +129,6 @@ const props = {
   circled: { type: Boolean, default: true },
   uploadApi: {
     type: Function as PropType<(params: apiFunParams) => Promise<any>>
-  },
-  src: {
-    type: String, default: ''
   }
 }
 
@@ -91,7 +136,7 @@ export default defineComponent({
   name: 'CropperModal',
   components: { BasicModal, Space, CropperImage, Upload, Avatar, Tooltip },
   props,
-  emits: ['uploadSuccess', 'register', 'uploadError'],
+  emits: ['uploadSuccess', 'register','uploadError'],
   setup(props, { emit }) {
     let filename = ''
     const src = ref('')
@@ -142,44 +187,18 @@ export default defineComponent({
         try {
           setModalProps({ confirmLoading: true })
           const result = await uploadApi({ name: 'file', file: blob, filename })
-          if (result.data.Code == 0) {
-            // src.value = ''
-            // previewSource.value = ''
-            console.log(src.value, previewSource.value, '45646576')
+          if(result.data.Code == 0){
             emit('uploadSuccess', { source: previewSource.value, data: result.data })
-            closeModal()
-          } else {
+          closeModal()
+          }else{
             emit('uploadError')
             return;
           }
-
+         
         } finally {
           setModalProps({ confirmLoading: false })
         }
       }
-    }
-
-    async function handlecancel() {
-      console.log(props.src)
-      if (props.src == '/src/assets/images/motou.png') {
-        src.value = ''
-        previewSource.value = ''
-      }
-    }
-
-    watch(()=>props.src,(newval,oldval)=>{
-      // console.log(newval,props.src,'props.srcprops.src')
-      
-      if(newval == '/src/assets/images/motou.png'){
-        clearData()
-      }else{
-        src.value = newval
-      }
-    })
-
-    function clearData() {
-      src.value = ''
-      previewSource.value = ''
     }
 
     return {
@@ -192,9 +211,7 @@ export default defineComponent({
       handleCropend,
       handleReady,
       handlerToolbar,
-      handleOk,
-      handlecancel,
-      clearData
+      handleOk
     }
   }
 })
@@ -222,16 +239,20 @@ export default defineComponent({
   &-cropper {
     height: 300px;
     background: #eee;
-    background-image: linear-gradient(45deg,
+    background-image: linear-gradient(
+        45deg,
         rgb(0 0 0 / 25%) 25%,
         transparent 0,
         transparent 75%,
-        rgb(0 0 0 / 25%) 0),
-      linear-gradient(45deg,
+        rgb(0 0 0 / 25%) 0
+      ),
+      linear-gradient(
+        45deg,
         rgb(0 0 0 / 25%) 25%,
         transparent 0,
         transparent 75%,
-        rgb(0 0 0 / 25%) 0);
+        rgb(0 0 0 / 25%) 0
+      );
     background-position: 0 0, 12px 12px;
     background-size: 24px 24px;
   }

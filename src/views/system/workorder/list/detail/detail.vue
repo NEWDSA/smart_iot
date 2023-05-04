@@ -15,7 +15,7 @@
           <div class="flex items-center justify-between">
             <div class="text-xl">{{ WorkorderDetail?.Title }}</div>
             <Icon icon="heroicons:pencil-square-solid" :size="20" @click="editStatusFun"
-              v-if="WorkorderDetail?.Status == 1 && mySelf == 2 && hasPermission(['workorder_detail_Title_Btn'])" />
+              v-if="WorkorderDetail?.Status == 1 && mySelf == 2 " />
           </div>
           <div class="text-gray-400 mt-5">{{ WorkorderDetail?.Content }}</div>
         </div>
@@ -45,7 +45,7 @@
         </div>
 
         <div style="width:95%">
-          <!-- 1受理中 2是完结 1不是自己 -->
+          <!-- 2是完结 1 不是自己 -->
           <a-textarea v-model:value="value" placeholder="在这里输入你的跟进结果" :rows="4"
             :disabled="WorkorderDetail?.Status == 2 || mySelf == 1" />
         </div>
@@ -56,7 +56,7 @@
             @change="handleChange" :maxCount="9" :headers="{
                 'Authorization': getToken()
               }">
-            <a-button :disabled="WorkorderDetail?.Status == 2 || mySelf == 1 || !hasPermission(['workorder_detail_Up_File_Btn'])">
+            <a-button :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
               <Icon icon="uil:upload" size="14px"></Icon>
               上传附件
             </a-button>
@@ -64,23 +64,23 @@
         </div>
 
         <div class="my-4">
-          <a-button type="primary" size="large" @click="hadlkOk" :disabled="WorkorderDetail?.Status == 2 || mySelf == 1 || !hasPermission(['workorder_detail_Updata_Btn'])">
+          <a-button type="primary" size="large" @click="hadlkOk" :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
             更新
           </a-button>
           <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel" ghost
-            :disabled="WorkorderDetail?.Status == 2 || mySelf == 1 || !hasPermission(['workorder_detail_Cancel_Btn'])">
+            :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
             取消
           </a-button>
           <a-button type="primary" size="large" class="ml-4" @click="openmodal" v-if="WorkorderDetail?.Status == 1"
-            :disabled="WorkorderDetail?.Status == 2 || mySelf == 1 || !hasPermission(['workorder_detail_Care_Of_Btn'])">
+            :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
             转交
           </a-button>
           <a-button type="primary" size="large" class="ml-4" @click="workOver" v-if="WorkorderDetail?.Status == 1"
-            :disabled="WorkorderDetail?.Status == 2 || mySelf == 1 || !hasPermission(['workorder_detail_End_Btn'])">
+            :disabled="WorkorderDetail?.Status == 2 || mySelf == 1">
             完结
           </a-button>
           <a-button type="primary" size="large" class="ml-4" @click="againOpen" v-if="WorkorderDetail?.Status == 2"
-            :disabled="WorkorderDetail?.Status == 1 || mySelf == 1 || !hasPermission(['workorder_detail_Again_Btn'])">
+            :disabled="WorkorderDetail?.Status == 1 || mySelf == 1">
             重新受理
           </a-button>
         </div>

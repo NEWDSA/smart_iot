@@ -27,17 +27,16 @@ export default defineComponent({
     emits: ['success', 'register', 'select'],
     setup(_, { emit }) {
         const checkedKeys = ref<Array<string | number>>([]);
-        const work = ref('')
         const { createConfirm } = useMessage();
         const checkData: any = ref();
         const DataType = ref('');
         const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
             console.log(data, 4564564)
             DataType.value = data?.type
-            work.value = data?.work
+
             // checkedKeys.value = []  
             checkedKeys.value = await data?.data
-            console.log(work.value)
+            // console.log()
 
         });
 
@@ -68,12 +67,6 @@ export default defineComponent({
             useSearchForm: true,
             showTableSetting: true,
             bordered: true,
-            searchInfo:{Status : 1},
-            // handleSearchInfoFn: (e) => {
-            //     if(work.value != ''){
-            //         e.Status = 1
-            //     }
-            // }
         });
 
         function onSelectChange(selectedRowKeys: (string | number)[]) {

@@ -5,8 +5,7 @@
     </template>
 
     <div class="flex items-center flex-wrap border-b">
-      <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index"
-        @click="topage(item.path)">
+      <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index" @click="topage(item.Component)">
         <div>
           <Icon :icon="item.Icon" size="24"></Icon>
         </div>
@@ -45,12 +44,12 @@
 
   </Card>
 
-  <RoleDrawer @register="registerDrawer" @success="handleSuccess"></RoleDrawer>
+<RoleDrawer @register="registerDrawer" @success="handleSuccess"></RoleDrawer>
 </template>
 <script lang="ts" setup>
-import { usePermission } from '@/hooks/web/useButtonPermission';
+import {usePermission} from '@/hooks/web/useButtonPermission';
 import Icon from '@/components/Icon';
-import { Ref, ref, watch, onMounted } from 'vue';
+import { Ref, ref, watch,onMounted } from 'vue';
 import { Card, Tag } from 'ant-design-vue';
 
 import { useDrawer } from '@/components/Drawer';
@@ -59,7 +58,6 @@ import RoleDrawer from './modal/SourceDrawer.vue';
 import { shortCutMenu } from '@/api/sys/user'
 
 import { useGo } from '@/hooks/web/usePage';
-import { forEach } from 'lodash-es';
 const go = useGo();
 const { hasPermission } = usePermission();
 const [registerDrawer, { openDrawer }] = useDrawer();
@@ -77,7 +75,7 @@ const props = defineProps({
 })
 
 
-onMounted(() => {
+onMounted(()=>{
   getShortCutMenu()
 })
 
@@ -105,32 +103,14 @@ function handleSuccess() {
 const shortcutList = ref()
 
 
-const getShortCutMenu = () => {
-  shortcutList.value = []
-  shortCutMenu().then(res => {
-    res.List.map((item, index) => {
-      let path
-      if(item.MenuName == '菜单管理' || item.MenuName == '角色管理'){
-        let a =item.Component.split('/')
-        path =  '/'+a[0]+'/'+a[1]
-      }else{
-        let a =item.Component.split('/')
-        path =  '/'+a[1]+'/'+a[2]
-      }
-      shortcutList.value.push({
-        path:path,
-        Icon:item.Icon,
-        MenuName:item.MenuName
-      })
-    })
-    console.log(shortcutList.value)
-    // shortcutList.value = res.List
-
+const getShortCutMenu = ()=>{
+  shortCutMenu().then(res=>{
+    shortcutList.value = res.List
   })
 }
 
-const topage = (Page) => {
-  // console.log(Page)
+const topage = (Page) =>{
+  console.log(Page)
   go(Page)
 }
 

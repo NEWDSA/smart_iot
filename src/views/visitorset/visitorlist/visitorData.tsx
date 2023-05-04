@@ -7,7 +7,7 @@ export function TabColumns() {
   return [
 
     {
-      title: '访客姓名',
+      title: '用户',
       dataIndex: 'VisitorName',
       width: 80,
     },

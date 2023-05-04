@@ -3,8 +3,7 @@
     <div class="px-5">
       <div class="flex justify-between items-center">
         <div class="text-lg">工单信息详情</div>
-        <Icon icon="heroicons:pencil-square-solid" :size="24" @click="editStatusFun"
-          v-if="editStatus == false && mySelf == 2 && workObj[3].value == 1 && hasPermission(['workorder_detail_Edit_Info_Btn'])" />
+        <Icon icon="heroicons:pencil-square-solid" :size="24" @click="editStatusFun" v-if="editStatus == false && mySelf == 2 && workObj[3].value == 1" />
       </div>
 
       <div class="centents">
@@ -115,12 +114,12 @@
 import Icon from '@/components/Icon';
 import { ref, onMounted, reactive, watch } from 'vue';
 import { TaskTicketInfoApi, TaskTicketEditApi } from '@/api/sys/workorder'
-import { message, Select, Button } from 'ant-design-vue';
+import { message, Select,Button } from 'ant-design-vue';
 import { useModal } from '@/components/Modal';
 import userDrawer from '@/views/facilityset/facilitylist/components/userDrawer.vue'
 import dayjs from 'dayjs'
-import { usePermission } from '@/hooks/web/useButtonPermission';
-const { hasPermission } = usePermission();
+
+
 const [registerMyTable, { openModal }] = useModal();
 
 const props = defineProps({

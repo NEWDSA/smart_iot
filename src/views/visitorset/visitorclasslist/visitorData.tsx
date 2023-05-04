@@ -10,7 +10,7 @@ export function TabColumns() {
     //   width: 150,
     // },
     {
-      title: '访客类型',
+      title: '分类名称',
       dataIndex: 'VisitorTypeName',
       width: 150,
     },

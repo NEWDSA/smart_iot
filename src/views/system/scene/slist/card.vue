@@ -32,23 +32,23 @@
 
                 <Popconfirm title="确认删除此场景？" ok-text="确认" cancel-text="取消" @confirm="confirm(index, item.Status)"
                   @cancel="cancel">
-                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" :class="item.Status == 1 ? 'text-gray-400' : ''" v-if="hasPermission(['scene_Delete_Btn'])"
+                  <div class="bg-gray-100 py-2 px-4 mr-3 rounded" :class="item.Status == 1 ? 'text-gray-400' : ''"
                     @click.stop="">
                     删除
                   </div>
                 </Popconfirm>
 
-                <div class="bg-gray-100 py-2 px-4 mr-3 rounded" :class="item.Status == 1 ? 'text-gray-400' : ''" v-if="hasPermission(['scene_Edit_Btn'])"
+                <div class="bg-gray-100 py-2 px-4 mr-3 rounded" :class="item.Status == 1 ? 'text-gray-400' : ''"
                   @click.stop="pathDetail(item.RuleId, item.Status)">
                   编辑</div>
-                <div class=" bg-blue-600 text-white py-2 px-4 mr-3 rounded" v-if="item.Status == 2 && hasPermission(['scene_Enable_Btn'])"
+                <div class=" bg-blue-600 text-white py-2 px-4 mr-3 rounded" v-if="item.Status == 2"
                   @click.stop="enableDevice(item.RuleId, index)">启用
                 </div>
-                <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded" v-if="item.Status == 1 && hasPermission(['scene_Disable_Btn'])"
+                <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded" v-if="item.Status == 1"
                   @click.stop="disableDevice(item.RuleId, index)">
                   禁用</div>
                 <div class=" bg-blue-600 text-white py-2 px-4 mr-3 rounded"
-                  :class="item.Status == 1 ? 'text-gray-400' : ''" v-if="item.TriggerMode == 3 && item.Status == 1 && hasPermission(['scene_execute_Btn'])"
+                  :class="item.Status == 1 ? 'text-gray-400' : ''" v-if="item.TriggerMode == 3 && item.Status == 1"
                   @click.stop="executeRule(item.Name, item.Status)">执行
                 </div>
               </div>
@@ -88,7 +88,6 @@ import { send_device_command_right_away } from '@/utils/iot'
 import forr from '@/assets/images/404.png'
 import scenesm from '@/assets/images/sceneSm.png'
 import scenebig from '@/assets/images/sceneBig.png'
-import { usePermission } from '@/hooks/web/useButtonPermission';
 
 export default defineComponent({
   props: ['id', 'set'],
@@ -107,7 +106,6 @@ export default defineComponent({
     const go = useGo();
     // 定义常量
     // const current = ref(1);
-    const { hasPermission } = usePermission();
     const tagColor = ref('#f50');
     const toTal = ref(0);
     const params = reactive({
@@ -297,8 +295,7 @@ export default defineComponent({
       executeRule,
       forr,
       scenesm,
-      scenebig,
-      hasPermission
+      scenebig
     };
   },
 });

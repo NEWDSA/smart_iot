@@ -30,11 +30,11 @@ export const columns: BasicColumn[] = [
       switch (status) {
         case 1:
           color = 'green'
-          text = '在线'
+          text = '启用'
           return h(Tag, { color: color }, () => text)
         case 2:
           color = 'red'
-          text = '离线'
+          text = '禁用'
           return h(Tag, { color: color }, () => text)
         case 3:
           color = 'red'
@@ -51,7 +51,7 @@ export const columns: BasicColumn[] = [
 
         default:
           color = 'gray'
-          text = '未知'
+          text = '离线'
           return h(Tag, { color: color }, () => text)
       }
 
