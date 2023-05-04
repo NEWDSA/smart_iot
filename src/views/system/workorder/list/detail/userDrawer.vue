@@ -16,7 +16,7 @@ import { defineComponent, ref, computed, unref, onMounted } from 'vue';
 import { useMessage } from '@/hooks/web/useMessage';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
-import { columns, searchFormSchema } from '@/views/system/user/account.data';
+import { columns, searchFormSchema } from './data';
 // import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
 import { getAccountList } from '@/api/demo/system';
@@ -104,3 +104,8 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.ant-table-body{
+    height: auto !important;
+}
+</style>

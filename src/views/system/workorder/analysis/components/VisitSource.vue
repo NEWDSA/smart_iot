@@ -5,7 +5,7 @@
     </template>
 
     <div class="flex items-center flex-wrap border-b">
-      <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index" @click="topage(item.Component)">
+      <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index" @click="topage(item.path)">
         <div>
           <Icon :icon="item.Icon" size="24"></Icon>
         </div>
@@ -103,9 +103,27 @@ function handleSuccess() {
 const shortcutList = ref()
 
 
-const getShortCutMenu = ()=>{
-  shortCutMenu().then(res=>{
-    shortcutList.value = res.List
+const getShortCutMenu = () => {
+  shortcutList.value = []
+  shortCutMenu().then(res => {
+    res.List.map((item, index) => {
+      let path
+      if(item.MenuName == '菜单管理' || item.MenuName == '角色管理'){
+        let a =item.Component.split('/')
+        path =  '/'+a[0]+'/'+a[1]
+      }else{
+        let a =item.Component.split('/')
+        path =  '/'+a[1]+'/'+a[2]
+      }
+      shortcutList.value.push({
+        path:path,
+        Icon:item.Icon,
+        MenuName:item.MenuName
+      })
+    })
+    console.log(shortcutList.value)
+    // shortcutList.value = res.List
+
   })
 }
 

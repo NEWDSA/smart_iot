@@ -31,10 +31,10 @@
             </div>
 
             <a-button type="primary" size="small" class="ml-4" @click="hadlkOkInput">
-              保存1
+              保存
             </a-button>
             <a-button type="primary" size="small" class="ml-4" @click="hadlkCancelInput" ghost>
-              取消2
+              取消
             </a-button>
           </div>
 
@@ -67,7 +67,7 @@
           <a-button type="primary" size="large" @click="hadlkOk" :disabled="WorkorderDetail?.Status == 2 || mySelf == 1 || !hasPermission(['workorder_detail_Updata_Btn'])">
             更新
           </a-button>
-          <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel" ghost
+          <a-button type="primary" size="large" class="ml-4" @click="hadlkCancel"
             :disabled="WorkorderDetail?.Status == 2 || mySelf == 1 || !hasPermission(['workorder_detail_Cancel_Btn'])">
             取消
           </a-button>
