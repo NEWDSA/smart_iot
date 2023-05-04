@@ -194,6 +194,7 @@ export default defineComponent({
         return [
           {
             label: '查看',
+            ifShow: hasPermission(['handleLook_visitorlist']),
             onClick: handleLook.bind(null, record)
           }
         ]

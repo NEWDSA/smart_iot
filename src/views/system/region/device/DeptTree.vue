@@ -24,10 +24,10 @@ export default defineComponent({
     async function fetch() {
       // treeData.value = (await getReginList()) as unknown as TreeItem[];
       const { Detail } = await getReginList()
-
-      selectedKeys.value=[Detail[0].RegionId] ;
-      emit('select',Detail[0].RegionId);
-      treeData.value = Detail
+      const myDetail=Detail.filter(item => item.Status == '1');
+      selectedKeys.value = [myDetail[0].RegionId];
+      emit('select', myDetail[0].RegionId);
+      treeData.value = myDetail;
     }
 
 
@@ -39,7 +39,7 @@ export default defineComponent({
     onMounted(() => {
       fetch();
     });
-    return { treeData,selectedKeys, handleSelect };
+    return { treeData, selectedKeys, handleSelect };
   },
 });
 </script>

@@ -6,7 +6,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, ref, unref } from 'vue';
+import { defineComponent, onMounted, ref, toRaw, toRef } from 'vue';
 
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
 import { getDeptList } from '@/api/demo/system';
@@ -46,7 +46,7 @@ export default defineComponent({
         return res;
       }
       let datas = listToTreeSimple(treeData.value);
-      treeData.value = datas;
+      treeData.value = datas.filter(item => item.Status == '0');
       return treeData
 
     }
