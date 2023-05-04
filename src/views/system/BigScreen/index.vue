@@ -68,25 +68,27 @@
         <div class="boxall" style="height: 100%">
           <div id="jianzhu" class="bg-jianzhu">
             <div class="my_setting">
-              <div @click="showFire" id="fire2" class="fire fire2">
+              <div @click="showFire(1)" class="fire fire2">
                 <img src="@/assets/images/fire.png" />
-                <div class="device-box">
-                  <div class="device-title">灯光2</div>
-                  <div class="device-con">设备运行正常，已运行1h32mins
-                  </div>
+
+              </div>
+              <div class="device-box1">
+                <div class="device-title">灯光2</div>
+                <div class="device-con">设备运行正常，已运行1h32mins
                 </div>
               </div>
-              <div @click="showFire" id="fire1" class="fire fire1">
+              <div @click="showFire(2)" id="fire1" class="fire fire1">
                 <img src="@/assets/images/fire.png" />
-                <div class="device-box">
-                  <div class="device-title">灯光1</div>
-                  <div class="device-con">设备运行正常，已运行1h32mins
-                  </div>
+
+              </div>
+              <div class="device-box2">
+                <div class="device-title">灯光1</div>
+                <div class="device-con">设备运行正常，已运行1h32mins
                 </div>
               </div>
             </div>
           </div>
-          <div class="flex absolute bottom-1/30">
+          <!-- <div class="flex absolute bottom-1/30">
             <div class="flex flex-wrap flex-col p-2">
               <div class="rounded-1 border-gray-500 border bg-dark-100" style="width: fit-content; height: fit-content;">
                 <Icon :size="40" icon="ion:ios-lightbulb-outline" />
@@ -106,7 +108,7 @@
               <span>2222</span>
             </div>
 
-          </div>
+          </div> -->
         </div>
       </a-layout-content>
       <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
@@ -571,7 +573,38 @@ setOptions4({
   ]
 })
 onMounted(() => {
+  $('.fire1').click(function () {
 
+    if ($("div").find('.device-box2').css('display') == 'none') {
+      $('.video-box2').hide();
+      $("div").find('.device-box2').show();
+    } else {
+      $("div").find('.device-box2').hide();
+    }
+    // if ($('.device-box2').css('display') == 'none') {
+
+    //   $('.device-box2').show();
+    // } else {
+    //   $('.device-box2').hide();
+    // }
+  })
+
+  $('.fire2').click(function () {
+
+    if ($("div").find('.device-box1').css('display') == 'none') {
+      $('.video-box1').hide();
+      $("div").find('.device-box1').show();
+    } else {
+      $("div").find('.device-box1').hide();
+    }
+    // if ($('.device-box1').css('display') == 'none') {
+
+    //   $('.device-box1').show();
+    // } else {
+    //   $('.device-box1').hide();
+    // }
+    // alert('111')
+  })
   // jz?.style.backgroundSize = result;
   setInterval(() => {
     currentTime.value = dayjs().format('YYYY/MM/DD HH:mm:ss');
@@ -580,16 +613,77 @@ onMounted(() => {
 })
 // 显示隐藏内容
 function showFire(e) {
-  e?.target.id
+  // e?.target.id
   // 进行判断
-  console.log(e,'...打印e...详情..');
-  $('.device-box').show()
+  console.log(e, '...打印e...详情..');
+  // $('.fire1').click(function () {
+
+  //   if ($("div").find('.device-box2').css('display') == 'none') {
+  //     $('.video-box2').hide();
+  //     $("div").find('.device-box2').show();
+  //   } else {
+  //     $("div").find('.device-box2').hide();
+  //   }
+  //   // if ($('.device-box2').css('display') == 'none') {
+
+  //   //   $('.device-box2').show();
+  //   // } else {
+  //   //   $('.device-box2').hide();
+  //   // }
+  // })
+
+  // $('.fire2').click(function () {
+
+  //   if ($("div").find('.device-box1').css('display') == 'none') {
+  //     $('.video-box1').hide();
+  //     $("div").find('.device-box1').show();
+  //   } else {
+  //     $("div").find('.device-box1').hide();
+  //   }
+  //   // if ($('.device-box1').css('display') == 'none') {
+
+  //   //   $('.device-box1').show();
+  //   // } else {
+  //   //   $('.device-box1').hide();
+  //   // }
+  //   // alert('111')
+  // })
+
   // if ($(this).find('.device-box').css('display') == 'none') {
   //   $('.device-box').hide();
   //   $(this).find('.device-box').show();
   // } else {
   //   $(this).find('.device-box').hide();
   // }
+  // debugger
+  // switch (e) {
+
+  //   case 1:
+  //     // $('.device-box1').show();
+  //     $('.fire1').click(function () {
+  //       if ($('.device-box1').css('display') == 'none') {
+  //         $('.device-box1').hide();
+  //         $('.device-box').show();
+  //       } else {
+  //         $('.device-box1').hide();
+  //       }
+  //     });
+  //     // $('.fire1').stop(true);
+  //     // 移除动画
+  //     break;
+  //   case 2:
+  //     $('.device-box2').show();
+  //     // 移除动画
+  //     // fire1
+  //     // $('.fire2').stop(true, true);
+  //     // do something
+  //     break;
+  //   default:
+
+  //     // do something
+  //     break;
+  // }
+
 }
 // 点击全屏事件
 function handleFullScreen() {
@@ -619,11 +713,16 @@ function handleFullScreen() {
 
 <style lang="less" scoped>
 .other_left {
-  padding-left: .2rem /* 16/80 */;
-  padding-right: .2rem /* 16/80 */;
+  padding-left: .2rem
+    /* 16/80 */
+  ;
+  padding-right: .2rem
+    /* 16/80 */
+  ;
   width: 20%;
   // style="padding-left: 16px;padding-right: 16px; width: 20%;"
 }
+
 .brand {
   position: relative;
   margin-right: auto;
@@ -631,7 +730,9 @@ function handleFullScreen() {
 }
 
 .alltitle {
-  padding: .125rem /* 10/80 */;
+  padding: .125rem
+    /* 10/80 */
+  ;
   text-align: left;
   // padding: 0.25rem;
   color: #ffffff;
@@ -712,7 +813,9 @@ function handleFullScreen() {
   justify-content: center;
   align-items: center;
   // font-size: 30px;
-  font-size: .375rem /* 30/80 */;
+  font-size: .375rem
+    /* 30/80 */
+  ;
   font-family: electronicFont;
   // color: #fff32b;
   color: #0e73f7;
@@ -828,7 +931,9 @@ function handleFullScreen() {
 }
 
 .boxall {
-  border: .0125rem /* 1/80 */ solid rgba(25, 186, 139, 0.17);
+  border: .0125rem
+    /* 1/80 */
+    solid rgba(25, 186, 139, 0.17);
   padding: 0 0.2rem 0.2rem 0.2rem;
   background: rgba(255, 255, 255, 0.04) url(@/assets/images/line.png);
   background-size: 100% auto;
@@ -839,7 +944,9 @@ function handleFullScreen() {
 }
 
 .boxall1 {
-  border: .0125rem /* 1/80 */ solid rgba(25, 186, 139, 0.17);
+  border: .0125rem
+    /* 1/80 */
+    solid rgba(25, 186, 139, 0.17);
   padding: 0 0.2rem 0.2rem 0.2rem;
   background: rgba(255, 255, 255, 0.04) url(@/assets/images/line.png);
   background-size: 100% auto;
@@ -853,7 +960,9 @@ function handleFullScreen() {
 }
 
 .boxall2 {
-  border: .0125rem /* 1/80 */ solid rgba(25, 186, 139, 0.17);
+  border: .0125rem
+    /* 1/80 */
+    solid rgba(25, 186, 139, 0.17);
   padding: 0 0.2rem 0.2rem 0.2rem;
   background: rgba(255, 255, 255, 0.04) url(@/assets/images/line.png);
   background-size: 100% auto;
@@ -884,13 +993,16 @@ function handleFullScreen() {
   left: 0;
 }
 
-.boxall:before
- {
+.boxall:before {
   position: absolute;
-  width: .125rem /* 10/80 */;
+  width: .125rem
+    /* 10/80 */
+  ;
   height: .125rem;
   content: '';
-  border-top: .025rem /* 2/80 */ solid #02a6b5;
+  border-top: .025rem
+    /* 2/80 */
+    solid #02a6b5;
   top: 0;
 }
 
@@ -1098,6 +1210,8 @@ function handleFullScreen() {
   animation: jump2 0.5s infinite alternate ease-in-out;
 }
 
+.file2_animate {}
+
 @keyframes jump2 {
   from {
     top: 3.5rem
@@ -1111,7 +1225,7 @@ function handleFullScreen() {
   }
 }
 
-.device-box {
+.device-box1 {
   width: 1.5rem
     /* 120/80 */
   ;
@@ -1124,8 +1238,38 @@ function handleFullScreen() {
   background: url("@/assets/images/device-box.png") no-repeat;
   background-size: 100% 100%;
   position: absolute;
-  // top: -4.3rem;
+  top: 1.875rem
+    /* 150/80 */
+  ;
+  left: 4.875rem
+    /* 390/80 */
+  ;
   // left: -7.4rem;
+  z-index: 9999;
+  display: none;
+}
+
+.device-box2 {
+
+  // right: 7.375rem;
+  width: 1.5rem
+    /* 120/80 */
+  ;
+  height: 1.5rem
+    /* 120/80 */
+  ;
+  font-size: .2rem
+    /* 16/80 */
+  ;
+  background: url("@/assets/images/device-box.png") no-repeat;
+  background-size: 100% 100%;
+  position: absolute;
+  top: .375rem
+    /* 30/80 */
+  ;
+  left: 3rem
+    /* 240/80 */
+  ;
   z-index: 9999;
   display: none;
 }
@@ -1172,4 +1316,5 @@ function handleFullScreen() {
   //   border: 1px solid pink;
   //   animation: jump2 0.5s infinite alternate ease-in-out;
   // }
-}</style>
+}
+</style>

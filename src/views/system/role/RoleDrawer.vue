@@ -16,7 +16,6 @@ import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
 import { BasicTree, TreeItem } from '@/components/Tree';
 import { Loading, useLoading } from '@/components/Loading';
 import { geRoletMenTree, CreateRole, ModifiRole, getMenTree } from '@/api/demo/system';
-import { object } from 'vue-types';
 export default defineComponent({
   name: 'RoleDrawer',
   components: { BasicDrawer, BasicForm, BasicTree },
@@ -59,7 +58,6 @@ export default defineComponent({
         checkStrictly.value = false;
         // checkedMenu.value = checkedKeys;
         treeData.value = (TreeSelect) as any as TreeItem[];
-        console.log(treeData.value, 'rererere')
       }
 
 
@@ -76,19 +74,14 @@ export default defineComponent({
         var menuIdsSelect;
         if (values.menuIds?.checked) {
           menuIdsSelect = Object.keys(values.menuIds?.checked).map((key) => {
-            console.log(key, '....key...')
             return parseInt(values.menuIds.checked[key], 10);
           })
         } else {
+          console.log(values.menuIds, '?...menuIds...?');
           menuIdsSelect = Object.keys(values.menuIds).map((key) => {
-            return parseInt(values.menuIds.checked[key], 10);
+            return parseInt(values.menuIds[key], 10);
           })
         }
-        // var intArr = Object.keys(obj).map(function (key) {
-        //   return parseInt(obj[key], 10);
-        // });
-
-        // console.log(intArr); // [1, 2, 3, 4, 5]
 
         !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: menuIdsSelect })
         // 显示一个加载中 并延迟3s
