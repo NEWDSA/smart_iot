@@ -54,7 +54,9 @@ specifiers:
   husky: ^8.0.2
   inquirer: ^9.1.4
   intro.js: ^6.0.0
+  jquery: ^3.6.4
   less: ^4.1.3
+  lib-flexible: ^0.3.2
   lint-staged: ^13.0.4
   lodash-es: ^4.17.21
   mitt: ^3.0.0
@@ -125,6 +127,8 @@ dependencies:
   dayjs: 1.11.6
   echarts: 5.4.0
   intro.js: 6.0.0
+  jquery: registry.npmmirror.com/jquery/3.6.4
+  lib-flexible: registry.npmmirror.com/lib-flexible/0.3.2
   lodash-es: 4.17.21
   mitt: registry.npmmirror.com/mitt/3.0.0
   mockjs: 1.1.0
@@ -2233,7 +2237,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.4
-      caniuse-lite: 1.0.30001431
+      caniuse-lite: registry.npmmirror.com/caniuse-lite/1.0.30001481
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -2345,7 +2349,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001431
+      caniuse-lite: registry.npmmirror.com/caniuse-lite/1.0.30001481
       electron-to-chromium: 1.4.284
       node-releases: 2.0.6
       update-browserslist-db: 1.0.10_browserslist@4.21.4
@@ -2411,10 +2415,6 @@ packages:
   /camelcase/6.3.0:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
-    dev: true
-
-  /caniuse-lite/1.0.30001431:
-    resolution: {integrity: sha512-zBUoFU0ZcxpvSt9IU66dXVT/3ctO1cy4y9cscs1szkPlcWb6pasYM144GqrUygUbT+k7cmUCW61cvskjcv0enQ==}
     dev: true
 
   /capital-case/1.0.4:
@@ -2962,7 +2962,7 @@ packages:
       decompress-tarbz2: registry.npmmirror.com/decompress-tarbz2/4.1.1
       decompress-targz: registry.npmmirror.com/decompress-targz/4.1.1
       decompress-unzip: registry.npmmirror.com/decompress-unzip/4.0.1
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       make-dir: registry.npmmirror.com/make-dir/1.3.0
       pify: registry.npmmirror.com/pify/2.3.0
       strip-dirs: registry.npmmirror.com/strip-dirs/2.1.0
@@ -3827,7 +3827,7 @@ packages:
       domutils: 1.7.0
       entities: 1.1.2
       inherits: registry.npmmirror.com/inherits/2.0.4
-      readable-stream: registry.npmmirror.com/readable-stream/3.6.0
+      readable-stream: registry.npmmirror.com/readable-stream/3.6.2
     dev: true
 
   /htmlparser2/8.0.1:
@@ -3940,7 +3940,7 @@ packages:
     dependencies:
       file-type: 12.4.2
       globby: registry.npmmirror.com/globby/10.0.2
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       junk: 3.1.0
       make-dir: 3.1.0
       p-pipe: 3.1.0
@@ -4284,7 +4284,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmmirror.com/@types/node/18.11.10
+      '@types/node': registry.npmmirror.com/@types/node/18.16.1
       merge-stream: registry.npmmirror.com/merge-stream/2.0.0
       supports-color: registry.npmmirror.com/supports-color/7.2.0
     dev: true
@@ -4391,11 +4391,11 @@ packages:
       tslib: 2.4.0
     optionalDependencies:
       errno: registry.npmmirror.com/errno/0.1.8
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       image-size: registry.npmmirror.com/image-size/0.5.5
       make-dir: registry.npmmirror.com/make-dir/2.1.0
       mime: registry.npmmirror.com/mime/1.6.0
-      needle: registry.npmmirror.com/needle/3.1.0
+      needle: registry.npmmirror.com/needle/3.2.0
       source-map: registry.npmmirror.com/source-map/0.6.1
     transitivePeerDependencies:
       - supports-color
@@ -4410,7 +4410,7 @@ packages:
     resolution: {integrity: sha512-cy7ZdNRXdablkXYNI049pthVeXFurRyb9+hA/dZzerZ0pGTx42z+y+ssxBaVV2l70t1muq5IdKhn4UtcoGUY9A==}
     engines: {node: '>=0.10.0'}
     dependencies:
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       parse-json: registry.npmmirror.com/parse-json/2.2.0
       pify: registry.npmmirror.com/pify/2.3.0
       pinkie-promise: registry.npmmirror.com/pinkie-promise/2.0.1
@@ -4421,7 +4421,7 @@ packages:
     resolution: {integrity: sha512-Kx8hMakjX03tiGTLAIdJ+lL0htKnXjEZN6hk/tozf/WOuYGdZBJrZ+rCJRbVCugsjB3jMLn9746NsQIf5VjBMw==}
     engines: {node: '>=4'}
     dependencies:
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       parse-json: 4.0.0
       pify: 3.0.0
       strip-bom: 3.0.0
@@ -5614,7 +5614,7 @@ packages:
     deprecated: See https://github.com/lydell/source-map-resolve#deprecated
     dependencies:
       atob: 2.1.2
-      decode-uri-component: registry.npmmirror.com/decode-uri-component/0.2.0
+      decode-uri-component: registry.npmmirror.com/decode-uri-component/0.2.2
       resolve-url: 0.2.1
       source-map-url: 0.4.1
       urix: 0.1.0
@@ -7361,7 +7361,7 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmmirror.com/@types/node/18.11.10
+      '@types/node': registry.npmmirror.com/@types/node/18.16.1
     dev: true
 
   registry.npmmirror.com/@types/minimist/1.2.2:
@@ -7382,6 +7382,12 @@ packages:
     version: 18.11.10
     dev: true
 
+  registry.npmmirror.com/@types/node/18.16.1:
+    resolution: {integrity: sha512-DZxSZWXxFfOlx7k7Rv4LAyiMroaxa3Ly/7OOzZO8cBNho0YzAi4qlbrx8W27JGqG57IgR/6J7r+nOJWw6kcvZA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/node/-/node-18.16.1.tgz}
+    name: '@types/node'
+    version: 18.16.1
+    dev: true
+
   registry.npmmirror.com/@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/normalize-package-data/-/normalize-package-data-2.4.1.tgz}
     name: '@types/normalize-package-data'
@@ -7399,7 +7405,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmmirror.com/@types/node/18.11.10
+      '@types/node': registry.npmmirror.com/@types/node/18.16.1
     dev: true
 
   registry.npmmirror.com/@types/semver/7.3.12:
@@ -8078,7 +8084,7 @@ packages:
     name: bl
     version: 1.2.3
     dependencies:
-      readable-stream: registry.npmmirror.com/readable-stream/2.3.7
+      readable-stream: registry.npmmirror.com/readable-stream/2.3.8
       safe-buffer: registry.npmmirror.com/safe-buffer/5.2.1
     dev: true
 
@@ -8224,6 +8230,12 @@ packages:
     name: camelcase
     version: 5.3.1
     engines: {node: '>=6'}
+    dev: true
+
+  registry.npmmirror.com/caniuse-lite/1.0.30001481:
+    resolution: {integrity: sha512-KCqHwRnaa1InZBtqXzP98LPg0ajCVujMKjqKDhZEthIpAsJl/YEIa3YvXjGXPVqzZVguccuu7ga9KOE1J9rKPQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/caniuse-lite/-/caniuse-lite-1.0.30001481.tgz}
+    name: caniuse-lite
+    version: 1.0.30001481
     dev: true
 
   registry.npmmirror.com/caw/2.0.1:
@@ -8672,10 +8684,10 @@ packages:
     version: 1.2.0
     engines: {node: '>=0.10.0'}
 
-  registry.npmmirror.com/decode-uri-component/0.2.0:
-    resolution: {integrity: sha512-hjf+xovcEn31w/EUYdTXQh/8smFL/dzYjohQGEIgjyNavaJfBY2p5F527Bo1VPATxv0VYTUC2bOcXvqFwk78Og==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz}
+  registry.npmmirror.com/decode-uri-component/0.2.2:
+    resolution: {integrity: sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/decode-uri-component/-/decode-uri-component-0.2.2.tgz}
     name: decode-uri-component
-    version: 0.2.0
+    version: 0.2.2
     engines: {node: '>=0.10'}
     dev: true
 
@@ -8745,7 +8757,7 @@ packages:
       decompress-tarbz2: registry.npmmirror.com/decompress-tarbz2/4.1.1
       decompress-targz: registry.npmmirror.com/decompress-targz/4.1.1
       decompress-unzip: registry.npmmirror.com/decompress-unzip/4.0.1
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       make-dir: registry.npmmirror.com/make-dir/1.3.0
       pify: registry.npmmirror.com/pify/2.3.0
       strip-dirs: registry.npmmirror.com/strip-dirs/2.1.0
@@ -9883,7 +9895,7 @@ packages:
     version: 2.3.0
     dependencies:
       inherits: registry.npmmirror.com/inherits/2.0.4
-      readable-stream: registry.npmmirror.com/readable-stream/2.3.7
+      readable-stream: registry.npmmirror.com/readable-stream/2.3.8
     dev: true
 
   registry.npmmirror.com/fs-constants/1.0.0:
@@ -9898,7 +9910,7 @@ packages:
     version: 10.1.0
     engines: {node: '>=12'}
     dependencies:
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       jsonfile: registry.npmmirror.com/jsonfile/6.1.0
       universalify: registry.npmmirror.com/universalify/2.0.0
     dev: true
@@ -9921,7 +9933,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       at-least-node: 1.0.0
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       jsonfile: registry.npmmirror.com/jsonfile/6.1.0
       universalify: registry.npmmirror.com/universalify/2.0.0
     dev: true
@@ -10186,6 +10198,12 @@ packages:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/graceful-fs/-/graceful-fs-4.2.10.tgz}
     name: graceful-fs
     version: 4.2.10
+    dev: true
+
+  registry.npmmirror.com/graceful-fs/4.2.11:
+    resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/graceful-fs/-/graceful-fs-4.2.11.tgz}
+    name: graceful-fs
+    version: 4.2.11
     dev: true
 
   registry.npmmirror.com/grapheme-splitter/1.0.4:
@@ -10568,6 +10586,12 @@ packages:
       is-object: registry.npmmirror.com/is-object/1.0.2
     dev: true
 
+  registry.npmmirror.com/jquery/3.6.4:
+    resolution: {integrity: sha512-v28EW9DWDFpzcD9O5iyJXg3R3+q+mET5JhnjJzQUZMHOv67bpSIHq81GEYpPNZHG+XXHsfSme3nxp/hndKEcsQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/jquery/-/jquery-3.6.4.tgz}
+    name: jquery
+    version: 3.6.4
+    dev: false
+
   registry.npmmirror.com/js-sdsl/4.1.5:
     resolution: {integrity: sha512-08bOAKweV2NUC1wqTtf3qZlnpOX/R2DU9ikpjOHs0H+ibQv3zpncVQg6um4uYtRtrwIX8M4Nh3ytK4HGlYAq7Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/js-sdsl/-/js-sdsl-4.1.5.tgz}
     name: js-sdsl
@@ -10626,7 +10650,7 @@ packages:
     dependencies:
       universalify: registry.npmmirror.com/universalify/2.0.0
     optionalDependencies:
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
     dev: true
 
   registry.npmmirror.com/jsonparse/1.3.1:
@@ -10691,6 +10715,12 @@ packages:
       prelude-ls: registry.npmmirror.com/prelude-ls/1.2.1
       type-check: registry.npmmirror.com/type-check/0.4.0
     dev: true
+
+  registry.npmmirror.com/lib-flexible/0.3.2:
+    resolution: {integrity: sha512-9yowMWA70tKhKdCJDaltY0mNQG4OWo7pWKScnTp9aiSxS7s20ZYlwBRE3335nweOf5qKXVC7sDxJwMPM8/MFZg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lib-flexible/-/lib-flexible-0.3.2.tgz}
+    name: lib-flexible
+    version: 0.3.2
+    dev: false
 
   registry.npmmirror.com/lilconfig/2.0.6:
     resolution: {integrity: sha512-9JROoBW7pobfsx+Sq2JsASvCo6Pfo6WWoUW79HuB1BCoBXD4PLWJPqDF6fNj67pqBYTbAHkE57M1kS/+L1neOg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lilconfig/-/lilconfig-2.0.6.tgz}
@@ -11203,10 +11233,10 @@ packages:
     version: 1.4.0
     dev: true
 
-  registry.npmmirror.com/needle/3.1.0:
-    resolution: {integrity: sha512-gCE9weDhjVGCRqS8dwDR/D3GTAeyXLXuqp7I8EzH6DllZGXSUyxuqqLh+YX9rMAWaaTFyVAg6rHGL25dqvczKw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/needle/-/needle-3.1.0.tgz}
+  registry.npmmirror.com/needle/3.2.0:
+    resolution: {integrity: sha512-oUvzXnyLiVyVGoianLijF9O/RecZUf7TkBfimjGrLM4eQhXyeJwM6GeAWccwfQ9aa4gMCZKqhAOuLaMIcQxajQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/needle/-/needle-3.2.0.tgz}
     name: needle
-    version: 3.1.0
+    version: 3.2.0
     engines: {node: '>= 4.4.x'}
     hasBin: true
     requiresBuild: true
@@ -11581,7 +11611,7 @@ packages:
     version: 1.1.0
     engines: {node: '>=0.10.0'}
     dependencies:
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.11
       pify: registry.npmmirror.com/pify/2.3.0
       pinkie-promise: registry.npmmirror.com/pinkie-promise/2.0.1
     dev: true
@@ -11836,7 +11866,7 @@ packages:
     version: 5.1.1
     engines: {node: '>=0.10.0'}
     dependencies:
-      decode-uri-component: registry.npmmirror.com/decode-uri-component/0.2.0
+      decode-uri-component: registry.npmmirror.com/decode-uri-component/0.2.2
       object-assign: registry.npmmirror.com/object-assign/4.1.1
       strict-uri-encode: registry.npmmirror.com/strict-uri-encode/1.1.0
     dev: true
@@ -11909,10 +11939,10 @@ packages:
       type-fest: registry.npmmirror.com/type-fest/0.6.0
     dev: true
 
-  registry.npmmirror.com/readable-stream/2.3.7:
-    resolution: {integrity: sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/readable-stream/-/readable-stream-2.3.7.tgz}
+  registry.npmmirror.com/readable-stream/2.3.8:
+    resolution: {integrity: sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/readable-stream/-/readable-stream-2.3.8.tgz}
     name: readable-stream
-    version: 2.3.7
+    version: 2.3.8
     dependencies:
       core-util-is: registry.npmmirror.com/core-util-is/1.0.3
       inherits: registry.npmmirror.com/inherits/2.0.4
@@ -11927,6 +11957,17 @@ packages:
     resolution: {integrity: sha512-BViHy7LKeTz4oNnkcLJ+lVSL6vpiFeX6/d3oSH8zCW7UxP2onchk+vTGB143xuFjHS3deTgkKoXXymXqymiIdA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/readable-stream/-/readable-stream-3.6.0.tgz}
     name: readable-stream
     version: 3.6.0
+    engines: {node: '>= 6'}
+    dependencies:
+      inherits: registry.npmmirror.com/inherits/2.0.4
+      string_decoder: registry.npmmirror.com/string_decoder/1.3.0
+      util-deprecate: registry.npmmirror.com/util-deprecate/1.0.2
+    dev: true
+
+  registry.npmmirror.com/readable-stream/3.6.2:
+    resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/readable-stream/-/readable-stream-3.6.2.tgz}
+    name: readable-stream
+    version: 3.6.2
     engines: {node: '>= 6'}
     dependencies:
       inherits: registry.npmmirror.com/inherits/2.0.4
@@ -12617,7 +12658,7 @@ packages:
       buffer-alloc: registry.npmmirror.com/buffer-alloc/1.2.0
       end-of-stream: registry.npmmirror.com/end-of-stream/1.4.4
       fs-constants: registry.npmmirror.com/fs-constants/1.0.0
-      readable-stream: registry.npmmirror.com/readable-stream/2.3.7
+      readable-stream: registry.npmmirror.com/readable-stream/2.3.8
       to-buffer: registry.npmmirror.com/to-buffer/1.1.1
       xtend: registry.npmmirror.com/xtend/4.0.2
     dev: true
@@ -12646,7 +12687,7 @@ packages:
     name: through2
     version: 2.0.5
     dependencies:
-      readable-stream: registry.npmmirror.com/readable-stream/2.3.7
+      readable-stream: registry.npmmirror.com/readable-stream/2.3.8
       xtend: registry.npmmirror.com/xtend/4.0.2
     dev: true
 

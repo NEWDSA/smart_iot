@@ -18,7 +18,7 @@
 import { defineComponent, onMounted, ref, unref } from 'vue';
 
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree';
-import { getAllRoleList } from '@/api/demo/system';
+import { getUserRole } from '@/api/demo/system';
 
 export default defineComponent({
   name: 'DeptTree',
@@ -44,8 +44,8 @@ export default defineComponent({
     
     // 获取部门数据
     async function fetch() {
-      const { List } = await getAllRoleList()
-      treeData.value = await List as unknown as TreeItem[];
+      const result = await getUserRole(0)
+      treeData.value = await result.Roles as unknown as TreeItem[];
     }
 
     function handleSelect(keys) {

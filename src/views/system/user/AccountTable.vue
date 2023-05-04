@@ -79,9 +79,15 @@ export default defineComponent({
         })
         setModalProps({ confirmLoading: true });
         closeModal();
-        await emit('success');
+        
       } finally {
-        setModalProps({ confirmLoading: false });
+        // 设置延迟5s
+        setTimeout(()=>{
+          setModalProps({ confirmLoading: false });
+          emit('success');
+        },3000)
+        
+        
       }
     }
     onMounted(() => {

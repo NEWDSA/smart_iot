@@ -10,7 +10,7 @@
             <TabPane>
               <template #tab>
                 {{ item.name }}
-                <span v-if="item.list && item.total!=='0'">({{ item.total }})</span>
+                <span v-if="item.list && item.total !== '0'">({{ item.total }})</span>
               </template>
               <NoticeLists :Datalist="item.list" :params="item" :Total="myTotal" @changePage="changePage"
                 @title-click="onNoticeClick" />
@@ -34,7 +34,8 @@ import { Popover, Tabs, Badge } from 'ant-design-vue'
 import { BellOutlined } from '@ant-design/icons-vue'
 import { tabListData } from './data'
 import NoticeLists from './NoticeList.vue'
-import { NoticeList, NoticeAllRead } from '@/api/demo/system';
+import { NoticeList, NoticeAllRead, isRead } from '@/api/demo/system';
+// import { isRead } from '@/api/demo/system'
 import { useDesign } from '@/hooks/web/useDesign'
 import { useGo } from '@/hooks/web/usePage';
 import { useLoading } from '@/components/Loading';
@@ -45,6 +46,12 @@ export default defineComponent({
     const { prefixCls } = useDesign('header-notify')
     const go = useGo();
     const listData = ref(tabListData);
+    // 触发监听
+    emitter.on('NotifygetData', () => {
+      for (var i = 0; i <= 2; i++) {
+         getData2(i)
+      }
+    });
     const Datalist: any = ref([]);
     const tabIndex = ref(0);
     const PageNum = ref(1);
@@ -76,7 +83,7 @@ export default defineComponent({
         await emitter.emit('getData');
         listData.value.map((item) => {
           item.list = [];
-          item.total='0';
+          item.total = '0';
         })
         console.log(listData.value)
       }
@@ -92,6 +99,22 @@ export default defineComponent({
       }, 2000)
 
 
+    }
+    async function getData2(type) {
+      listData.value = [];
+      const data = await isRead({
+        PageNum: 1,
+        PageSize: 10,
+        Type: type
+      })
+      listData.value.push({
+        key: type,
+        name: type == 0 ? '全部' : type == 1 ? '设备告警' : type == 2 ? '工单' : '',
+        component: '',
+        list: data.Detail,
+        total: data.Total
+      })
+      // console.log(myTabList.value, '......myTablist....')
     }
     async function changePage(index) {
       PageNum.value = index;
@@ -131,6 +154,7 @@ export default defineComponent({
       isdot,
       PageNum,
       params,
+      getData2,
       handleClickChange,
       Tab_Click,
       AllRead,

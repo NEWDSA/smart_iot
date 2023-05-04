@@ -43,8 +43,13 @@ async function getData2(type) {
   })
   console.log(myTabList.value,'......myTablist....')
 }
+// emitter.on('')
+// emitter.on('getDataAvatar', async () => {
+  // 对接口进行重置
+  // myTabList.value=[];
+  for (var i = 0; i <= 2; i++) {
+    await getData2(i)
+  }
+// })
 
-for (var i = 0; i <= 2; i++) {
-  await getData2(i)
-}
 

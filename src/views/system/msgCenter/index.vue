@@ -1,12 +1,13 @@
 <template>
   <PageWrapper :class="prefixCls" dense contentFullHeight contentClass="flex">
-    <Tabs @change="Tab_Click">
-      <template v-for="item in settingList" :key="item.key">
-        <TabPane :tab="item.name">
-          <PageList ref="ListRef" :Datalist="item.list" :params="item.params" :Total="item.total" @changePage="changePage"
-            @title-click="onNoticeClick" />
-        </TabPane>
-      </template>
+    <Tabs v-model:activeKey="tabIndex" @change="Tab_Click">
+      <!-- <template v-for="item in settingList" :key="item.key"> -->
+      <!-- 记录选中的tab -->
+      <TabPane v-for="(item, index) in settingList" :key="index" :tab="item.name">
+        <PageList ref="ListRef" :Datalist="item.list" :selectedIndex="itemIndex" :params="item.params"
+          @changePage="changePage" @title-click="onNoticeClick" />
+      </TabPane>
+      <!-- </template> -->
     </Tabs>
     <div class="board">
       <div class="board_item">
@@ -24,7 +25,9 @@
         <!-- 主题 -->
         <div class="p-3 text-xl">{{ infoDetail.Detail?.NoticeTitle }}</div>
         <div class="p-3 text-base"><span style="color: #2a96f3">{{ infoDetail?.Detail?.RegionalLocation }}-{{
-          infoDetail.DeviceName }}</span>：<span>{{ infoDetail?.Detail?.Content }}</span><sapn v-if="infoDetail.Detail.Type == 2">，设备ID：{{infoDetail?.Detail.DeviceId  }}</sapn> </div>
+          infoDetail.DeviceName }}</span>：<span>{{ infoDetail?.Detail?.Content }}</span>
+          <sapn v-if="infoDetail.Detail.Type == 2">，设备ID：{{ infoDetail?.Detail.DeviceId }}</sapn>
+        </div>
         <!-- 报警类型 -->
         <div v-if="infoDetail.Detail.Type == 1" class="p-3 text-base">{{
           infoDetail?.Detail.AlertType == 1
@@ -126,9 +129,12 @@ export default defineComponent({
     const { createConfirm, createMessage } = useMessage()
     const { info } = createMessage
     watch(
-      () => settingList,
+      () => [settingList.value, itemIndex.value],
       (newValue, oldValue) => {
-        settingList.value = newValue
+        console.log(newValue, '...newVlaeee??')
+        settingList.value = newValue[0];
+        itemIndex.value = newValue[1];
+        console.log(newValue[1], '...settingList...?');
       }
     )
     onMounted(async () => {
@@ -143,8 +149,8 @@ export default defineComponent({
         await getData(i)
       }
     })
-    const PageNum = ref(1)
-    const tabIndex = ref(0)
+    const PageNum = ref(1);
+    const tabIndex = ref(0);
     function handleSuccess() {
       // 提示
       info('操作成功')
@@ -158,21 +164,22 @@ export default defineComponent({
     }
     async function getData(type) {
       const data = await NoticeList({
-        PageNum: 1,
+        PageNum: PageNum.value,
         PageSize: 9,
         Type: type
       })
       // settingList.value=[];
+      console.log(PageNum.value, '...PageNum.value...')
       settingList.value.push({
         key: type,
         name: type == 0 ? '全部' : type == 1 ? '设备告警' : type == 2 ? '工单' : '',
         component: '',
-        current: 1,
+        current: PageNum.value,
         list: data.Detail,
         total: data.Total,
         params: {
-          current: 1,
-          PageSize: 10,
+          current: PageNum.value,
+          PageSize: 9,
           Total: data.Total
         }
       })
@@ -192,12 +199,22 @@ export default defineComponent({
 
       const Code = await NoticeRead({ NoticeId: [NoticeId] })
       if (Code == 0) {
-        const data = await NoticeList({
-          PageNum: 1,
-          PageSize: 9,
-          Type: tabIndex.value
-        })
-        settingList.value[tabIndex.value].list = data.Detail
+        // 所有类型的数据都应刷新 so i make wrong
+        settingList.value = []
+
+        for (var i = 0; i <= 2; i++) {
+          await getData(i)
+        }
+        // but still have a lot problmes in blow 
+        // first it's can't remeber pagenation
+        // ok it have select probolems wait soloved
+
+
+
+
+        // 调用其它接口使弹窗变已读
+        emitter.emit('NotifygetData', tabIndex.value)
+
       }
 
       // 详情
@@ -213,12 +230,19 @@ export default defineComponent({
       infoDetail.DeviceId = result[0].DeviceId
     }
     async function changePage(index) {
-      PageNum.value = index
+      // 翻页将数据设为空
+      ListRef.value[tabIndex.value].myselectedIndex = null;
+      // 将右侧数据设为空
+      infoDetail.Detail = null;
+      // console.log(itemIndex.value, '数据刷新处理');
+      PageNum.value = index;
+      // 
       const { Detail, Total } = await NoticeList({
         PageNum: PageNum.value,
-        PageSize: 8,
+        PageSize: 9,
         Type: tabIndex.value
       })
+
       settingList.value[tabIndex.value].list = Detail
       settingList.value[tabIndex.value].current = PageNum.value.toString()
     }

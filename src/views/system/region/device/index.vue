@@ -11,21 +11,21 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
-            {
-              label: '移出',
-              ifShow: hasPermission(['moveOut_RegionDevice']),
-              popConfirm: {
-                title: '是否确认移出',
-                placement: 'left',
-                confirm: handleDelete.bind(null, record),
+              {
+                label: '移出',
+                ifShow: hasPermission(['moveOut_RegionDevice']),
+                popConfirm: {
+                  title: '是否确认移出',
+                  placement: 'left',
+                  confirm: handleDelete.bind(null, record),
+                },
               },
-            },
-            {
-              label: '权限设置',
-              ifShow: hasPermission(['AuthSetting_RegionDevice']),
-              onClick: handleEditPwd.bind(null, record)
-            }
-          ]" />
+              {
+                label: '权限设置',
+                ifShow: hasPermission(['AuthSetting_RegionDevice']),
+                onClick: handleEditPwd.bind(null, record)
+              }
+            ]" />
         </template>
       </template>
     </BasicTable>
@@ -102,9 +102,14 @@ export default defineComponent({
         // 接口返回表格总数的字段
         totalField: 'Total'
       },
+
       formConfig: {
+
         layout: 'horizontal',
         labelWidth: 120,
+        actionColOptions:{
+          span:3
+        },
         schemas: searchFormSchema,
         autoSubmitOnEnter: true,
       },
@@ -210,6 +215,7 @@ export default defineComponent({
     async function handleSuccess() {
       await reload();
     }
+    // 权限设置
     function handleEditPwd(record: Recordable) {
       setSelectedRowKeys([record.DeviceId]);
       if (getSelectRowKeys().length > 0 && getSelectRowKeys().length <= 1) {

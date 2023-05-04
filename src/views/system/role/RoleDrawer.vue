@@ -14,12 +14,16 @@ import { BasicForm, useForm } from '@/components/Form/index';
 import { formSchema } from './role.data';
 import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
 import { BasicTree, TreeItem } from '@/components/Tree';
-import { geRoletMenTree, CreateRole, ModifiRole,getMenTree } from '@/api/demo/system';
+import { Loading, useLoading } from '@/components/Loading';
+import { geRoletMenTree, CreateRole, ModifiRole, getMenTree } from '@/api/demo/system';
 export default defineComponent({
   name: 'RoleDrawer',
   components: { BasicDrawer, BasicForm, BasicTree },
   emits: ['success', 'register'],
   setup(_, { emit }) {
+    const [openFullLoading, closeFullLoading] = useLoading({
+      tip: '数据处理中...',
+    });
     const isUpdate = ref(true);
     const isTrue = ref(true);
     const check = ref();
@@ -54,7 +58,6 @@ export default defineComponent({
         checkStrictly.value = false;
         // checkedMenu.value = checkedKeys;
         treeData.value = (TreeSelect) as any as TreeItem[];
-        console.log(treeData.value,'rererere')
       }
 
 
@@ -65,17 +68,36 @@ export default defineComponent({
         const values = await validate();
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
-        console.log(values.menuIds,'..rrerere....')
+
+        openFullLoading();
         values.RoleSort === null || values.RoleSort === undefined ? values.RoleSort = 0 : values.RoleSort;
-        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: values.menuIds.checked})
-        emit('success');
+        var menuIdsSelect;
+        if (values.menuIds?.checked) {
+          menuIdsSelect = Object.keys(values.menuIds?.checked).map((key) => {
+            return parseInt(values.menuIds.checked[key], 10);
+          })
+        } else {
+          console.log(values.menuIds, '?...menuIds...?');
+          menuIdsSelect = Object.keys(values.menuIds).map((key) => {
+            return parseInt(values.menuIds[key], 10);
+          })
+        }
+
+        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: menuIdsSelect })
+        // 显示一个加载中 并延迟3s
+        setTimeout(() => {
+          closeFullLoading();
+          emit('success');
+        }, 2000)
+
 
       } finally {
+
         setDrawerProps({ confirmLoading: false });
       }
     }
     function onCheck(checkedKeys, e) {
-      console.log(checkedKeys,'...checkedKeys...');
+      console.log(checkedKeys, '...checkedKeys...');
       // check.value = [...checkedKeys, ...e.halfCheckedKeys];
       // console.log(checkedKeys, e.halfCheckedKeys, '...checked...');
       // console.log(check.value, '...check.value....')

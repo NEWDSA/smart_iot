@@ -22,11 +22,32 @@ export default defineComponent({
     const lastSelectedKey = ref();
     // 获取部门数据
     async function fetch() {
-      const { List } = await getDeptList();
-      selectedKeys.value = [List[0].DeptId];
-      emit('select', List[0].DeptId
-      );
-      treeData.value = List;
+      // const { List } = await getDeptList();
+      // selectedKeys.value = [List[0].DeptId];
+      // emit('select', List[0].DeptId
+      // );
+      // treeData.value = List;
+
+      treeData.value = (await getDeptList()) as unknown as TreeItem[];
+      // 组装后端数据
+      function listToTreeSimple(data) {
+        const res: any = [];
+        data.List.forEach((item) => {
+          const parent = data.List.find((node) => node.DeptId === item.ParentId);
+          if (parent) {
+
+            parent.children = parent.children || [];
+            parent.children.push(item);
+          } else {
+            // * 根节点
+            res.push(item);
+          }
+        });
+        return res;
+      }
+      let datas = listToTreeSimple(treeData.value);
+      treeData.value = datas;
+      return treeData
 
     }
 

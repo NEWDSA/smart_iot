@@ -8,6 +8,7 @@ import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { formSchema } from './dept.data';
+import { useMessage } from '@/hooks/web/useMessage';
 import { addRegion, getReginList, editRegion } from '@/api/demo/region';
 export default defineComponent({
   name: 'DeptModal',
@@ -24,7 +25,7 @@ export default defineComponent({
       schemas: formSchema,
       showActionButtonGroup: false,
     });
-
+    const { createMessage } = useMessage();
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       resetFields();
       setModalProps({ confirmLoading: false });
@@ -53,11 +54,15 @@ export default defineComponent({
       try {
         const values = await validate();
 
-        unref(isModifiy) == 1 ? Object.assign(values, { ParentId:RegionId.value}) : ''
+        unref(isModifiy) == 1 ? Object.assign(values, { ParentId: RegionId.value }) : ''
         setModalProps({ confirmLoading: true });
         // await createDept(values)
-        !unref(isUpdate) ? await addRegion(values) : await editRegion({ ...values, RegionId: RegionId.value })
-        console.log(values);
+        !unref(isUpdate) ? await addRegion(values).then((res) => {
+          res == 0 ? createMessage.info('操作成功') : createMessage.info('操作失败');
+        }) : await editRegion({ ...values, RegionId: RegionId.value }).then((res) => {
+          res == 0 ? createMessage.info('操作成功') : createMessage.info('操作失败');
+        })
+
         closeModal();
         emit('success');
       } finally {

@@ -4,36 +4,41 @@
     <BasicTable @register="registerTable" :clickToRowSelect="clickToRowSelect" class="w-3/4 xl:w-4/5"
       :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleBulk">批量调动</a-button>
-        <a-button type="primary" @click="handleCreate">添加用户</a-button>
+        <a-button v-if="hasPermission(['BatchMob_User'])"  type="primary" @click="handleBulk">批量调动</a-button>
+        <a-button v-if="hasPermission(['AddUser_User'])" type="primary" @click="handleCreate">添加用户</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'DeptName'">
           {{ record.DeptName }}
         </template>
-        <template v-if="column.key === 'action'">
+        <template v-if="column.key === 'action' && record.UserId !== 1
+          ">
           <TableAction :actions="[
-            {
-              icon: 'ant-design:delete-outlined',
-              color: 'error',
-              tooltip: '删除此账号',
-              popConfirm: {
-                title: '是否确认删除',
-                placement: 'left',
-                confirm: handleDelete.bind(null, record),
+              {
+                ifShow: hasPermission(['handleDelete_User']),
+                icon: 'ant-design:delete-outlined',
+                color: 'error',
+                tooltip: '删除此账号',
+                popConfirm: {
+                  title: '是否确认删除',
+                  placement: 'left',
+                  confirm: handleDelete.bind(null, record),
+                },
               },
-            },
-            {
-              icon: 'clarity:note-edit-line',
-              tooltip: '编辑用户资料',
-              onClick: handleEdit.bind(null, record),
-            },
-            {
-              icon: 'ri:lock-password-fill',
-              tooltip: '修改密码',
-              onClick: handleEditPwd.bind(null, record)
-            }
-          ]" />
+              {
+                ifShow: hasPermission(['handleEdit_User']),
+                icon: 'clarity:note-edit-line',
+                tooltip: '编辑用户资料',
+                onClick: handleEdit.bind(null, record),
+              },
+              {
+                ifShow: hasPermission(['handleEditPwd_User']),
+                icon: 'ri:lock-password-fill',
+                tooltip: '修改密码',
+                onClick: handleEditPwd.bind(null, record)
+              }
+            ]
+            " />
         </template>
       </template>
     </BasicTable>
@@ -50,7 +55,7 @@ import { useMessage } from '@/hooks/web/useMessage';
 import { getAccountList, delAccount } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
-
+import { usePermission } from '@/hooks/web/useButtonPermission';
 import { useModal } from '@/components/Modal';
 import AccountModal from './AccountModal.vue';
 import AccountTable from './AccountTable.vue';
@@ -62,6 +67,7 @@ export default defineComponent({
   components: { BasicTable, PageWrapper, DeptTree, AccountModal, AccountTable, TableAction, pwdModal },
   setup() {
     const go = useGo();
+    const { hasPermission } = usePermission();
     const myData: any = ref('');
     const lastSelectedKey = ref();
     const update = getCurrentInstance() as ComponentInternalInstance | null
@@ -87,6 +93,8 @@ export default defineComponent({
       onChange,
       api: async (p) => {
         const { List, Total } = await getAccountList(p);
+        // 对数据类型进行特殊处理
+        
         return {
           Total,
           List
@@ -210,6 +218,7 @@ export default defineComponent({
       openModal2,
       openModal3,
       pwdSuccess,
+      hasPermission,
       lastSelectedKey,
       clickToRowSelect,
       pagination,

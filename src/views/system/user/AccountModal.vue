@@ -15,7 +15,7 @@ import { Tooltip } from 'ant-design-vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { accountFormSchema } from './account.data';
-import { getAllRoleList, getUserRole, getDeptDrop, modifiAccountList, createAccountList } from '@/api/demo/system';
+import {  getUserRole, getDeptDrop, modifiAccountList, createAccountList } from '@/api/demo/system';
 export default defineComponent({
   name: 'AccountModal',
   components: { BasicModal, BasicForm, Tooltip },
@@ -46,10 +46,11 @@ export default defineComponent({
             return item
           }
         })
+        console.log(result,'...result...?')
         updateSchema({
           field: 'RoleIds',
-          defaultValue: Object.keys(resd).length > 0 ? result.RoleIds.toString() : '',
-          componentProps: { treeData: result.Roles }
+          defaultValue: result.RoleIds,
+          componentProps: { treeData: result.Roles}
         })
         const treeData = await getDeptDrop().then((res) => {
           return res.TreeSelect
@@ -61,11 +62,15 @@ export default defineComponent({
         });
 
       } else {
-        const { List } = await getAllRoleList()
+        // 修改错误
+        // const { List } = await getAllRoleList()
+        const result = await getUserRole(
+          0
+        )
         updateSchema({
-          defaultValue: List[0].RoleId,
+          defaultValue: result.Roles[0].RoleId,
           field: 'RoleIds',
-          componentProps: { treeData: List }
+          componentProps: { treeData: result.Roles }
         })
         setFieldsValue({ DeptId: data.DeptId });
         const treeData = await getDeptDrop().then((res) => {

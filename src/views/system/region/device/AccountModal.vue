@@ -1,7 +1,8 @@
 <template>
-  <BasicModal @visible-change="ModelStatus" width="70%"  v-bind="$attrs" @register="registerModal" :title="getTitle"
+  <BasicModal @visible-change="ModelStatus" width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle"
     @ok="handleSubmit">
-    <BasicTable :scroll="{x:null,y:nulll}" height="300px" ref="tableRef" @register="registerTable" :searchInfo="searchInfo">
+    <BasicTable :scroll="{ x: null, y: nulll }" height="300px" ref="tableRef" @register="registerTable"
+      :searchInfo="searchInfo">
     </BasicTable>
     <!-- footer -->
     <template #insertFooter>
@@ -16,6 +17,7 @@
 import { defineComponent, ref, computed, unref, reactive, toRaw } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
+import { useMessage } from '@/hooks/web/useMessage'
 import { editDeviceArea } from '@/api/demo/region';
 import { deviceTree, getReginDevice } from '@/api/demo/region'
 import { BasicTable, useTable, TableActionType, TableAction } from '@/components/Table';
@@ -30,11 +32,12 @@ export default defineComponent({
     const isUpdate = ref(true);
     const height = 300;
     const searchInfo = reactive<Recordable>({});
-    const TreeTableData: any = reactive([]);
+    const TreeTableData: any = ref([]);
     const dataSource: any = ref([]);
     const checkedKeys = ref<Array<string | number>>([]);
     const paramList: any = ref();
-    const params=ref({});
+    const { createMessage } = useMessage();
+    const params = ref({});
     const PageNum = ref(1);
     const PageSize = ref(10);
     const pagenation = reactive({
@@ -60,7 +63,7 @@ export default defineComponent({
         PageSize: pagenation.PageSize,
         Sort: pagenation.Sort
       }
-      Object.assign(myparams,getForm().getFieldsValue());
+      Object.assign(myparams, getForm().getFieldsValue());
       const { Detail, Total } = await getReginDevice(myparams);
       getTableAction().setTableData(Detail);
       pagenation.total = Total;
@@ -71,22 +74,24 @@ export default defineComponent({
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
       // 获取设备分类
+      TreeTableData.value=[];
       await deviceTree().then((res) => {
+        
         for (let i = 0; i < res.length; i++) {
-          TreeTableData.push(res[i].SelfData);
-          if (res[i].SonData) {
-            TreeTableData[i].children = []
-            for (let y = 0; y < res[i].SonData.length; y++) {
+          TreeTableData.value.push(res[i].SelfData);
+          // if (res[i].SonData) {
+          //   TreeTableData[i].children = []
+          //   for (let y = 0; y < res[i].SonData.length; y++) {
 
-              TreeTableData[i].children.push(res[i].SonData[y].SelfData)
-              if (res[i].SonData[y].SonData) {
-                TreeTableData[i].children[y].children = []
-                for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
-                  TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
-                }
-              }
-            }
-          }
+          //     TreeTableData[i].children.push(res[i].SonData[y].SelfData)
+          //     if (res[i].SonData[y].SonData) {
+          //       TreeTableData[i].children[y].children = []
+          //       for (let x = 0; x < res[i].SonData[y].SonData.length; x++) {
+          //         TreeTableData[i].children[y].children.push(res[i].SonData[y].SonData[x].SelfData)
+          //       }
+          //     }
+          //   }
+          // }
         }
         return res;
       });
@@ -97,7 +102,7 @@ export default defineComponent({
 
     });
 
-    const [registerTable, { getForm,reload }] = useTable({
+    const [registerTable, { getForm, reload }] = useTable({
       title: '',
       onChange,
       rowSelection: {
@@ -137,11 +142,11 @@ export default defineComponent({
         pagenation.current = 1;
         pagenation.PageSize = 10;
         pagenation.Sort = info.Sort;
-        let params={
+        let params = {
           PageNum: pagenation.current,
-          PageSize:pagenation.PageSize
+          PageSize: pagenation.PageSize
         }
-        Object.assign(params,info);
+        Object.assign(params, info);
         return info;
       }
     });
@@ -160,16 +165,19 @@ export default defineComponent({
           RegionId: paramList.value
 
         }
+        // 判断所选内容是否不为空
+
+        console.log(checkedKeys.value.length)
         setModalProps({ confirmLoading: true });
         !unref(isUpdate) ? await editDeviceArea(params) : ''
-        closeModal();
+        checkedKeys.value.length > 0 ? closeModal() : createMessage.info('请选择设备');
         emit('success');
       } finally {
         setModalProps({ confirmLoading: false });
       }
     }
 
-    return { registerModal, registerTable, handleSubmit, onSelectChange, ModelStatus, changePage, getTableAction,params, tableRef, pagenation, PageNum, PageSize, height, paramList, checkedKeys, getTitle, searchInfo, dataSource };
+    return { registerModal, registerTable, handleSubmit, onSelectChange, ModelStatus, changePage, getTableAction, params, tableRef, pagenation, PageNum, PageSize, height, paramList, checkedKeys, getTitle, searchInfo, dataSource };
   },
 });
 </script>
