@@ -241,6 +241,7 @@ export default defineComponent({
             // if (SZvalue.value.length > 0) {
                 openModal2(true, {
                     type: 'S',
+                    work:1,
                     data: SRvalue.value
                 });
             // } else {
@@ -253,6 +254,7 @@ export default defineComponent({
         function showGRen() {
             openModal2(true, {
                 type: 'G',
+                work:1,
                 data: SGRvalue.value
             });
         }

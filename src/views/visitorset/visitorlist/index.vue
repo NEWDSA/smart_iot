@@ -206,7 +206,7 @@ export default defineComponent({
             popConfirm: {
               title: '是否确认预约',
               placement: 'left',
-              ifShow: hasPermission(['handlecancel_visitorlist']),
+              ifShow: hasPermission(['handleMake_visitorlist']),
               confirm: handlecancel.bind(null, record, 2),
             },
             // onClick: handleLook.bind(null, record)
@@ -238,7 +238,7 @@ export default defineComponent({
         return [
           {
             label: '登记',
-            ifShow: hasPermission(['handlecancel_visitorlist']),
+            ifShow: hasPermission(['handleRegister_visitorlist']),
             popConfirm: {
               title: '是否确认登记',
               placement: 'left',
@@ -278,14 +278,17 @@ export default defineComponent({
               placement: 'left',
               confirm: handlecancel.bind(null, record, 4),
             },
+            ifShow:hasPermission(['handleLeavie_visitorlist']),
             // onClick: handleLook.bind(null, record)
           },
           {
             label: '修改',
+            ifShow: hasPermission(['handleEdit_visitorlist']),
             onClick: handleEdit.bind(null, record)
           },
           {
             label: '查看',
+            ifShow: hasPermission(['handleLook_visitorlist']),
             onClick: handleLook.bind(null, record)
           }
         ]

@@ -1,13 +1,22 @@
 <template>
   <PageWrapper :title="infoFacility ? infoFacility.DeviceName : '设备详情'" contentBackground @back="goBack">
+    <template #tags>
+      <div class="rounded-md px-2 flex items-center" :class="computedStatus(infoFacility?.NetworkStatus, true)">
+        <div class="w-1 h-1 mr-2" :class="computedStatus(infoFacility?.NetworkStatus, false)" style="border-radius: 50%;">
+        </div>
+        {{
+          infoFacility?.NetworkStatus == 1 ? '在线' : infoFacility?.NetworkStatus == 2 ? '离线' : infoFacility?.NetworkStatus
+            == 3 ? '异常' : infoFacility?.NetworkStatus == 4 ? '故障' : infoFacility?.NetworkStatus == 5 ? '运行' : '未知'
+        }}
+      </div>
+    </template>
     <div class="p-5 bg-white">
       <div class="text-lg font-bold">设备列表</div>
 
       <div class="my-4 flex items-center justify-between">
         <div class="flex">
           <div class="px-3 py-1 mr-2" v-for="(item, index) in facilityDetailTab" :key="item.id"
-            :class="facilityDetailTabIndex == index ? 'bg-gray-100 sp-blue-text rounded-2xl' : ''"
-            @click="cutTab(index)">
+            :class="facilityDetailTabIndex == index ? 'bg-gray-100 sp-blue-text rounded-2xl' : ''" @click="cutTab(index)">
             {{ item.title }}
           </div>
         </div>
@@ -40,14 +49,14 @@ import { useGo } from '@/hooks/web/usePage';
 import { useRoute, onBeforeRouteLeave } from 'vue-router';
 import { subscribeDeviceStatusNew } from '@/utils/iot';
 import { connect, registerTopAreaRef, registerCurrentAreaRef, registerDevicesRef } from '@/utils/iot'
-    // 设备登录
-    const titles = ref([])
-    registerTopAreaRef(titles)
-    const current = ref("")
-    registerCurrentAreaRef(current)
-    const devices = ref([])
-    registerDevicesRef(devices)
-    connect()
+// 设备登录
+const titles = ref([])
+registerTopAreaRef(titles)
+const current = ref("")
+registerCurrentAreaRef(current)
+const devices = ref([])
+registerDevicesRef(devices)
+connect()
 const route = useRoute();
 const go = useGo();
 const infoFacility = ref()
@@ -58,8 +67,8 @@ onMounted(() => {
   getfacilityId(facilityId.value);
 })
 
-watch(()=>devices.value,(data)=> {
-console.log(devices.value,'devices.valuedevices.valuedevices.value')
+watch(() => devices.value, (data) => {
+  console.log(devices.value, 'devices.valuedevices.valuedevices.value')
 })
 
 const Inter = ref()
@@ -92,8 +101,8 @@ const cutTab = (index) => {
 }
 
 watch(() => facilityDetailTabIndex.value, (data) => {
-  console.log(facilityDetailTabIndex.value,infoFacility.value.NetworkStatus)
-  if (facilityDetailTabIndex.value == '2' && infoFacility.value.NetworkStatus !=0 && infoFacility.value.NetworkStatus !=2) {
+  console.log(facilityDetailTabIndex.value, infoFacility.value.NetworkStatus)
+  if (facilityDetailTabIndex.value == '2' && infoFacility.value.NetworkStatus != 0 && infoFacility.value.NetworkStatus != 2) {
     getLod()
     Inter.value = setInterval(getLod, 10000)
   } else {
@@ -132,6 +141,25 @@ const getfacilityId = (id) => {
   })
 
 }
+
+const computedStatus = (status, type) => {
+      // console.log(status)
+      switch (status) {
+        case 1:
+          return type ? 'bg-green-200' : 'bg-green-500'
+        case 2:
+          return type ? 'bg-gray-200' : 'bg-gray-500'
+        case 3:
+          return type ? 'bg-yellow-500' : 'bg-white'
+        case 4:
+          return type ? 'bg-red-200' : 'bg-red-500'
+        case 5:
+          return type ? 'bg-blue-500' : 'bg-white'
+
+        default:
+          return type ? 'bg-gray-200' : 'bg-gray-500'
+      }
+    }
 
 const goBack = () => {
   // 本例的效果时点击返回始终跳转到账号列表页，实际应用时可返回上一页

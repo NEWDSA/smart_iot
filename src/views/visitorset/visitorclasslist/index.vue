@@ -64,12 +64,15 @@ export default defineComponent({
     function createActions(record) {
       return [
         {
-          label: '修改',
+          // label: '修改',
+          icon: 'clarity:note-edit-line',
           ifShow:  hasPermission(['handleEdit_visitorlist']),
           onClick: handleEdit.bind(null, record)
         },
         {
-          label: '删除',
+          // label: '删除',
+          icon: 'ant-design:delete-outlined',
+          color: 'error',
           ifShow:  hasPermission(['handleDelete_visitorlist']),
           popConfirm: {
             title: '是否确认删除',
