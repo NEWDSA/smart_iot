@@ -50,6 +50,7 @@ export default defineComponent({
         updateSchema({
           field: 'RoleIds',
           defaultValue: result.RoleIds,
+          required: true,
           componentProps: { treeData: result.Roles}
         })
         const treeData = await getDeptDrop().then((res) => {
@@ -57,6 +58,7 @@ export default defineComponent({
         });
         updateSchema({
           field: 'DeptId',
+          required: true,
           defaultValue: data.record.DeptId,
           componentProps: { treeData }
         });
@@ -68,8 +70,8 @@ export default defineComponent({
           0
         )
         updateSchema({
-          defaultValue: result.Roles[0].RoleId,
           field: 'RoleIds',
+          required: true,
           componentProps: { treeData: result.Roles }
         })
         setFieldsValue({ DeptId: data.DeptId });
@@ -78,6 +80,7 @@ export default defineComponent({
         });
         await updateSchema({
           field: 'DeptId',
+          required:true,
           componentProps: { treeData },
         });
 

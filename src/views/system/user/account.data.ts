@@ -38,8 +38,8 @@ export const columns: BasicColumn[] = [
   {
     title: '部门',
     dataIndex: 'DeptName',
-    customRender:({record})=>{
-      return record.Dept.DeptName;
+    customRender: ({ record }) => {
+      return record.Dept.DeptName
     }
   },
   {
@@ -69,7 +69,7 @@ export const searchFormSchema: FormSchema[] = [
   {
     field: 'NickName',
     label: '用户名',
-    labelWidth:60,
+    labelWidth: 60,
     component: 'Input',
     colProps: { span: 8 },
     componentProps: () => {
@@ -79,12 +79,12 @@ export const searchFormSchema: FormSchema[] = [
           console.log(e)
         }
       }
-    } 
+    }
   },
   {
     field: 'PhoneNumber',
     label: '手机号',
-    labelWidth:60,
+    labelWidth: 60,
     component: 'Input',
     colProps: { span: 8 },
     componentProps: () => {
@@ -114,7 +114,6 @@ export const accountFormSchema: FormSchema[] = [
     field: 'DeptId',
     label: '所属部门',
     component: 'TreeSelect',
-
     componentProps: {
       fieldNames: {
         label: 'Name',
@@ -122,8 +121,7 @@ export const accountFormSchema: FormSchema[] = [
         value: 'Id'
       },
       getPopupContainer: () => document.body
-    },
-    required: true
+    }
   },
   {
     field: 'UserName',
@@ -142,16 +140,15 @@ export const accountFormSchema: FormSchema[] = [
     field: 'RoleIds',
     component: 'TreeSelect',
     componentProps: {
-      allowClear:true,
-      showCheckedStrategy:'TreeSelect.SHOW_ALL',
-      treeCheckable:true,
+      allowClear: true,
+      showCheckedStrategy: 'TreeSelect.SHOW_ALL',
+      treeCheckable: true,
       fieldNames: {
         label: 'RoleName',
         key: 'RoleId',
         value: 'RoleId'
       }
-    },
-    required: true
+    }
   },
   {
     label: '邮箱',
