@@ -75,8 +75,9 @@ export default defineComponent({
     const userStore = useUserStore()
     const go = useGo();
     const getUserInfo = computed(() => {
-      const { realName = '', avatar, desc } = userStore.getUserInfo || {}
-      return { realName, avatar: avatar || headerImg, desc }
+      const { realName = '', Avatar, desc } = userStore.getUserInfo?.user || {}
+      console.log(Avatar,'...测试时..')
+      return { realName, avatar: Avatar || headerImg, desc }
     })
 
     const [register, { openModal }] = useModal()
