@@ -204,10 +204,10 @@ export default defineComponent({
         return [
           {
             label: '预约',
+            ifShow: hasPermission(['handleMake_visitorlist']),
             popConfirm: {
               title: '是否确认预约',
               placement: 'left',
-              ifShow: hasPermission(['handleMake_visitorlist']),
               confirm: handlecancel.bind(null, record, 2),
             },
             // onClick: handleLook.bind(null, record)
