@@ -298,7 +298,7 @@ function hadlkOkInput() {
   // }
   var obj = {
     Detail: {
-      Id: Number(props.workOrderId),
+      Id: props.workOrderId,
       Priority: EPriority.value,
       Followers: SGRvalue.value,
       Title: props.workTitle,
@@ -306,7 +306,7 @@ function hadlkOkInput() {
     }
   }
 
-  TaskTicketEditApi(obj).then(res => {
+  TaskTicketEditApi(obj,props.workOrderId).then(res => {
     EPriorityW.value = ''
     SGRvalue.value = ''
     SGRvalueW.value = ''

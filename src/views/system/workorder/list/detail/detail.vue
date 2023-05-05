@@ -46,7 +46,7 @@
 
         <div style="width:95%">
           <!-- 1受理中 2是完结 1不是自己 -->
-          <a-textarea v-model:value="value" placeholder="在这里输入你的跟进结果" :rows="4"
+          <a-textarea v-model:value="value" placeholder="请描述内容" :rows="4"
             :disabled="WorkorderDetail?.Status == 2 || mySelf == 1" />
         </div>
 
@@ -256,18 +256,23 @@ export default defineComponent({
     const userStore = useUserStore()
 
     const [registerMyTable, { openModal }] = useModal();
-    function bulkPermission(data, value) {
+    function bulkPermission(data) {
       var obj: any = {
         TaskTicketId: Number(WorkorderId.value),
         Transferor: data,
         Detail: {
-          Operation: value
+          Operation: ''
         }
+      }
+
+      if (value.value != '') {
+        obj.Detail.Operation = value.value
       }
 
       TaskTicketHandOverApi(obj, Number(WorkorderId.value)).then(res => {
         if (res == 0) {
           message.success('转交成功')
+          value.value = ''
           getTaskTicketProgressList(Number(WorkorderId.value))
         } else {
           message.error(res)
@@ -493,7 +498,7 @@ export default defineComponent({
     function againOpen() {
       TaskTicketCopyApi({ Id: Number(WorkorderId.value) }).then(res => {
         if (res) {
-          message.success('重开成功，请返回列表查看')
+          message.success('重开受理成功，请返回列表查看')
         }
         // console.log(res)
       })

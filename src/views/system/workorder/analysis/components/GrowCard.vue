@@ -11,7 +11,7 @@
           <div class="text-lg truncate ...">
             {{ item.title }}
           </div>
-          <div class="">
+          <div :class="index == 1 ? 'text-green-400' : index == 2 ? 'text-red-500': '' ">
             <CountTo :startVal="1" :endVal="item.value" class="text-4xl" />
             <!-- {{ item.value }} -->
           </div>
@@ -20,7 +20,7 @@
               {{ item.fuTitle }}
             </div>
             <div class="pl-5 text-green-500 ">
-              <CountTo :startVal="1" :endVal="item.fuValue" class="text-lg" />
+              <CountTo :startVal="1" :endVal="item.fuValue" class="text-lg"  :class="index == 1 ? 'text-green-500' : index == 2 ? 'text-red-500': '' "/>
             </div>
           </div>
         </div>
@@ -69,7 +69,11 @@ function getfacilityData(time){
 
     deviceList.value[2].value = res?.UrgentTaskTicketTotal || 0
 
-    deviceList.value[3].value = res?.TaskTicketTotal || 0 - res?.CloseTaskTicketTotal || 0
+    var a = res?.CloseTaskTicketTotal || 0
+
+    var b= res?.TaskTicketTotal || 0
+
+    deviceList.value[3].value = b - a
     
   })
 }

@@ -14,8 +14,9 @@
           <div class="text-lg truncate ...">
             {{ deviceRef.title }}
           </div>
-          <div class="mt-4">
+          <div class="mt-4 flex items-center ">
             <CountTo :startVal="1" :endVal="deviceRef.value" class="text-4xl" />
+            <span class="text-3xl">小时</span>
             <!-- {{ item.value }} -->
           </div>
         </div>
