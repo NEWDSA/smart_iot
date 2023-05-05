@@ -1,7 +1,11 @@
 <template>
   <PageWrapper>
-    <BasicForm @register="register">
+    <div class="time-pp">
+      
+      <BasicForm @register="register">
     </BasicForm>
+    </div>
+    
     <Modal v-model:visible="dialogVisible" title="选择日期">
       <div class="number-picker-body">
         <div v-for="n in 31" :key="n" class="number-picker-item" :class="{ selected: isSelected(n) }"
@@ -95,7 +99,7 @@ const schemas: FormSchema[] = [{
     ],
     maxTagCount: 2,
   },
-  colProps: { span: 8 },
+  colProps: { span: 5 },
   ifShow: ({ values }) => {
     return values.ConditionItems == 1;
   }
@@ -203,7 +207,7 @@ const schemas: FormSchema[] = [{
   field: 'EndTime',
   component: 'TimePicker',
   label: '~',
-  labelWidth: '10px',
+  labelWidth: '20px',
   colProps: {
     span: 4
   },
@@ -220,7 +224,7 @@ const schemas: FormSchema[] = [{
   field: 'circulationTime',
   component: 'Input',
   label: '每',
-  labelWidth: '20px',
+  labelWidth: '30px',
   colProps: {
     span: 3
   },
@@ -530,6 +534,9 @@ export default defineComponent({
   color: #fff;
 }
 
+::v-deep(.ant-picker-default) {
+  width: 100%;
+}
 // .overflow-hidden
 // ::v-deep(.overflow-hidden) {
 //   overflow: inherit;

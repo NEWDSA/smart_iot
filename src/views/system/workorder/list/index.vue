@@ -1,6 +1,6 @@
 <template>
     <PageWrapper contentFullHeight title="工单列表">
-        <div class="bg-white">
+        <div class="bg-white ppo">
             <!-- <div class="p-2 flex justify-between items-center">
                 <div>
                     
@@ -138,7 +138,7 @@ export default defineComponent({
                     e.SearchValue = null
                 }
                 e.Search = null
-                    e.SearchValue = null
+                e.SearchValue = null
             }
         })
 
@@ -246,16 +246,11 @@ export default defineComponent({
 
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 body {
     font-family: 'Alibaba PuHuiTi';
 }
 
-.ant-row .ant-col-24 {
-    // display: flex;
-    margin-left: 50px;
-    flex: none;
-}
 
 
 .sp-blue-text {
@@ -266,7 +261,16 @@ body {
     background: rgb(22, 100, 255);
 }
 
+.ppo {
+    .ant-row .ant-col-24 {
+        // display: flex;
+        margin-left: 50px;
+        flex: none;
+    }
+}
+
 .fasility-class-select {
+
     .ant-select-selector {
         font-size: 10px;
         border-radius: 5px !important;

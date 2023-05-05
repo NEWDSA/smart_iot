@@ -162,9 +162,12 @@ export default defineComponent({
                 componentProps: {
                     onChange: (e,key) => {
                         console.log(e,key)
-                        setFieldsValue({
+                        if(key){
+                            setFieldsValue({
                             TemplateName: key.label
                         });
+                        }
+                       
                     }
                 },
             });

@@ -78,8 +78,8 @@
                       @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
                       <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
                     </Modal>
-                    <div class="bg-gray-100 py-2 px-4 mr-3 rounded" @click.stop="showModalClick(index, index2)"
-                      v-if="facility.TypeId != -1">移出</div>
+                    <div class="bg-gray-100 py-2 px-4 mr-3 rounded"
+                      @click.stop="showModalClick(index, index2, facility.DeviceName)" v-if="facility.TypeId != -1">移出</div>
                     <div v-if="hasPermission(['Edit_visitorsceneList'])" class="bg-gray-100 py-2 px-4 mr-3 rounded"
                       @click.stop="handleEdit(index, index2)">编辑</div>
                     <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded" enableDevice_DeviceList
@@ -148,7 +148,7 @@
 import { ref, reactive, defineComponent } from 'vue';
 import { Select, Modal, TreeSelect } from 'ant-design-vue';
 import { useGo } from '@/hooks/web/usePage';
-import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityCheckRuleApi, facilityRegionListApi, facilityDisableRuleApi, facilityRelieveApi,  } from '@/api/facility/facility';
+import { facilityListApi, facilityTypeTreeApi, facilityEnableApi, facilityDisableApi, facilityCheckRuleApi, facilityRegionListApi, facilityDisableRuleApi, facilityRelieveApi, } from '@/api/facility/facility';
 
 import SearchFrom from './components/sorchFrom.vue';
 import { message } from 'ant-design-vue';
@@ -763,7 +763,10 @@ export default defineComponent({
             ModalShow.value[0].model.splice(index2, 1)
           }
         } else {
-          message.success('移出失败')
+          var a = res.split('=')
+          // console.log(a)
+          message.error(a[2])
+          // message.error('移出失败')
 
         }
         // console.log(res)
@@ -777,12 +780,20 @@ export default defineComponent({
     //   searchSlect.value.selectValue = val
     // }
 
-    const showModalClick = (index, index2) => {
-      if (facilityList[index].facility[index2].NetworkStatus == 2) {
-        message.warn('设备处于禁用状态，无法移出')
-        return
+    const showModalClick = (index, index2, name) => {
+      if (!SearchStatus) {
+        if (facilityList[index].facility[index2].NetworkStatus == 2) {
+          message.warn('设备处于禁用状态，无法移出')
+          return
+        }
+      } else {
+        if (SelectFacilityList[index].facility[index2].NetworkStatus == 2) {
+          message.warn('设备处于禁用状态，无法移出')
+          return
+        }
       }
-      ModalDeviceName.value = facilityList[index].facility[index2].DeviceName
+
+      ModalDeviceName.value = name
 
       ModalShow.value[index].model[index2] = true
     };
