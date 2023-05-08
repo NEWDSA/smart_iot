@@ -5,7 +5,7 @@
     </template>
     <div class="lg:flex">
       <div class="lg:w-7/10 w-full !mr-4 enter-y">
-        <div class="flex mb-4 justify-between mt-3">
+        <div class="flex mb-4 justify-between mt-3 ml-3">
           <span class="flex mb-4">
             <Icon icon="carbon:3d-cursor" color="#888888" size="30" />
             <span class="text-lg ml-4">场景名称</span>
@@ -13,8 +13,11 @@
           <a-button type="primary" @click="saveThings"> 保存设置 </a-button>
 
         </div>
-        <a-input class="" placeholder="会议室温控场景应用" v-model:value="SceneName" />
-        <span class="flex mt-4 mb-4">
+        <div class="pl-3">
+          <a-input class="ml-3" placeholder="请输入" v-model:value="SceneName" />
+
+        </div>
+        <span class="flex mt-4 mb-4 ml-3">
           <Icon icon="carbon:3d-cursor" color="#888888" size="30" />
           <span class="text-lg ml-4">触发方式</span>
         </span>
@@ -36,11 +39,11 @@
         </template>
 
       </div>
-      <div class="lg:w-3/10 w-full enter-y">
-        <div class="scroll-wrap">
-          <h1>配置说明</h1>
+      <div class="lg:w-3/10 w-full enter-y ">
+        <div class="scroll-wrap p-3 m-3 bg-gray-100 rounded-lg">
+          <h1 class="text-2xl">配置说明</h1>
           <ScrollContainer class="mt-4">
-            <ul class="p-3">
+            <ul class="">
               <li>1.设备触发</li>
               <li>适用于多个不同设备间执行动作的联动。选择具体设备时支持指定产品下属的固定设备、全部设备或选择产品下属于具体组织的设备</li>
               <li>例如：打开综合办部门房间门的时候，打开电灯、空调。</li>
@@ -234,14 +237,15 @@ export default defineComponent({
 
         }
         console.log('child.value.myData.RegionIdArr', child.value.myData.RegionIdArr)
-        if (child.value.myData.RegionIdArr.length > 0) {
-          EndDD.RegionIds = [...unique(child.value.myData.RegionIdArr)]
+        if (child.value.myData.RegionIdArr.length > 0 || child.value.actionData.RegionIdArr.length > 0) {
+          EndDD.RegionIds = [...unique(child.value.myData.RegionIdArr), ...unique(child.value.actionData.RegionIdArr)]
         } else {
 
         }
+
       }
       if (CardType.value == 2) {
-        console.log(setTime.value.myData.EndData(),'setTime.value.myData.EndData()')
+        console.log(setTime.value.myData.EndData(), 'setTime.value.myData.EndData()')
         if (!setTime.value.myData.EndData() || setTime.value.myData.EndData().length == 0) {
           message.warn('请选择定时条件');
           return;
@@ -305,7 +309,11 @@ export default defineComponent({
         // }
 
         mergedData.OperationMode = setTime.value.actionData.bcIndex
+        if (setTime.value.myData.actionData.length > 0) {
+          EndDD.RegionIds = [...unique(setTime.value.actionData.RegionIdArr)]
+        } else {
 
+        }
         mergedData.EntryType = 'cron'
         EndDD.Content = JSON.stringify(mergedData)
         EndDD.DeviceIds = unique(setTime.value.actionData.DeviceIdArr)
@@ -340,6 +348,11 @@ export default defineComponent({
         //   // enddata[i].push(FfromArr[i])
         // }
         mergedData.OperationMode = hand.value.actionData.bcIndex
+        if (hand.value.myData.actionData.length > 0) {
+          EndDD.RegionIds = [...unique(hand.value.actionData.RegionIdArr)]
+        } else {
+
+        }
         mergedData.EntryType = 'manual'
         EndDD.Content = JSON.stringify(mergedData)
         EndDD.DeviceIds = unique(hand.value.actionData.DeviceIdArr)
@@ -592,7 +605,7 @@ export default defineComponent({
 .scroll-wrap {
   // width: 50%;
   height: 900px;
-  background-color: @component-background;
+  // background-color: @component-background;
 }
 
 .vben-page-wrapper-content-bg {

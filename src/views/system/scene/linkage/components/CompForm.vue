@@ -12,7 +12,7 @@
       </Form>
     </template>
     <div class="rounded-md pt-5 pl-5 border">
-      <template v-for="(item, index) in add" :key="index">
+      <div class="opp" v-for="(item, index) in add" :key="index">
         <div class="flex justify-center items-center lc_liner" v-if="index > 0 && item.hasOwnProperty('checked1')">
           <div
             style="position: relative;display:flex;height: 35px;align-items: center;justify-content: center;width: 50px;">
@@ -23,14 +23,14 @@
               unCheckedChildren="OR"></Switch>
           </div>
         </div>
-        <div v-if="item && item.schemas_normal.length > 0" id="schemas" class="border bg-light-100 p-4 lc_liner">
+        <div v-if="item && item?.schemas_normal?.length > 0" id="schemas" class="border bg-light-100 p-4 lc_liner">
 
-          <BasicForm v-if="item && item.schemas_normal.length > 0" :schemas="item.schemas_normal" @register="register"
-            ref="FformElRef" @get-form="formvalueFF(arg, index)" class="m l-10">
+          <BasicForm id="Fform_form" :schemas="item?.schemas_normal" @register="register" ref="FformElRef"
+            @get-form="formvalueFF(arg, index)" :formIndex="index">
             <template #deleteSlot="{ model, field }">
               <div class="w-8 h-8 mr-2 flex justify-center items-center"
                 style="border-radius: 50%;border:3px solid black;">
-                {{ index + 1 }}
+                {{ item.index != '' && item.index ? item.index : index + 1 }}
               </div>
             </template>
             <template #customSlot="{ model, field }">
@@ -75,14 +75,14 @@
           <div v-if="item && item.schemas_normal.length > 0" class="p-1 relative flex items-center justify-between">
             <div @click="addRule(index)">
               <Icon icon="bi:plus" size="14" />
-              添加过滤条件
+              添加条件
             </div>
 
             <Icon @click="delete_rule(index)" icon="ant-design:delete-outlined" color="red" size="20px" />
           </div>
         </div>
 
-      </template>
+      </div>
       <!-- 引入模态框 -->
       <AccountTable @register="registerMyTable" @success="handleSuccess" @successFF="handleSuccessFK" />
       <a-button type="primary" class="my-4" @click="handel_Add"> 添加条件 </a-button>
@@ -110,13 +110,14 @@ const schemas: FormSchema[] = []
 const FformArr: any = ref([])
 const formArr: any = ref([])
 const add: any = ref([])
+const FromF: any = ref([])
 const params: any = ref([])
 const result1: any = ref([])
 const FIndex = ref()
 const ZIndex = ref()
 const DeviceIdArr: any = ref([])
 const VisitorIdArr: any = ref([])
-const RegionIdArr:any = ref([])
+const RegionIdArr: any = ref([])
 const VisitorTypeArr = ref([])
 visitorTypeListApi().then(res => {
   VisitorTypeArr.value = res.Detail
@@ -2023,28 +2024,99 @@ export default defineComponent({
         add.value.push({
           FormAdd: [],
           checked1: false,
+          index: '',
           schemas_normal: schemas_normal
         })
       } else {
         add.value.push({
           FormAdd: [],
+          index: '',
           schemas_normal: schemas_normal
         })
       }
+
+      
+      delete add.value[0].checked1
+      let arr = []
+      for (let i = 0; i < add.value.length; i++) {
+        if (add.value[i].schemas_normal.length != 0) {
+          arr.push(i)
+        }
+      }
+
+      if(arr.length<=1){
+        delete add.value[arr[0]].checked1
+      }
+
+      console.log(arr)
+      for (let i = 0; i < add.value.length; i++) {
+        for (let y = 0; y < add.value.length; y++) {
+          if (add.value[i].schemas_normal.length != 0) {
+            add.value[arr[y]].index = y + 1
+          }
+        }
+      }
+
+      FromF.value.push([1])
     }
     async function delete_rule(index) {
       // delete add.value[index].checked1
 
-      // add.value[index].schemas_normal = []
+      FformElRef.value.splice(index, 1)
+      console.log(index, add.value, FformElRef.value)
+      add.value[index].schemas_normal = []
+      let arr = []
+      for (let i = 0; i < add.value.length; i++) {
+        if (add.value[i].schemas_normal.length != 0) {
+          arr.push(i)
+        }
+      }
+      console.log(arr)
+      if (index == 0 || (!add.value[index].checked1 && add.value[index].checked1 != false)) {
+        // FIndex.value = arr.indexOf(Number(index))
+        if (index == arr[0]) {
+          delete add.value[arr[1]].checked1
+        } else {
+          delete add.value[arr[0]].checked1
+        }
+      } else {
+        delete add.value[index].checked1
+      }
+
+      add.value[index].FormAdd = []
+
+      for (let i = 0; i < add.value.length; i++) {
+        for (let y = 0; y < add.value.length; y++) {
+          if (add.value[i].schemas_normal.length != 0) {
+            add.value[arr[y]].index = y + 1
+          }
+        }
+      }
+
       // add.value[index].FormAdd = []
-      add.value.splice(index, 1)
+      // var a = add.value
+      // a.splice(index, 1)
+      // add.value = []
+
+      // add.value = [...a]
+      // add.value[index] = []
+      // setTimeout(() => {
+      // add.value.splice(index, 1)
+
+      // }, 1000);
+      // add.value = a
+      // FromF.value[index]=[]
+      // add.value.splice(index, 1)
+
+
     }
     async function delete_rule_zi(index, index2) {
-      console.log(add.value)
+      // console.log(add.value)
       // delete add.value[index].checked1.splice(index2,1)
 
       // add.value[index].schemas_normal.splice(index2,1)
       add.value[index].FormAdd.splice(index2, 1)
+      FromF.value.splice(index, 1)
     }
     // function callback(id){
     //   return do(){
@@ -2088,7 +2160,7 @@ export default defineComponent({
               DeviceName: result[0].DeviceName,
               DeviceId: result[0].DeviceId,
               DeviceSerial: result[0].DeviceSerial,
-              RegionId:result[0].RegionId
+              RegionId: result[0].RegionId
             }
             // [
             //   {
@@ -2110,7 +2182,7 @@ export default defineComponent({
             DeviceName: obj[0][0].DeviceName,
             DeviceId: obj[0][0].DeviceId,
             DeviceSerial: obj[0][0].DeviceSerial,
-            RegionId:obj[0][0].RegionId
+            RegionId: obj[0][0].RegionId
           })
         }
 
@@ -2271,6 +2343,7 @@ export default defineComponent({
       }
       // 父
       else if (typeof result[0]?.DeviceModel !== 'undefined' && !Reflect.has(obj[1], 'item')) {
+        // console.log(FIndex.value)
         let FormSchema = JSON.parse(result[0]?.DeviceModel)
         // console.log(FformElRef.value[Number(FIndex.value)].getFieldsValue().device,obj[0][0].DeviceId)
         var pp = 0
@@ -2290,7 +2363,7 @@ export default defineComponent({
               DeviceName: result[0].DeviceName,
               DeviceId: result[0].DeviceId,
               DeviceSerial: result[0].DeviceSerial,
-              RegionId:result[0].RegionId
+              RegionId: result[0].RegionId
             }
             // [
             //   {
@@ -2312,7 +2385,7 @@ export default defineComponent({
             DeviceName: obj[0][0].DeviceName,
             DeviceId: obj[0][0].DeviceId,
             DeviceSerial: obj[0][0].DeviceSerial,
-            RegionId:obj[0][0].RegionId
+            RegionId: obj[0][0].RegionId
           })
         }
 
@@ -2524,7 +2597,7 @@ export default defineComponent({
             DeviceName: result[0].DeviceName,
             DeviceId: result[0].DeviceId,
             DeviceSerial: result[0].DeviceSerial,
-            RegionId:result[0].RegionId
+            RegionId: result[0].RegionId
           }
         )
       }
@@ -2536,7 +2609,7 @@ export default defineComponent({
             DeviceName: result[0].DeviceName,
             DeviceId: result[0].DeviceId,
             DeviceSerial: result[0].DeviceSerial,
-            RegionId:result[0].RegionId
+            RegionId: result[0].RegionId
           }
         )
       } else {
@@ -2571,7 +2644,14 @@ export default defineComponent({
     }
     // 选择设备
     function e_Device(index, type) {
-      FIndex.value = index
+      let arr = []
+      for (let i = 0; i < add.value.length; i++) {
+        if (add.value[i].schemas_normal.length != 0) {
+          arr.push(i)
+        }
+      }
+      FIndex.value = arr.indexOf(Number(index))
+      console.log(FIndex.value)
       ZIndex.value = ''
       if (type) {
         //  打开弹窗
@@ -2638,7 +2718,7 @@ export default defineComponent({
           }
           if (FformElRef.value[i].getFieldsValue().ConditionType == 1 || FformElRef.value[i].getFieldsValue().ConditionType == 2) {
             DeviceIdArr.value.push(Number(FformElRef.value[i].getFieldsValue().DeviceId))
-            console.log('FformElRef.value[i].getFieldsValue().RegionId',FformElRef.value[i].getFieldsValue().RegionId)
+            console.log('FformElRef.value[i].getFieldsValue().RegionId', FformElRef.value[i].getFieldsValue().RegionId)
             RegionIdArr.value.push(Number(FformElRef.value[i].getFieldsValue().RegionId))
           }
           FfromArr.push(FformElRef.value[i].getFieldsValue())
@@ -2664,23 +2744,30 @@ export default defineComponent({
       // console.log(FfromArr, fromArr, 'EndDataEndData')
       let ziIndex = 0;
       let enddata: any = []
+
+      let addindex = -1
       for (let i = 0; i < add.value.length; i++) {
-        enddata.push([])
-        enddata[i].push(FfromArr[i])
-        if (i >= 1) {
-          if (add.value[i].checked1 == true || add.value[i].checked1 == false) {
-            console.log(add.value[i].checked1)
-            enddata[i][0].Op = add.value[i].checked1 == false ? 'or' : 'and'
-          }
-        }
+        if (add.value[i].schemas_normal.length != 0) {
+          addindex += 1
 
-
-        if (add.value[i].FormAdd.length > 0) {
-          for (let x = 0; x < add.value[i].FormAdd.length; x++) {
-            enddata[i].push(fromArr[ziIndex])
-            ziIndex += 1
+          enddata.push([])
+          enddata[addindex].push(FfromArr[addindex])
+          // console.log(enddata[i])
+          if (i >= 1) {
+            if (add.value[i].checked1 == true || add.value[i].checked1 == false) {
+              console.log(add.value[i].checked1)
+              enddata[addindex][0].Op = add.value[i].checked1 == false ? 'or' : 'and'
+            }
           }
 
+
+          if (add.value[i].FormAdd.length > 0) {
+            for (let x = 0; x < add.value[i].FormAdd.length; x++) {
+              enddata[addindex].push(fromArr[ziIndex])
+              ziIndex += 1
+            }
+
+          }
         }
       }
 
@@ -2770,7 +2857,7 @@ export default defineComponent({
               enddata[o][p].Gval = 'value' + enddata[o][p].checkTimeSymbol + Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000
             } else if (enddata[o][p].checkTimeSymbol == '==') {
               enddata[o][p].Gval = 'value<=' + ((Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000) + 86399) + '&&' + 'value>=' + Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000
-            }else if(enddata[o][p].checkTimeSymbol == '<='){
+            } else if (enddata[o][p].checkTimeSymbol == '<=') {
               enddata[o][p].Gval = 'value<=' + ((Date.parse(enddata[o][p].checkDate + ' 00:00').valueOf() / 1000) + 86399)
             }
             else {
@@ -2909,7 +2996,8 @@ export default defineComponent({
           add.value.push({
             FormAdd: [],
             checked1: a[i][0].Op ? a[i][0].Op == "or" ? false : true : false,
-            schemas_normal: schemas_normal
+            schemas_normal: schemas_normal,
+            index: ''
           })
           // add.value.push(a[i][0])
           for (let o = 1; o < a[i].length; o++) {
@@ -3016,7 +3104,7 @@ export default defineComponent({
       return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     }
 
-    defineExpose({ EndData, isShake, DeviceIdArr, VisitorIdArr,RegionIdArr });
+    defineExpose({ EndData, isShake, DeviceIdArr, VisitorIdArr, RegionIdArr });
 
     return {
       formData,
@@ -3073,7 +3161,8 @@ export default defineComponent({
       formArr,
       huix,
       filterOption,
-      handleSuccessFK
+      handleSuccessFK,
+      FromF
     }
   }
 
@@ -3129,5 +3218,4 @@ export default defineComponent({
     color: #0960bd !important;
   }
 }
-
 </style>

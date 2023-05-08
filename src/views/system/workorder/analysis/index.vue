@@ -28,3 +28,7 @@ setTimeout(() => {
   loading.value = false
 }, 1500)
 </script>
+
+<style lang="less" scoped>
+
+</style>

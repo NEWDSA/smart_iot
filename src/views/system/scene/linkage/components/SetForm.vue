@@ -23,7 +23,7 @@
             <BasicForm draggable="true" v-if="element.schemas_normal" :ref="setItemRef" @get-form="formvalue(arg, index)"
               :schemas="element.schemas_normal" @register="register">
               <template #numslot="{ model, field }">
-                <div class="w-8 h-8 mr-2 flex justify-center items-center"
+                <div class="w-8 h-8 flex justify-center items-center"
                   style="border-radius: 50%;border:3px solid black;">
                   {{ index + 1 }}
                 </div>
@@ -77,7 +77,7 @@ const schemas_normal: FormSchema[] = [
     component: 'Input',
     slot: 'numslot',
     colProps: {
-      span: 2
+      span: 1
     },
     // 判断显示隐藏
     ifShow: ({ values }) => {
@@ -152,6 +152,19 @@ const schemas_normal: FormSchema[] = [
   },
   {
     field: 'DeviceSerial',
+    label: '',
+    component: 'Input',
+    slot: 'customSlot',
+    colProps: {
+      span: 8
+    },
+    // 判断显示隐藏
+    ifShow: ({ values }) => {
+      return false
+    }
+  },
+  {
+    field: 'RegionId',
     label: '',
     component: 'Input',
     slot: 'customSlot',
@@ -343,10 +356,12 @@ const schemas_normal: FormSchema[] = [
 ];
 const add: any = ref([]);
 const DeviceIdArr: any = ref([]);
+const RegionIdArr: any = ref([]);
 const xformElRef: any = ref([]);
 const setItemRef = (el) => {
   console.log(el)
   xformElRef.value.push(el);
+  console.log(xformElRef.value)
 };
 const bcIndex = ref(1)
 const TIndex = ref()
@@ -527,7 +542,7 @@ export default defineComponent({
         index: add.value.length
       })
       xformElRef.value = []
-      console.log(toRaw(add), 'ddd?')
+      // console.log(toRaw(add), 'ddd?')
     }
     async function handleSuccess(params, type) {
 
@@ -574,6 +589,10 @@ export default defineComponent({
             field: 'DeviceSerial',
             defaultValue: result[0].DeviceSerial,
           },
+          {
+            field: 'RegionId',
+            defaultValue: result[0].RegionId,
+          },
         ]);
       } else {
         console.log(obj)
@@ -581,6 +600,7 @@ export default defineComponent({
           DeviceName: obj[0][0].DeviceName,
           DeviceId: obj[0][0].DeviceId,
           DeviceSerial: obj[0][0].DeviceSerial,
+          RegionId: obj[0][0].RegionId
         })
       }
 
@@ -853,6 +873,9 @@ export default defineComponent({
       // delete add.value[index].checked1
 
       add.value.splice(index, 1)
+      console.log(xformElRef.value)
+      xformElRef.value = []
+      // xformElRef.value.splice(index, 1)
       // add.value[index].FormAdd = []
     }
     function logddd(evt) {
@@ -873,19 +896,26 @@ export default defineComponent({
     function EndData() {
       DeviceIdArr.value = []
       console.log(xformElRef.value, 'EndDataEndData')
-      const form = unref(xformElRef)
+      const form = unref(xformElRef.value)
       let fromArr: any = []
-      // console.log(add.value)
+      RegionIdArr.value = []
+      console.log(add.value,xformElRef.value)
       if (form != null) {
         for (let i = 0; i < xformElRef.value.length; i++) {
-          if (JSON.stringify(xformElRef.value[i].getFieldsValue()) === '{}') {
+          if(xformElRef.value[i] !=null){
+            if (JSON.stringify(xformElRef.value[i].getFieldsValue()) === '{}') {
+            console.log(xformElRef.value)
             // message.warn('请选择完整条件');
             return 1;
           }
           if (xformElRef.value[i].getFieldsValue().OperationType == '1') {
+            console.log(xformElRef.value[i].getFieldsValue().RegionId)
             DeviceIdArr.value.push(Number(xformElRef.value[i].getFieldsValue().DeviceId))
+            RegionIdArr.value.push(Number(xformElRef.value[i].getFieldsValue().RegionId))
           }
           fromArr.push(xformElRef.value[i].getFieldsValue())
+          }
+          
         }
       }
 
@@ -925,6 +955,7 @@ export default defineComponent({
 
         fromArr[i].OperationType = Number(fromArr[i].OperationType)
         enddata.push(fromArr[i])
+        console.log(RegionIdArr.value)
         // enddata[i].push(FfromArr[i])
       }
 
@@ -942,6 +973,7 @@ export default defineComponent({
     function huix() {
       add.value = []
       xformElRef.value = []
+      RegionIdArr.value = []
       // let a = [
       //   {
       //     "DeviceField": "switch",
@@ -1003,7 +1035,7 @@ export default defineComponent({
 
     }
 
-    defineExpose({ EndData, bcIndex, DeviceIdArr });
+    defineExpose({ EndData, bcIndex, DeviceIdArr,RegionIdArr });
 
     return {
       register,
@@ -1047,7 +1079,8 @@ export default defineComponent({
       bcIndex,
       delete_rule,
       huix,
-      DeviceIdArr
+      DeviceIdArr,
+      RegionIdArr
       // getForm
     };
   }

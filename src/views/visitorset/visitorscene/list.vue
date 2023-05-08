@@ -12,8 +12,9 @@
                         </div>
                     </div>
                     <div class="search md:ml-10 mt-3 md:mt-0 flex">
-                        <a-input-search v-model:value="searchValue" placeholder="搜索" class="w-full md:w-50 pl-3"
-                            @search="onSearch" />
+                        <a-input v-model:value="searchValue" placeholder="搜索" class="w-full md:w-50 pl-3"/>
+                        <Button @click="onSearch" type="primary">搜索</Button>
+                        <Button @click="searchScenceC">重置</Button>
                     </div>
                 </div>
 
@@ -23,7 +24,7 @@
                         <div class="flex items-center flex-wrap" v-if="visitorSceneList.length > 0">
 
                             <div v-for="(Scene, index) in visitorSceneList" :key="Scene.RuleId" class="w-100 mb-5"
-                                @click="pushScene(Scene.RuleId)">
+                                @click="pushScene(Scene.RuleId, Scene.Status)">
 
                                 <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5"
                                     style="position: relative;">
@@ -45,98 +46,100 @@
                                                     Scene.Status == 4 ? '故障' : Scene.Status == 5 ? '运行' : '未知'
                                             }}
                                         </div> -->
-                                            <Tag :color="Scene.Status == 1 ? '#87d068' : Scene.Status == 2 ? '#f50' : ''"
-                                                class="status_icon">{{ Scene.Status == 1 ? '在线' : Scene.Status == 2 ? '离线' :
-                                                    '' }}</Tag>
-                                        </div>
-                                        <!-- <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div> -->
-                                        <div :class="`trigger-type`" style="line-height: 36px;">
-                                            <span>{{
-                                                Scene.TriggerMode == 1 ? '条件触发' : Scene.TriggerMode == 2 ? '定时触发' : '手动触发'
-                                            }}</span>
-                                        </div>
-                                        <div class="text-gray-500 w-8/10 truncate ..." style="line-height: 36px;">关联设备 <span
-                                                class="text-black">{{
-                                                    Scene.DeviceNames
-                                                }}</span></div>
-                                        <div class="text-gray-500 w-8/10 truncate ..." style="line-height: 36px;">关联访客 <span
-                                                class="text-black">{{
-                                                    Scene.VisitorTypeNames
-                                                }}</span></div>
+                                        <Tag :color="Scene.Status == 1 ? '#87d068' : Scene.Status == 2 ? '#f50' : ''"
+                                            class="status_icon">{{ Scene.Status == 1 ? '在线' : Scene.Status == 2 ? '离线' :
+                                                '' }}</Tag>
+                                    </div>
+                                    <!-- <div class="text-gray-500 mb-5">{{ checkVisitorType(Scene.VisitorTypeId) }}</div> -->
+                                    <div :class="`trigger-type`" style="line-height: 36px;">
+                                        <span>{{
+                                            Scene.TriggerMode == 1 ? '条件触发' : Scene.TriggerMode == 2 ? '定时触发' : '手动触发'
+                                        }}</span>
+                                    </div>
+                                    <div class="text-gray-500 w-8/10 truncate ..." style="line-height: 36px;">关联设备 <span
+                                            class="text-black">{{
+                                                Scene.DeviceNames
+                                            }}</span></div>
+                                    <div class="text-gray-500 w-8/10 truncate ..." style="line-height: 36px;">关联访客 <span
+                                            class="text-black">{{
+                                                Scene.VisitorTypeNames
+                                            }}</span></div>
 
-                                        <div class="bottom-but flex items-center mt-2 justify-end">
-                                            <!-- <Modal
+                                    <div class="bottom-but flex items-center mt-2 justify-end">
+                                        <!-- <Modal
                                         v-model:visible="ModalShow[SceneTabIndex == '0' && !SearchStatus ? index : 0].model[index2]"
                                         @ok="handleOk(index, index2)" @cancel="handleClock(index, index2)" title="移出设备">
                                         <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
                                     </Modal> -->
 
-                                            <div v-if="hasPermission(['Delete_visitorsceneList'])"
-                                                class="bg-gray-100 py-2 px-4 mr-3 rounded"
-                                                @click.stop="showModalClick(index)">
-                                                删除
-                                            </div>
+                                        <div v-if="hasPermission(['Delete_visitorsceneList'])"
+                                            class="bg-gray-100 py-2 px-4 mr-3 rounded"
+                                            :class="Scene.Status == 1 ? 'text-gray-400' : ''"
+                                            @click.stop="showModalClick(index, Scene.Status)">
+                                            删除
+                                        </div>
 
 
-                                            <div v-if="hasPermission(['Edit_visitorsceneList'])"
-                                                class="bg-gray-100 py-2 px-4 mr-3 rounded"
-                                                @click.stop="pushScene(Scene.RuleId)">
-                                                编辑</div>
-                                            <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded"
-                                                v-if="Scene.Status == 2 && hasPermission(['Enable_visitorsceneList']) || !Scene.Status && hasPermission(['Enable_visitorsceneList'])"
-                                                @click.stop="enableDevice(Scene.RuleId, index)">启用</div>
-                                            <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded"
-                                                v-if="Scene.Status == 1 && hasPermission(['disableDevice_visitorsceneList']) || Scene.Status == 5 && hasPermission(['disableDevice_visitorsceneList'])"
-                                                @click.stop="disableDevice(Scene.RuleId, index)">禁用</div>
-                                            <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
-                                                v-if="Scene.Status == 3 || Scene.Status == 4">启用</div>
-                                        </div>
-                                        <div style="position: absolute;right: 20px;top:40%">
-                                            <img :src="scenebig" alt="">
-                                        </div>
+                                        <div v-if="hasPermission(['Edit_visitorsceneList'])"
+                                            class="bg-gray-100 py-2 px-4 mr-3 rounded"
+                                            :class="Scene.Status == 1 ? 'text-gray-400' : ''"
+                                            @click.stop="pushScene(Scene.RuleId, Scene.Status)">
+                                            编辑</div>
+                                        <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded"
+                                            v-if="Scene.Status == 2 && hasPermission(['Enable_visitorsceneList']) || !Scene.Status && hasPermission(['Enable_visitorsceneList'])"
+                                            @click.stop="enableDevice(Scene.RuleId, index)">启用</div>
+                                        <div class="bg-red-600 text-white py-2 px-4 mr-3 rounded"
+                                            v-if="Scene.Status == 1 && hasPermission(['disableDevice_visitorsceneList']) || Scene.Status == 5 && hasPermission(['disableDevice_visitorsceneList'])"
+                                            @click.stop="disableDevice(Scene.RuleId, index)">禁用</div>
+                                        <div class="bg-gray-300 text-white py-2 px-4 mr-3 rounded"
+                                            v-if="Scene.Status == 3 || Scene.Status == 4">启用</div>
+                                    </div>
+                                    <div style="position: absolute;right: 20px;top:40%">
+                                        <img :src="scenebig" alt="">
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="w-100 mb-5" v-if="visitorSceneListlock == false">
+                        </div>
+                        <!-- <div class="w-100 mb-5" v-if="visitorSceneListlock == false">
                             <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5"
                                 @click="addpage(index, SceneTabIndex)" style="height:195px;">
                                 更多+
                             </div>
                         </div> -->
-                            <div v-else class="w-100 mb-5">
-                                <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5"
-                                    style="height:195px;">
-                                    暂无联动
-                                </div>
-
+                        <div v-else class="w-100 mb-5">
+                            <div class="border border-gray-200 border-solid rounded w-11/12 px-4 py-5"
+                                style="height:195px;">
+                                暂无联动
                             </div>
 
                         </div>
 
-                        <Pagination v-model:current="seachObj.PageNum" v-model:pageSize="seachObj.PageSize" :total="total"
-                            show-size-changer @change="cutPage()"></Pagination>
+                    </div>
 
-                        <!-- <div class="flex text-right" style="text-align: center;">
+                    <Pagination v-model:current="seachObj.PageNum" v-model:pageSize="seachObj.PageSize" :total="total"
+                        show-size-changer @change="cutPage()"></Pagination>
+
+                    <!-- <div class="flex text-right" style="text-align: center;">
                     <div class="mr-2" v-for="count in visitorSceneListlock">
                         <div class="px-3 py-1 rounded" @click="cutPage(count)"
                             :class="seachObj.PageNum == count ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'">
                             {{ count }} </div>
                     </div>
                 </div> -->
-                    </div>
                 </div>
-
-                <Modal v-model:visible="ModalShow" @ok="handleOk()" @cancel="handleClock()" title="删除场景">
-                    <div class="p-3">确认删除 <span class="text-red-500">{{ ModalObj.Name }}</span> 此场景？</div>
-                </Modal>
             </div>
+
+            <Modal v-model:visible="ModalShow" @ok="handleOk()" @cancel="handleClock()" title="删除场景">
+                <div class="p-3">确认删除 <span class="text-red-500">{{ ModalObj.Name }}</span> 此场景？</div>
+            </Modal>
+        </div>
     </PageWrapper>
 </template>
 
 <script lang="ts">
 import { ref, defineComponent, reactive, onMounted, nextTick } from 'vue';
 import { visitorTypeListApi, ruleVisitorListApi, ruleEnableApi, ruleDisableApi, ruleDeleteApi } from '@/api/visitor/visitor'
-import { message, Modal, Pagination,Tag } from 'ant-design-vue';
+import { message, Modal, Pagination, Tag,Button } from 'ant-design-vue';
 import { PageWrapper } from '@/components/Page';
 import { facilityDetailApi } from '@/api/facility/facility'
 import { usePermission } from '@/hooks/web/useButtonPermission';
@@ -146,7 +149,7 @@ import scenebig from '@/assets/images/sceneBig.png'
 // import { nextTick } from 'process';
 
 export default defineComponent({
-    components: { Modal, Pagination, PageWrapper,Tag },
+    components: { Modal, Pagination, PageWrapper, Tag,Button },
     setup() {
         const { hasPermission } = usePermission();
         onMounted(() => {
@@ -215,13 +218,22 @@ export default defineComponent({
             })
 
         }
+        async function searchScenceC(value) {
+            searchValue.value = ''
+            getSceneList(true, null)
+        }
 
-        function showModalClick(index) {
+        function showModalClick(index, status) {
+            if (status == 1) {
+                message.warn('设备启用中，请禁用后再试。')
+                return;
+            } else {
+                ModalObj.Name = visitorSceneList.value[Number(index)].Name
+                ModalObj.RuleId = visitorSceneList.value[index].RuleId
+                ModalObj.index = index
+                ModalShow.value = true
+            }
 
-            ModalObj.Name = visitorSceneList.value[Number(index)].Name
-            ModalObj.RuleId = visitorSceneList.value[index].RuleId
-            ModalObj.index = index
-            ModalShow.value = true
             // console.log(ModalShow.value)
         }
 
@@ -294,8 +306,13 @@ export default defineComponent({
             getSceneList(false, 1)
         }
 
-        function pushScene(id) {
-            go('/scene/linkage/' + id)
+        function pushScene(id, status) {
+            if (status == 1) {
+                message.warn('设备启用中，请禁用后再试。')
+                return;
+            } else {
+                go('/scene/linkage/' + id)
+            }
 
         }
 
@@ -376,7 +393,8 @@ export default defineComponent({
             pushScene,
             checkDevice,
             scenesm,
-            scenebig
+            scenebig,
+            searchScenceC
         };
     },
 });
@@ -420,4 +438,5 @@ body {
         // margin-left: 5px;
         font-size: 14px;
     }
-}</style>
+}
+</style>

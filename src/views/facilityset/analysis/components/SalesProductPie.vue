@@ -146,8 +146,26 @@ const deviceList = ref([
 const value1 = ref<Dayjs>()
 
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .pppo .ant-card-body{
   padding-top:15px !important;
+}
+
+@media  (max-width: 768px) {
+  body {
+    font-size: 14px !important;
+  }
+}
+
+@media  (min-width: 769px) and (max-width: 1024px) {
+  body {
+    font-size: 16px !important;
+  }
+}
+
+@media  (min-width: 1025px) {
+  body {
+    font-size: 18px !important;
+  }
 }
 </style>

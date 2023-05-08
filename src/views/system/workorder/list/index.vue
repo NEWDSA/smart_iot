@@ -246,7 +246,7 @@ export default defineComponent({
 
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 body {
     font-family: 'Alibaba PuHuiTi';
 }

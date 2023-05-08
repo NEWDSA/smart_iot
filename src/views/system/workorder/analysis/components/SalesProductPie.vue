@@ -21,10 +21,10 @@
           </div>
         </div>
 
-        <div class="w-3/4 pl-5 flex items-center">
-          <div class="w-1/3 pl-5 flex items-center" v-for="(item) in deviceList" :key="item.title">
-            <Progress :percent="item.percentage" type="circle" stroke-linecap="square" :strokeWidth="12" :width="80" :showInfo="false"
-              :strokeColor="item.color" />
+        <div class="w-3/4 pl-5 flex items-center oip">
+          <div class="pl-5 flex items-center" v-for="(item) in deviceList" :key="item.title" style="width: 25wh;">
+            <Progress :percent="item.percentage" type="circle" stroke-linecap="square" :strokeWidth="12" :width="80"
+              :showInfo="false" :strokeColor="item.color" style="display: block;" />
             <div class="pl-5">
               <div class="text-lg text-gray-500">{{ item.title }}</div>
               <div>
@@ -68,16 +68,16 @@ defineProps({
 onMounted(() => {
   value1.value = dayjs(new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf())
   value2.value = dayjs(new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf())
-  
+
   value1Time.value = new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf() / 1000
   value2Time.value = new Date(new Date(new Date().toLocaleDateString()).getTime()).valueOf() / 1000 + 1000
   getBoardNum()
 })
 
 function getBoardNum() {
-  let obj= {
-      BeginTime: value1Time.value,
-      EndTime: value2Time.value
+  let obj = {
+    BeginTime: value1Time.value,
+    EndTime: value2Time.value
   }
 
   TicketCountClosedTimeApi(obj).then(res => {
@@ -99,12 +99,12 @@ function getBoardNum() {
 }
 
 function changeData(e, key) {
-  value1Time.value =new Date(key).valueOf()/1000
+  value1Time.value = new Date(key).valueOf() / 1000
   getBoardNum()
 }
 
-function changeDataa(e, key){
-  value2Time.value =new Date(key).valueOf()/1000
+function changeDataa(e, key) {
+  value2Time.value = new Date(key).valueOf() / 1000
   getBoardNum()
 }
 
@@ -135,8 +135,50 @@ const deviceList = ref([
 ])
 
 </script>
-<style lang="less">
-.pppo .ant-card-body{
-  padding-top:15px !important;
+<style lang="less" scoped>
+.pppo .ant-card-body {
+  padding-top: 15px !important;
+}
+
+.oip{
+  white-space:nowrap
+}
+/* // 屏幕宽度小于767个象素时应用的CSS样式 */
+@media (max-width: 767px) {
+
+  .oip {
+    scale: (0.7);
+  }
+}
+
+/* // 屏幕宽度在767和991象素之间的CSS样式 */
+@media (min-width: 768px) and (max-width: 991px) {
+  .oip {
+    scale: (0.7);
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1140px) {
+  .oip {
+    scale: (0.6);
+  }
+}
+
+@media (min-width: 1140px) and (max-width: 1190px) {
+  .oip {
+    scale: (0.7);
+  }
+}
+
+@media (min-width: 1190px) and (max-width: 1260px) {
+  .oip {
+    scale: (0.7);
+  }
+}
+
+@media (min-width: 1260px) and (max-width: 1350px) {
+  .oip {
+    scale: 0.9;
+  }
 }
 </style>

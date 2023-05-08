@@ -49,6 +49,10 @@ enum Api {
     DeviceTrendRatio = '/device/trendRatio',
     DeviceBoardNum = '/device/board/num',
 
+    DeviceDeptPage = '/device/dept/page',
+    DeviceFreeList = '/device/free/list',
+    DeviceDeptSave = '/device/dept/save',
+    DeviceDeptDelete = '/device/dept/delete',
 
     regionList = '/region/list', //区域列表
     regionInfo = '/region/info'   // 区域详情
@@ -300,7 +304,36 @@ export function facilityAlertDataApi(params) {
     });
 }
 
+// 可控设备分页列表
+export function DeviceDeptPageApi(params) {
+    return realHttp.get({
+        url: Api.DeviceDeptPage,
+        params
+    });
+}
 
+// 可关联的设备列表
+export function DeviceFreeListApi(params) {
+    return realHttp.get({
+        url: Api.DeviceFreeList,
+        params
+    });
+}
 
+// 新增设备部门关联
+export function DeviceDeptSaveApi(params) {
+    return realHttp.post({
+        url: Api.DeviceDeptSave,
+        params
+    });
+}
+
+// 删除设备部门关联
+export function DeviceDeptDeleteApi(params) {
+    return realHttp.delete({
+        url: Api.DeviceDeptDelete,
+        params
+    });
+}
 
 

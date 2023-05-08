@@ -250,10 +250,11 @@ export default defineComponent({
         message.warn('设备启用中，请禁用后再试。')
         return;
       }
-      ruleDeleteApi({ Ids: [dataList.value[index].RuleId] }).then(res => {
+      ruleDeleteApi({ Ids: [dataList.value[index].RuleId] }).then(async res => {
         if (res == 0) {
           message.success('删除成功');
-          dataList.value.splice(index, 1)
+          // dataList.value.splice(index, 1)
+          await getData(null,'k')
         } else {
           message.error(res)
         }
