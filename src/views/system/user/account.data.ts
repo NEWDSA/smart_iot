@@ -67,7 +67,7 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'NickName',
+    field: 'UserName',
     label: '用户名',
     labelWidth: 60,
     component: 'Input',
@@ -103,10 +103,13 @@ export const accountFormSchema: FormSchema[] = [
     field: 'NickName',
     label: '昵称',
     component: 'Input',
+    componentProps: {
+      placeholder: '请输入昵称'
+    },
     rules: [
       {
         required: true,
-        message: '请输入用户名'
+        message: '请输入昵称'
       }
     ]
   },
@@ -115,6 +118,7 @@ export const accountFormSchema: FormSchema[] = [
     label: '所属部门',
     component: 'TreeSelect',
     componentProps: {
+      placeholder: '请选择部门',
       fieldNames: {
         label: 'Name',
         key: 'Id',
@@ -127,11 +131,17 @@ export const accountFormSchema: FormSchema[] = [
     field: 'UserName',
     label: '用户名称',
     component: 'Input',
-    required: true
+    required: true,
+    componentProps: {
+      placeholder: '请输入名称'
+    }
   },
   {
     field: 'PhoneNumber',
     label: '手机号',
+    componentProps: {
+      placeholder: '请输入手机号'
+    },
     component: 'Input',
     required: true
   },
@@ -140,6 +150,7 @@ export const accountFormSchema: FormSchema[] = [
     field: 'RoleIds',
     component: 'TreeSelect',
     componentProps: {
+      placeholder: '请选择角色类型',
       allowClear: true,
       showCheckedStrategy: 'TreeSelect.SHOW_ALL',
       treeCheckable: true,

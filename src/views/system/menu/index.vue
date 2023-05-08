@@ -39,6 +39,7 @@ import MenuModal from './MenuModal.vue';
 import { columns } from './menu.data';
 import { useModal } from '@/components/Modal';
 import { usePermission } from '@/hooks/web/useButtonPermission';
+import { useMessage } from '@/hooks/web/useMessage';
 export default defineComponent({
   name: 'MenuManagement',
   components: { BasicTable, MenuModal, TableAction },
@@ -46,6 +47,7 @@ export default defineComponent({
     const { hasPermission } = usePermission();
     const [registerMenuModal, { openModal }] = useModal();
     const checkAll = ref(true);
+    const { createMessage } = useMessage();
     const [registerTable, { reload, expandAll, collapseAll }] = useTable({
       title: '菜单列表',
       api: async (p) => {
@@ -100,10 +102,13 @@ export default defineComponent({
       });
     }
 
-    function handleDelete(record: Recordable) {
+    async function handleDelete(record: Recordable) {
 
       try {
-        DelMenuList({ MenuId: record.MenuId });
+        // 删除设置
+        const { Code } = await DelMenuList({ MenuId: record.MenuId });
+        Code == '200' ? createMessage.info('操作成功') : '';
+        // console.log(result, '...result...');
       } finally {
         reload();
       }

@@ -281,26 +281,31 @@ export default defineComponent({
       const userId = await userStore.getUserInfo.user?.UserId
       // UserId
       // 弹出确认删除提示框
-      createConfirm({
-        iconType: 'warning',
-        title: () => h('span', '温馨提示'),
-        content: () => h('span', '是否删除消息?'),
-        onOk: async () => {
-          try {
-            await DelNotice({
-              NoticeId: Number(infoDetail?.Detail?.NoticeId),
-              // 获取用户UserId
-              UserId: [Number(userId)]
-            })
-          } finally {
-            infoDetail.Detail = null
-            settingList.value = []
-            for (var i = 0; i <= 2; i++) {
-              await getData(i)
+      if (infoDetail?.Detail) {
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '温馨提示'),
+          content: () => h('span', '是否删除消息?'),
+          onOk: async () => {
+            try {
+              await DelNotice({
+                NoticeId: Number(infoDetail?.Detail?.NoticeId),
+                // 获取用户UserId
+                UserId: [Number(userId)]
+              })
+            } finally {
+              infoDetail.Detail = null
+              settingList.value = []
+              for (var i = 0; i <= 2; i++) {
+                await getData(i)
+              }
             }
           }
-        }
-      })
+        })
+      } else {
+        info('请先选中消息');
+      }
+
     }
     function nextItem() {
       // 当前数据长度

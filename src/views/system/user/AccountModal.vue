@@ -15,7 +15,8 @@ import { Tooltip } from 'ant-design-vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { accountFormSchema } from './account.data';
-import {  getUserRole, getDeptDrop, modifiAccountList, createAccountList } from '@/api/demo/system';
+import { useMessage } from '@/hooks/web/useMessage';
+import { getUserRole, getDeptDrop, modifiAccountList, createAccountList } from '@/api/demo/system';
 export default defineComponent({
   name: 'AccountModal',
   components: { BasicModal, BasicForm, Tooltip },
@@ -29,6 +30,7 @@ export default defineComponent({
       schemas: accountFormSchema,
       showActionButtonGroup: false
     });
+    const { createMessage } = useMessage();
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       resetFields();
       setModalProps({ confirmLoading: false });
@@ -46,12 +48,11 @@ export default defineComponent({
             return item
           }
         })
-        console.log(result,'...result...?')
         updateSchema({
           field: 'RoleIds',
           defaultValue: result.RoleIds,
           required: true,
-          componentProps: { treeData: result.Roles}
+          componentProps: { treeData: result.Roles }
         })
         const treeData = await getDeptDrop().then((res) => {
           return res.TreeSelect
@@ -74,13 +75,13 @@ export default defineComponent({
           required: true,
           componentProps: { treeData: result.Roles }
         })
-        setFieldsValue({ DeptId: data.DeptId });
+        // setFieldsValue({ DeptId: data.DeptId });
         const treeData = await getDeptDrop().then((res) => {
           return res.TreeSelect
         });
         await updateSchema({
           field: 'DeptId',
-          required:true,
+          required: true,
           componentProps: { treeData },
         });
 
@@ -98,7 +99,19 @@ export default defineComponent({
         else {
           Object.assign(values, { RoleIds: [Number(values.RoleIds)] })
         }
-        !unref(isUpdate) ? await createAccountList(values) : await modifiAccountList({ ...values, UserId: UserId.value })
+        // !unref(isUpdate) ? await createAccountList(values) : await modifiAccountList({ ...values, UserId: UserId.value })
+        // 
+        switch (!unref(isUpdate)) {
+          case false:
+            await modifiAccountList({ ...values, UserId: UserId.value }).then((res) => {
+              res.Code == '200' ? createMessage.info('操作成功') : '';
+            })
+            break;
+          case true:
+            const { Code, Msg } = await createAccountList(values)
+            Code == '200' ? createMessage.info('操作成功') : '';
+            break;
+        }
         closeModal();
         emit('success');
       } finally {

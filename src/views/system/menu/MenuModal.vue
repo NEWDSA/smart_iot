@@ -8,7 +8,7 @@ import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { formSchema } from './menu.data';
-
+import { useMessage } from '@/hooks/web/useMessage';
 import { getMenTree, editMenuList, createMenuList } from '@/api/demo/system';
 export default defineComponent({
   name: 'DeptModal',
@@ -21,8 +21,8 @@ export default defineComponent({
     const isShow = ref(false);
     const isModifiy = ref(0);
     const DeptId = ref('');
-
-    const [registerForm, { resetFields, setFieldsValue, updateSchema, validate,getFieldsValue }] = useForm({
+    const { createMessage } = useMessage();
+    const [registerForm, { resetFields, setFieldsValue, updateSchema, validate, getFieldsValue }] = useForm({
       labelWidth: 100,
       schemas: formSchema,
       showActionButtonGroup: false,
@@ -53,7 +53,7 @@ export default defineComponent({
         componentProps: { treeData },
       });
     });
-    const getTitle = computed(() => (!unref(isUpdate) ? '新增菜单' : MenuType.value=='M'?  '编辑目录':MenuType.value=='F'?'编辑按钮':MenuType.value=='C'?'编辑菜单':''));
+    const getTitle = computed(() => (!unref(isUpdate) ? '新增菜单' : MenuType.value == 'M' ? '编辑目录' : MenuType.value == 'F' ? '编辑按钮' : MenuType.value == 'C' ? '编辑菜单' : ''));
     async function handleSubmit() {
       try {
         const values = await validate();
@@ -61,8 +61,21 @@ export default defineComponent({
         if (!values.ParentId) {
           values.ParentId = 0;
         }
-        values.OrderNum===undefined || values.OrderNum===null ?values.OrderNum=0:values.OrderNum;
-        !unref(isUpdate) ? await createMenuList(values) : await editMenuList({ ...values, MenuId: MenuId.value })
+        values.OrderNum === undefined || values.OrderNum === null ? values.OrderNum = 0 : values.OrderNum;
+        // !unref(isUpdate) ? await createMenuList(values) : await editMenuList({ ...values, MenuId: MenuId.value })
+        // switch
+        switch (!unref(isUpdate)) {
+          case false:
+            await editMenuList({ ...values, MenuId: MenuId.value }).then((res) => {
+              res.Code == '200' ? createMessage.info('操作成功') : '';
+            })
+
+            break;
+          case true:
+            const { Code, Msg } = await createMenuList(values)
+            Code == '200' ? createMessage.info('操作成功') : '';
+            break;
+        }
         closeModal();
         emit('success');
       } finally {

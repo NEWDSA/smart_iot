@@ -1,7 +1,7 @@
 <template>
-  <BasicModal @visible-change="ModelStatus" width="48%" v-bind="$attrs" @register="registerModal" :title="getTitle"
+  <BasicModal @visible-change="ModelStatus" width="70%" :height="700" v-bind="$attrs" @register="registerModal" :title="getTitle"
     @ok="handleSubmit">
-    <BasicTable  @register="registerTable"  :searchInfo="searchInfo">
+    <BasicTable  @register="registerTable" :max-height="400"  :searchInfo="searchInfo">
     </BasicTable>
   </BasicModal>
 </template>

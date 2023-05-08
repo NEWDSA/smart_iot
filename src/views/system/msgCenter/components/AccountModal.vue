@@ -1,6 +1,6 @@
 <template>
-  <BasicModal width="70%" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
-    <BasicTable :maxHeight="300" @register="registerTable" :searchInfo="searchInfo">
+  <BasicModal width="70%" :height="700" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
+    <BasicTable :maxHeight="400" @register="registerTable" :searchInfo="searchInfo">
     </BasicTable>
   </BasicModal>
 </template>
@@ -68,7 +68,7 @@ export default defineComponent({
       columns,
       pagination: true,
       useSearchForm: true,
-      showTableSetting: true,
+      showTableSetting: false,
       showIndexColumn: false,
       bordered: true,
       handleSearchInfoFn(info) {

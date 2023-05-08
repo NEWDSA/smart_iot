@@ -27,6 +27,8 @@ export default defineComponent({
     const checkData = ref('');
     const checkedMenu = ref<Array<string | number>>([]);
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      // 清除数据
+      checkedMenu.value=[];
       myResult.value = toRaw(data.DeviceId);
       // 接口调用错误
       // const { TreeSelect } = await getDeptDrop();
@@ -56,7 +58,7 @@ export default defineComponent({
           DepartmentId: keys?.checked
         }).then((res) => {
           //  操作成功
-          res==0?createMessage.info('操作成功'):createMessage.info('操作失败');
+          res==0?createMessage.info('操作成功'):'';
         })
         setModalProps({ confirmLoading: true });
         closeModal();

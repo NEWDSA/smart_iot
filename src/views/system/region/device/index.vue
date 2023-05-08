@@ -11,21 +11,21 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction :actions="[
-              {
-                label: '移出',
-                ifShow: hasPermission(['moveOut_RegionDevice']),
-                popConfirm: {
-                  title: '是否确认移出',
-                  placement: 'left',
-                  confirm: handleDelete.bind(null, record),
-                },
+            {
+              label: '移出',
+              ifShow: hasPermission(['moveOut_RegionDevice']),
+              popConfirm: {
+                title: '是否确认移出',
+                placement: 'left',
+                confirm: handleDelete.bind(null, record),
               },
-              {
-                label: '权限设置',
-                ifShow: hasPermission(['AuthSetting_RegionDevice']),
-                onClick: handleEditPwd.bind(null, record)
-              }
-            ]" />
+            },
+            {
+              label: '权限设置',
+              ifShow: hasPermission(['AuthSetting_RegionDevice']),
+              onClick: handleEditPwd.bind(null, record)
+            }
+          ]" />
         </template>
       </template>
     </BasicTable>
@@ -40,7 +40,6 @@ import { useMessage } from '@/hooks/web/useMessage';
 import { getReginDevice, getDeviceType, bulkDeviceOut } from '@/api/demo/region';
 import { PageWrapper } from '@/components/Page';
 import DeptTree from './DeptTree.vue';
-
 import { useModal } from '@/components/Modal';
 import AccountTable from './AccountTable.vue';
 import AccountModal from './AccountModal.vue';
@@ -65,6 +64,7 @@ export default defineComponent({
       DeviceId: [],
       DepartmentId: []
     })
+
     const dataSource: any = ref([]);
     const modalVisible = ref<Boolean>(false);
     var pagination = reactive({ TypeId: 2, Sort: 0, RegionId: 1, PageNum: 1, PageSize: 10 })
@@ -74,7 +74,7 @@ export default defineComponent({
     } = useMessage();
     function onChange() {
     }
-    const [registerTable, { reload, getSelectRowKeys, setSelectedRowKeys, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, setSelectedRowKeys, deleteTableDataRecord, clearSelectedRowKeys }] = useTable({
       title: '区域设备管理',
       onChange,
       rowSelection: {
@@ -102,13 +102,11 @@ export default defineComponent({
         // 接口返回表格总数的字段
         totalField: 'Total'
       },
-
       formConfig: {
-
         layout: 'horizontal',
         labelWidth: 120,
-        actionColOptions:{
-          span:3
+        actionColOptions: {
+          span: 3
         },
         schemas: searchFormSchema,
         autoSubmitOnEnter: true,
@@ -154,7 +152,9 @@ export default defineComponent({
           RegionId: 0
         }
         try {
-          await bulkDeviceOut(param)
+          const { Code } = await bulkDeviceOut(param);
+          console.log(Code,'...Code...?')
+          Code == '0' ? createMessage.info('操作成功') : '';
         } finally {
           reload()
         }
@@ -213,6 +213,7 @@ export default defineComponent({
 
     }
     async function handleSuccess() {
+      // 清空所选内容
       await reload();
     }
     // 权限设置

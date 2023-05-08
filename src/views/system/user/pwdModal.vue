@@ -8,6 +8,7 @@ import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm, FormSchema } from '@/components/Form/index';
 import { updatePwd } from '@/api/demo/system';
+import { useMessage } from '@/hooks/web/useMessage';
 const schemas: FormSchema[] = [
   {
     field: 'NewPassword',
@@ -28,13 +29,13 @@ export default defineComponent({
     const isUpdate = ref(true);
     const isModifiy = ref(0);
     const RegionId = ref('');
-    const UserId=ref();
+    const UserId = ref();
     const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
       labelWidth: 100,
       baseColProps: { span: 24 },
       showActionButtonGroup: false,
     });
-
+    const { createMessage } = useMessage();
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       resetFields();
       setModalProps({ confirmLoading: false });
@@ -46,24 +47,21 @@ export default defineComponent({
           ...data.record,
         });
       }
-      UserId.value=data.record.UserId;
+      UserId.value = data.record.UserId;
       console.log(data.record);
     });
 
     async function handleSubmit() {
       try {
         const values = await validate();
-        // const value2 = props.data;
-        // const param = (({UserId
-        // }) => ({ UserId}))(value2)
-        // values.UserId=data
-        values.UserId=UserId.value;
+        values.UserId = UserId.value;
         setModalProps({ confirmLoading: true });
         // 调用接口进行密码修改
         Object.assign(values);
-        updatePwd({
+        const { Code } = await updatePwd({
           ...values
         })
+        Code == '200' ? createMessage.info('操作成功') : '';
         closeModal();
         emit('success');
       } finally {

@@ -8,7 +8,7 @@ import { defineComponent, ref, computed, unref } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicForm, useForm } from '@/components/Form/index';
 import { formSchema } from './dept.data';
-
+import { useMessage } from '@/hooks/web/useMessage';
 import { getDeptDrop, createDept, modifiDept } from '@/api/demo/system';
 export default defineComponent({
   name: 'DeptModal',
@@ -20,7 +20,7 @@ export default defineComponent({
     const isShow = ref(false);
     const isModifiy = ref(0);
     const DeptId = ref('');
-
+    const { createMessage } = useMessage();
     const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
       labelWidth: 100,
       baseColProps: { span: 24 },
@@ -45,7 +45,7 @@ export default defineComponent({
       updateSchema({
         field: 'ParentId',
         componentProps: { treeData },
-        ifShow: !unref(isUpdate) ? false : !data.record ? true : data.record.ParentId == 0  ? false : true
+        ifShow: !unref(isUpdate) ? false : !data.record ? true : data.record.ParentId == 0 ? false : true
       });
 
     });
@@ -54,11 +54,23 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         const values = await validate();
-        values.OrderNum===undefined || values.OrderNum===null ?values.OrderNum=0:values.OrderNum;
-        unref(isModifiy) == 1 ? Object.assign(values, { ParentId:DeptId.value}) : ''
+        values.OrderNum === undefined || values.OrderNum === null ? values.OrderNum = 0 : values.OrderNum;
+        unref(isModifiy) == 1 ? Object.assign(values, { ParentId: DeptId.value }) : ''
         setModalProps({ confirmLoading: true });
-        !unref(isUpdate) ? await createDept(values) : await modifiDept({ ...values, deptId: DeptId.value })
-        console.log(values);
+        // 对接口进行特殊处理
+
+        // !unref(isUpdate) ? await createDept(values) : await modifiDept({ ...values, deptId: DeptId.value })
+        switch (!unref(isUpdate)) {
+          case false:
+            await modifiDept({ ...values, deptId: DeptId.value }).then((res) => {
+              res.Code == '200' ? createMessage.info('操作成功') : '';
+            })
+            break;
+          case true:
+            const { Code, Msg } = await createDept(values)
+            Code == '200' ? createMessage.info('操作成功') : '';
+            break;
+        }
         closeModal();
         emit('success');
       } finally {

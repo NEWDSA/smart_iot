@@ -9,7 +9,7 @@
       <div class="ml-auto" id="showTime">{{ currentTime }}</div>
     </a-layout-header>
     <a-layout>
-      <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
+      <a-layout-sider width="20%" class="sider"
         v-model:collapsed="collapsed">
         <div class="boxall1">
           <div class="alltitle"> 全局预览 </div>
@@ -154,16 +154,6 @@
                 <span class="changecolor"></span>
                 <p>下午</p>
               </div>
-              <!-- <div class="recetit">
-                <strong>40人</strong>
-                <span></span>
-                <span></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <p>本月新办户数</p>
-              </div> -->
             </div>
           </div>
         </div>
@@ -188,7 +178,7 @@
 import { ref, Ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import { Icon } from '@/components/Icon';
-import 'lib-flexible';
+import '@/utils/lib/flexible';
 // import { SvgIcon } from '@/components/Icon';
 // import VScaleScreen from 'v-scale-screen';
 // import autofit from 'vue-autofit'
@@ -712,6 +702,40 @@ function handleFullScreen() {
 </script>
 
 <style lang="less" scoped>
+// 使用媒体查询解决问题
+// 屏幕大于 1024px 或小于 1440px 时应用该样式
+@media screen and (min-width: 500px) and (max-width: 1685px) {
+
+  // .sider {
+  //   max-width: 100% !important;
+  //   min-width: 100% !important;
+  //   border: 1px solid pink;
+  // }
+  // .content{
+ 
+  //   width: 100% !important;
+  //   border: 1px solid green;
+  // }
+  // .footer{
+  //   width: 100% !important;
+  //   border: 1px solid gold;
+  // }
+}
+
+// 屏幕大于 1440px 时应用该样式
+@media screen and (min-width: 1441px) {}
+
+//屏幕小于 1000px 时应用的样式
+// @media screen and (max-width: 1024px) {
+//      .sider{
+//       border: 1px solid pink;
+//      }
+
+// }
+// 屏幕大于 1024px 或小于 1440px 时应用该样式
+@media screen and (min-width: 1024px) and (max-width: 1440px) {}
+
+
 .other_left {
   padding-left: .2rem
     /* 16/80 */
@@ -874,6 +898,7 @@ function handleFullScreen() {
 }
 
 .sider {
+  width: 20%;
   background-color: #001529;
   // padding: 16px;
   // height: calc(100% - 2.7875rem);/* 223/80 */

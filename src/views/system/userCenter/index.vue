@@ -10,7 +10,7 @@
           </template>
         </CropperAvatar>
         <a-descriptions class="ml-4" size="small" :column="2">
-          <a-descriptions-item label="用户ID"> {{ info.UserId
+          <a-descriptions-item label="用户名"> {{ info.UserName
           }}</a-descriptions-item>
           <a-descriptions-item label="邮箱">
             <Tag color="blue"> {{ info.Email === '' || info.Email === null ? '暂无数据' : info.Email }}</Tag>

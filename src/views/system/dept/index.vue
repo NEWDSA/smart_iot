@@ -2,7 +2,8 @@
   <PageWrapper contentFullHeight title="部门管理">
     <BasicTable :canResize="true" @register="registerTable">
       <template #tableTitle>
-        <a-button v-if="hasPermission(['addDepart_Depart'])" preIcon="mdi:plus" @click="handleCreate" type="primary">创建部门</a-button>
+        <a-button v-if="hasPermission(['addDepart_Depart'])" preIcon="mdi:plus" @click="handleCreate"
+          type="primary">创建部门</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -14,7 +15,7 @@
             },
             {
               icon: 'ion:add-circle-outline',
-              onClick:handelChildren.bind(null,record),
+              onClick: handelChildren.bind(null, record),
               ifShow: hasPermission(['handelChildren_Depart'])
             },
             {
@@ -36,7 +37,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-
+import { useMessage } from '@/hooks/web/useMessage';
 import { BasicTable, useTable, TableAction } from '@/components/Table';
 import { getDeptList, DelDept } from '@/api/demo/system';
 import { PageWrapper } from '@/components/Page';
@@ -49,6 +50,7 @@ export default defineComponent({
   components: { PageWrapper, BasicTable, DeptModal, TableAction },
   setup() {
     const { hasPermission } = usePermission();
+    const { createMessage } = useMessage();
     const [registerModal, { openModal }] = useModal();
     let source = 0;
     let target = 0;
@@ -106,11 +108,11 @@ export default defineComponent({
 
     }
     // 添加子部门
-    function handelChildren(record:Recordable){
+    function handelChildren(record: Recordable) {
       openModal(true, {
         record,
         isUpdate: false,
-        isModifiy:1,
+        isModifiy: 1,
       });
     }
     function handleEdit(record: Recordable) {
@@ -122,8 +124,13 @@ export default defineComponent({
 
     async function handleDelete(record: Recordable) {
       await deleteTableDataRecord(record.RoleId);
-      await DelDept({ DeptId: record.DeptId })
-      reload();
+      try {
+        const { Code } = await DelDept({ DeptId: record.DeptId });
+        Code == '200' ? createMessage.info('操作成功') : '';
+      } finally {
+        reload();
+      }
+
     }
 
     function handleSuccess() {

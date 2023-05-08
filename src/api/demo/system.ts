@@ -46,9 +46,9 @@ enum Api {
   NoticeEdit = '/notice/edit',
   NoticeRead = '/notice/is-read',
   IsRead = '/notice/list-unread',
-  AllRead='/notice/whole-is-read',
-  DeviceDepartment='/device-department/list-device-id',
-  DeviceList='/device/query'
+  AllRead = '/notice/whole-is-read',
+  DeviceDepartment = '/device-department/list-device-id',
+  DeviceList = '/device/query'
 }
 
 // 获取用户列表
@@ -57,13 +57,10 @@ export const getAccountList = (params: AccountParams) =>
 
 // 修改用户信息
 export const modifiAccountList = (params: AccountParams) =>
-  realHttp.put<AccountListGetResultModel>(
-    { url: Api.AccountList, params },
-    { isTransformResponse: true }
-  )
+  realHttp.put({ url: Api.AccountList, params }, { isTransformResponse: true })
 // 修改用户密码
-export const updatePwd = (params?) =>
-  realHttp.put(
+export const updatePwd = (params?) => {
+  return realHttp.put(
     {
       url: Api.updaePwd,
       params
@@ -72,29 +69,25 @@ export const updatePwd = (params?) =>
       isTransformResponse: true
     }
   )
+}
+
 // 根据编号获取详细信息
 export const getUserRole = (params?) =>
   realHttp.get({ url: `${Api.AccountList}/${params}` }, { isTransformResponse: true })
 // 新增用户信息
 export const createAccountList = (params: AccountParams) =>
-  realHttp.post<AccountListGetResultModel>(
-    { url: Api.AccountList, params },
-    { isTransformResponse: true }
-  )
+  realHttp.post({ url: Api.AccountList, params }, { isTransformResponse: true })
 // 删除用户信息
 export const delAccount = (params) =>
-  realHttp.delete<AccountListGetResultModel>(
-    { url: Api.AccountList, params },
-    { isTransformResponse: true }
-  )
+  realHttp.delete({ url: Api.AccountList, params }, { isTransformResponse: true })
 
 // 获取部门列表
 export const getDeptList = (params?: DeptParams) =>
   realHttp.get({ url: Api.DeptReal, params }, { isTransformResponse: true })
 
-  // 获取部门详情
+// 获取部门详情
 export const getDeptInfoList = (params) =>
-realHttp.get({ url: Api.DeptReal + '/' + params}, { isTransformResponse: true })
+  realHttp.get({ url: Api.DeptReal + '/' + params }, { isTransformResponse: true })
 
 // 部门下拉列表
 export const getDeptDrop = (params?: DeptParams) =>
@@ -102,18 +95,18 @@ export const getDeptDrop = (params?: DeptParams) =>
 
 // 创建部门
 export const createDept = (params?: DeptParams) =>
-  realHttp.post<DeptListGetResultModel>({ url: Api.CreateDept, params })
+  realHttp.post({ url: Api.CreateDept, params }, { isTransformResponse: true })
 
 // 修改部门
 export const modifiDept = (params?: DeptParams) =>
-  realHttp.put<DeptListGetResultModel>({ url: Api.CreateDept, params })
+  realHttp.put({ url: Api.CreateDept, params }, { isTransformResponse: true })
 
 // 删除部门
 export const DelDept = (params) =>
-  realHttp.delete<DeptListGetResultModel>({ url: Api.CreateDept, params })
+  realHttp.delete({ url: Api.CreateDept, params }, { isTransformResponse: true })
 // 批量调动用户部门接口
 export const BulkDept = (params) => {
-  realHttp.put({ url: Api.GetBull, params })
+  return realHttp.put({ url: Api.GetBull, params }, { isTransformResponse: true })
 }
 
 // 获取菜单
@@ -129,8 +122,8 @@ export const getMenuList = (params?: MenuParams) =>
   )
 
 // 编辑菜单
-export const editMenuList = (params?: MenuParams) =>
-  realHttp.put<MenuListGetResultModel>(
+export const editMenuList = (params?: MenuParams) => {
+  return realHttp.put(
     {
       url: Api.MenuRealList,
       params
@@ -139,9 +132,11 @@ export const editMenuList = (params?: MenuParams) =>
       isTransformResponse: true
     }
   )
+}
+
 // 新增菜单
 export const createMenuList = (params?: MenuParams) =>
-  realHttp.post<MenuListGetResultModel>(
+  realHttp.post(
     {
       url: Api.MenuRealList,
       params
@@ -153,7 +148,7 @@ export const createMenuList = (params?: MenuParams) =>
 
 // 删除菜单
 export const DelMenuList = (params?: MenuParams) =>
-  realHttp.delete<MenuListGetResultModel>(
+  realHttp.delete(
     {
       url: Api.MenuRealList,
       params
@@ -180,15 +175,22 @@ export const getAllRoleList = (params?: RoleParams) =>
 
 // 创建角色
 export const CreateRole = (params?: RoleParams) =>
-  realHttp.post<RolePageListGetResultModel>({ url: Api.createRole, params }) //后端接口
+  realHttp.post({ url: Api.createRole, params }, { isTransformResponse: true }) //后端接口
 
 // 删除角色
 
-export const DelRole = (params?: RoleParams) =>
-  realHttp.delete({ url: Api.DelRole, params })
+export const DelRole = (params?: RoleParams) => realHttp.delete({ url: Api.DelRole, params })
 // 修改角色
-export const ModifiRole = (params?: RoleParams) => {
-  realHttp.put<RolePageListGetResultModel>({ url: Api.createRole, params }) //后端接口
+// export const ModifiRole = (params?) => {
+//   return realHttp.put({ url: Api.createRole, params }, { isTransformResponse: true }) //后端接口
+// }
+
+// 修改角色
+export function ModifiRole(params?) {
+  return realHttp.put({
+    url: Api.createRole,
+    params
+  })
 }
 // 修改角色状态
 export const setRoleStatus = (RoleId: number, Status: string) =>
@@ -278,12 +280,12 @@ export const NoticeRead = (params?) =>
     }
   )
 
-  // 全部已读
-export const NoticeAllRead=(params?)=>
-realHttp.post({
-  url:Api.AllRead,
-  params
-})
+// 全部已读
+export const NoticeAllRead = (params?) =>
+  realHttp.post({
+    url: Api.AllRead,
+    params
+  })
 
 // 接入用户isRead 接口
 export const isRead = (params?) =>
@@ -299,24 +301,26 @@ export const isRead = (params?) =>
   )
 
 // 设备ID查询关联部门
-export const DeviceIdDepartMent=(params?)=>
-realHttp.get(
-  {
-    url: Api.DeviceDepartment,
-    params
-  },
+export const DeviceIdDepartMent = (params?) =>
+  realHttp.get(
+    {
+      url: Api.DeviceDepartment,
+      params
+    },
 
-  {
-    isTransformResponse: true
-  }
-)
+    {
+      isTransformResponse: true
+    }
+  )
 
 // 设备列表
-export const DeviceList=(params?)=>
-realHttp.get({
-  url:Api.DeviceList,
-  params
-},{
-  isTransformResponse: true
-})
-
+export const DeviceList = (params?) =>
+  realHttp.get(
+    {
+      url: Api.DeviceList,
+      params
+    },
+    {
+      isTransformResponse: true
+    }
+  )

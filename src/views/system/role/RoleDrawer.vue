@@ -16,6 +16,7 @@ import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
 import { BasicTree, TreeItem } from '@/components/Tree';
 import { Loading, useLoading } from '@/components/Loading';
 import { geRoletMenTree, CreateRole, ModifiRole, getMenTree } from '@/api/demo/system';
+import { useMessage } from '@/hooks/web/useMessage';
 export default defineComponent({
   name: 'RoleDrawer',
   components: { BasicDrawer, BasicForm, BasicTree },
@@ -29,6 +30,7 @@ export default defineComponent({
     const check = ref();
     const checkStrictly = ref(false);
     const treeData = ref<TreeItem[]>([]);
+    const { createMessage } = useMessage();
     const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
       labelWidth: 90,
       baseColProps: { span: 24 },
@@ -68,31 +70,38 @@ export default defineComponent({
         const values = await validate();
         setDrawerProps({ confirmLoading: true });
         closeDrawer();
-
         openFullLoading();
         values.RoleSort === null || values.RoleSort === undefined ? values.RoleSort = 0 : values.RoleSort;
         var menuIdsSelect;
-        if (values.menuIds?.checked) {
-          menuIdsSelect = Object.keys(values.menuIds?.checked).map((key) => {
-            return parseInt(values.menuIds.checked[key], 10);
-          })
-        } else {
-          console.log(values.menuIds, '?...menuIds...?');
-          menuIdsSelect = Object.keys(values.menuIds).map((key) => {
-            return parseInt(values.menuIds[key], 10);
-          })
+        if (values.menuIds) {
+          if (values.menuIds?.checked) {
+            menuIdsSelect = Object.keys(values.menuIds?.checked).map((key) => {
+              return parseInt(values.menuIds.checked[key], 10);
+            })
+          } else {
+            menuIdsSelect = Object.keys(values.menuIds).map((key) => {
+              return parseInt(values.menuIds[key], 10);
+            })
+          }
+        }
+        switch (!unref(isUpdate)) {
+          case false:
+            ModifiRole({ ...values, RoleId: RoleId.value, menuIds: menuIdsSelect }).then((res) => {
+              res.Code == '200' ? createMessage.info('操作成功') : '';
+            })
+            break;
+          case true:
+            const { Code, Msg } = await CreateRole(values);
+            Code == '200' ? createMessage.info('操作成功') : '';
+            break;
         }
 
-        !unref(isUpdate) ? await CreateRole(values) : await ModifiRole({ ...values, RoleId: RoleId.value, menuIds: menuIdsSelect })
-        // 显示一个加载中 并延迟3s
+      } finally {
+        // 显示一个加载中 并延迟300ms
         setTimeout(() => {
           closeFullLoading();
           emit('success');
-        }, 2000)
-
-
-      } finally {
-
+        }, 300);
         setDrawerProps({ confirmLoading: false });
       }
     }
@@ -101,8 +110,6 @@ export default defineComponent({
       // check.value = [...checkedKeys, ...e.halfCheckedKeys];
       // console.log(checkedKeys, e.halfCheckedKeys, '...checked...');
       // console.log(check.value, '...check.value....')
-
-
     }
     return {
       registerDrawer,

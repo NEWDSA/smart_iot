@@ -11,7 +11,7 @@ import { defineComponent, ref, unref, onMounted } from 'vue';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { BasicTree, TreeItem, TreeActionType } from '@/components/Tree/index';
 import { getDeptList, BulkDept } from '@/api/demo/system';
-
+import { useMessage } from '@/hooks/web/useMessage';
 export default defineComponent({
   name: 'AccountModal',
   components: { BasicModal, BasicTree },
@@ -22,7 +22,7 @@ export default defineComponent({
     const user = ref();
     const checkedKeys = ref();
     const checkData = ref('');
-
+    const { createMessage } = useMessage();
     const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       user.value = data.user;
       checkedKeys.value = [];
@@ -35,6 +35,8 @@ export default defineComponent({
       return tree;
     }
     async function fetch() {
+      // 对数据进行特殊处理
+
       treeData.value = (await getDeptList()) as unknown as TreeItem[];
       // 组装后端数据
       function listToTreeSimple(data) {
@@ -53,7 +55,7 @@ export default defineComponent({
         return res;
       }
       let datas = listToTreeSimple(treeData.value);
-      treeData.value = datas;
+      treeData.value = datas.filter(item => item.Status == '0');
       return treeData
 
     }
@@ -63,7 +65,6 @@ export default defineComponent({
     }
     function handleSelect(keys) {
       checkData.value = keys.checked;
-      console.log(checkData.value, '?...checkData...?');
       if (keys.checked.length > 1) {
         checkData.value = keys.checked[keys.checked.length - 1];
         getTree().setCheckedKeys([checkData.value]);
@@ -73,21 +74,22 @@ export default defineComponent({
     async function handleSubmit() {
       try {
         // 将数据传递给接口
-        await BulkDept({
+        const { Code } = await BulkDept({
           UserIds: user.value,
           DeptId: Number(await checkData.value)
         })
+        Code == '200' ? createMessage.info('操作成功') : '';
         setModalProps({ confirmLoading: true });
         closeModal();
-        
+
       } finally {
-        // 设置延迟5s
-        setTimeout(()=>{
+        // 设置延迟300ms
+        setTimeout(() => {
           setModalProps({ confirmLoading: false });
           emit('success');
-        },3000)
-        
-        
+        }, 300)
+
+
       }
     }
     onMounted(() => {
