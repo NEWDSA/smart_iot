@@ -92,6 +92,7 @@
     "@vue/compiler-sfc": "^3.2.45",
     "autoprefixer": "^10.4.13",
     "conventional-changelog-cli": "^2.2.2",
+    "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "eslint": "^8.28.0",

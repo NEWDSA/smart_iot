@@ -117,7 +117,7 @@ import { ref, onMounted, reactive, watch } from 'vue';
 import { TaskTicketInfoApi, TaskTicketEditApi } from '@/api/sys/workorder'
 import { message, Select, Button } from 'ant-design-vue';
 import { useModal } from '@/components/Modal';
-import userDrawer from '@/views/facilityset/facilitylist/components/userDrawer.vue'
+import userDrawer from '../userDrawer.vue'
 import dayjs from 'dayjs'
 import { usePermission } from '@/hooks/web/useButtonPermission';
 const { hasPermission } = usePermission();
