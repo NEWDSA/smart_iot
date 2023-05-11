@@ -25,10 +25,10 @@
       <!-- end 左侧边栏 -->
       <!-- 中间内容区域 -->
       <a-layout-content id="myboxall" class="md:w-1/3  content">
-        <Icon @click="plusIcon('plus')" style="position: absolute; top: .125rem /* 10/80 */;right: 0;" :size="70"
-          color="#fff" icon="ion:md-add-circle" />
-        <Icon @click="plusIcon('min')" style="position: absolute; top: 1.75rem /* 140/80 */;right: 0;" :size="70"
-          color="#fff" icon="ion:ios-minus-outline" />
+        <Icon @click="plusIcon('plus')" style="position: absolute; top: .125rem /* 10/80 */;right: 0; z-index: 999; "
+          :size="70" color="#fff" icon="ion:md-add-circle" />
+        <Icon @click="plusIcon('min')" style="position: absolute; top: 1.75rem /* 140/80 */;right: 0;z-index: 999; "
+          :size="70" color="#fff" icon="ion:ios-minus-outline" />
         <div>
 
         </div>
@@ -37,8 +37,7 @@
       </a-layout-content>
       <!-- end 中间内容区域 -->
       <!-- 右侧边栏 -->
-      <a-layout-sider ref="myheight" className="sider"
-        style="background: rgb(0, 4, 22);">
+      <a-layout-sider ref="myheight" className="sider" style="background: rgb(0, 4, 22);">
 
         <div style="position: relative;height: 100%;width: 100%;">
 
@@ -52,13 +51,13 @@
       <div class="flex">
         <!-- height: 2.7rem; -->
         <VisitorTable style="width: 20%; height:2.7rem /* 170/80 */;" />
-        <ElectricalChart style="width: 30%;height:2.7rem /* 170/80 */;" :height="myheights"  />
+        <ElectricalChart style="width: 30%;height:2.7rem /* 170/80 */;" :height="myheights" />
         <EnvironmentData :height="myheights" style="width: 30%;height:2.7rem;" />
         <!-- <ElectricalChart :width="mywidth" :height="myheights" style=" height:2.7rem /* 170/80 */;" />
         <EnvironmentData :height="myheights" style="width:5.5125rem /* 441/80 */;height:2.7rem;" /> -->
         <GpsLocation style="width: 20%; height: 2.7rem;" />
       </div>
-     
+
     </a-layout-footer>
     <!-- end 底部 -->
   </a-layout>
@@ -1008,7 +1007,8 @@ function plusIcon(type) {
 .content {
   position: relative;
   // background: rgb(0, 4, 22);
-  background: #1d1b1b;
+  // background: #1d1b1b;
+  background:#000000;
   width: 13.3rem !important
     /* 1064/80 */
   ;

@@ -10,7 +10,7 @@
         </div>
 
       </div> -->
-      <div :style="{ width }" style="width:300px;height: 200px;" ref="chartRef"></div>
+      <div :style="{ width }" style="width:100%;height: 200px;" ref="chartRef"></div>
     <!-- </div> -->
 
     <div class="" style="text-align: center;" :style="{ height, width }">

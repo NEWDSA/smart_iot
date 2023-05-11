@@ -148,13 +148,15 @@ onMounted(() => {
   //   ],
   // })
   setOptions1({
-    // title: {
-    //   text: "水量变化",
-    //   subtext: "纯属虚构",
-    //   textStyle: {
-    //     color: "#fff",
-    //   },
-    // },
+    title: {
+      text: "环境数据监测",
+      top:20,
+      // subtext: "纯属虚构",
+      textStyle: {
+        fontSize:'16',
+        color: "#fff",
+      },
+    },
     // backgroundColor: "#242842",
     tooltip: {
       trigger: "axis",
