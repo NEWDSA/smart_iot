@@ -498,7 +498,7 @@ export default defineComponent({
     function againOpen() {
       TaskTicketCopyApi({ Id: Number(WorkorderId.value) }).then(res => {
         if (res) {
-          message.success('重开受理成功，请返回列表查看')
+          message.success('重新受理成功，请返回列表查看')
         }
         // console.log(res)
       })

@@ -14,7 +14,7 @@
 
         </div>
         <div class="pl-3">
-          <a-input class="ml-3" placeholder="请输入" v-model:value="SceneName" />
+          <a-input class="ml-3" placeholder="请输入场景名称" v-model:value="SceneName" />
 
         </div>
         <span class="flex mt-4 mb-4 ml-3">
@@ -309,7 +309,7 @@ export default defineComponent({
         // }
 
         mergedData.OperationMode = setTime.value.actionData.bcIndex
-        if (setTime.value.myData.actionData.length > 0) {
+        if (setTime.value.actionData.RegionIdArr.length > 0) {
           EndDD.RegionIds = [...unique(setTime.value.actionData.RegionIdArr)]
         } else {
 
@@ -348,7 +348,7 @@ export default defineComponent({
         //   // enddata[i].push(FfromArr[i])
         // }
         mergedData.OperationMode = hand.value.actionData.bcIndex
-        if (hand.value.myData.actionData.length > 0) {
+        if (hand.value.actionData.RegionIdArr.length > 0) {
           EndDD.RegionIds = [...unique(hand.value.actionData.RegionIdArr)]
         } else {
 
