@@ -31,6 +31,7 @@
     "gen:icon": "esno ./build/generate/icon/index.ts"
   },
   "dependencies": {
+    "hammerjs": "^2.0.8",
     "@ant-design/colors": "^6.0.0",
     "@ant-design/icons-vue": "^6.1.0",
     "@iconify/iconify": "^3.0.1",
@@ -61,6 +62,7 @@
     "v-scale-screen": "2.0.0",
     "vue": "^3.2.45",
     "vue-autofit": "^1.0.4",
+    "vue-fullscreen": "^3.1.1",
     "vue-i18n": "^9.2.2",
     "vue-json-pretty": "^2.2.3",
     "vue-router": "^4.1.6",

@@ -1,206 +1,121 @@
 <template>
   <a-layout id="show_screen" class="layout">
+    <!-- 头部 -->
     <a-layout-header class="header">
       <div class="brand">
         <img src="@/assets/images/LOGO-title.png" />
       </div>
+      <div class="float-right flex items-center mr-2">
+        <div class="ml-auto" id="showTime">{{ currentTime }}</div>
+        <FullscreenOutlined class="other_brand ml-1" role="close" @click="toggle" />
+      </div>
 
-      <FullscreenOutlined class="brand" role="close" @click="handleFullScreen" />
-      <div class="ml-auto" id="showTime">{{ currentTime }}</div>
     </a-layout-header>
-    <a-layout>
-      <a-layout-sider width="20%" class="sider"
-        v-model:collapsed="collapsed">
-        <div class="boxall1">
-          <div class="alltitle"> 全局预览 </div>
-          <div class="yq" id="yq">2634</div>
+    <!-- end 头部 -->
+    <a-layout class="md:flex my_content">
+      <!-- 左侧边栏 -->
+      <a-layout-sider style="background: rgb(0, 4, 22);" className="sider">
+        <div class="h-1/2">
+          <GlobalPreview ref="PlatformSourceRef" />
         </div>
-        <div class="boxall1">
-          <div class="alltitle text-left"> 数据统计 </div>
-          <div style="width: 90%; height: 85%;" ref="chartRef4"></div>
-        </div>
-        <div class="boxall2">
-          <div class="alltitle"> 访客信息 </div>
-          <div class="topRec_List">
-            <dl>
-              <dd>资源名称</dd>
-              <dd>调用方</dd>
-              <dd>调用时间</dd>
-            </dl>
-            <div class="maquee">
-              <ul>
-                <li>
-                  <div>审计局主要职责</div>
-                  <div>审计局</div>
-                  <div>08:20:26</div>
-                </li>
-                <li>
-                  <div>残联主要职责</div>
-                  <div>残联</div>
-                  <div>08:20:36</div>
-                </li>
-                <li>
-                  <div>委老干部局主要职责</div>
-                  <div>老干部局</div>
-                  <div>08:20:46</div>
-                </li>
-                <li>
-                  <div>公安局主要职责</div>
-                  <div>公安局</div>
-                  <div>08:20:56</div>
-                </li>
-                <li>
-                  <div>更多精美大屏</div>
-                  <div>关注公众号</div>
-                  <div>DreamCoders</div>
-                </li>
-                <li>
-                  <div>交通运输局主要职责</div>
-                  <div>完全免费分享</div>
-                  <div>08:21:07</div>
-                </li>
-              </ul>
-            </div>
-          </div>
+        <div class="h-1/2">
+          <StatisticsLine :height="staticHeight" />
         </div>
       </a-layout-sider>
-      <a-layout-content id="myboxall" class="content">
-        <div class="boxall" style="height: 100%">
-          <div id="jianzhu" class="bg-jianzhu">
-            <div class="my_setting">
-              <div @click="showFire(1)" class="fire fire2">
-                <img src="@/assets/images/fire.png" />
+      <!-- end 左侧边栏 -->
+      <!-- 中间内容区域 -->
+      <a-layout-content id="myboxall" class="md:w-1/3  content">
+        <Icon @click="plusIcon('plus')" style="position: absolute; top: .125rem /* 10/80 */;right: 0;" :size="70"
+          color="#fff" icon="ion:md-add-circle" />
+        <Icon @click="plusIcon('min')" style="position: absolute; top: 1.75rem /* 140/80 */;right: 0;" :size="70"
+          color="#fff" icon="ion:ios-minus-outline" />
+        <div>
 
-              </div>
-              <div class="device-box1">
-                <div class="device-title">灯光2</div>
-                <div class="device-con">设备运行正常，已运行1h32mins
-                </div>
-              </div>
-              <div @click="showFire(2)" id="fire1" class="fire fire1">
-                <img src="@/assets/images/fire.png" />
-
-              </div>
-              <div class="device-box2">
-                <div class="device-title">灯光1</div>
-                <div class="device-con">设备运行正常，已运行1h32mins
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- <div class="flex absolute bottom-1/30">
-            <div class="flex flex-wrap flex-col p-2">
-              <div class="rounded-1 border-gray-500 border bg-dark-100" style="width: fit-content; height: fit-content;">
-                <Icon :size="40" icon="ion:ios-lightbulb-outline" />
-              </div>
-              <span>灯光</span>
-            </div>
-            <div class="flex flex-wrap flex-col p-2">
-              <div class="rounded-1 border-gray-500 border bg-dark-100" style="width: fit-content; height: fit-content;">
-                <Icon :size="40" icon="ion:ios-lightbulb-outline" />
-              </div>
-              <span>冰箱</span>
-            </div>
-            <div class="flex flex-wrap flex-col p-2">
-              <div class="rounded-1 border-gray-500 border bg-dark-100" style="width: fit-content; height: fit-content;">
-                <Icon :size="40" icon="ion:ios-lightbulb-outline" />
-              </div>
-              <span>2222</span>
-            </div>
-
-          </div> -->
         </div>
+        <img ref="dragbg" id="dragbg" :style="'width:' + bgimg + '%' + ';' + 'height:' + bgheight + '%'"
+          style="position: absolute;top:20%;left: 0;right: 0;" src="@/assets/images/modules1.png" />
       </a-layout-content>
-      <a-layout-sider width="20%" class="sider" :collapsed-width="collapsedWidth" :trigger="null" :collapsible="true"
-        v-model:collapsed="collapsed">
-        <div class="boxall" style="height: 100%">
-          <div class="alltitle"> 设备列表 </div>
-          <div class="boxnav" style="height: 100%">
-            <!--  -->
-            <div class="" ref="chartRef" style="height:6.35rem /* 508/80 */;" id="echart2"></div>
-          </div>
+      <!-- end 中间内容区域 -->
+      <!-- 右侧边栏 -->
+      <a-layout-sider ref="myheight" className="sider"
+        style="background: rgb(0, 4, 22);">
+
+        <div style="position: relative;height: 100%;width: 100%;">
+
+          <VisitRadar :height="sheight" class="w-full h-full" />
         </div>
       </a-layout-sider>
+      <!-- end 右侧边栏 -->
     </a-layout>
+    <!-- 底部 -->
     <a-layout-footer class="footer">
       <div class="flex">
-        <div class="float-left" style="padding-left: 16px;padding-right: 16px; width: 20%;">
-          <div class="boxall">
-            <div class="alltitle"> 负载信息 </div>
-            <div class="reception">
-              <div class="recetit">
-                <strong>40%</strong>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <p>上午</p>
-              </div>
-              <div class="recetit">
-                <strong>50%</strong>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <span class="changecolor"></span>
-                <p>下午</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="float-left" style="flex: auto;">
-          <div class="boxall">
-            <div class="alltitle text-left"> 环境数据监测 </div>
-            <div style="width:100%;height:2.5rem;" ref="chartRef3"></div>
-          </div>
-        </div>
-        <div class="other_left">
-          <div class="boxall">
-            <div class="alltitle text-left"> GPS地理位置分析 </div>
-            <div style="width: 100%; height:2.5rem /* 200/80 */;" ref="chartRef2"></div>
-          </div>
-        </div>
+        <!-- height: 2.7rem; -->
+        <VisitorTable style="width: 20%; height:2.7rem /* 170/80 */;" />
+        <ElectricalChart style="width: 30%;height:2.7rem /* 170/80 */;" :height="myheights"  />
+        <EnvironmentData :height="myheights" style="width: 30%;height:2.7rem;" />
+        <!-- <ElectricalChart :width="mywidth" :height="myheights" style=" height:2.7rem /* 170/80 */;" />
+        <EnvironmentData :height="myheights" style="width:5.5125rem /* 441/80 */;height:2.7rem;" /> -->
+        <GpsLocation style="width: 20%; height: 2.7rem;" />
       </div>
+     
     </a-layout-footer>
+    <!-- end 底部 -->
   </a-layout>
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, onMounted } from 'vue';
+import { ref, Ref, onMounted, reactive, nextTick } from 'vue';
 import dayjs from 'dayjs';
 import { Icon } from '@/components/Icon';
 import '@/utils/lib/flexible';
-// import { SvgIcon } from '@/components/Icon';
-// import VScaleScreen from 'v-scale-screen';
-// import autofit from 'vue-autofit'
-
 import $ from 'jquery';
+import { PlusCircleTwoTone, PlusCircleOutlined, MinusSquareOutlined } from '@ant-design/icons-vue'
 import { FullscreenExitOutlined, FullscreenOutlined, CloseOutlined } from '@ant-design/icons-vue';
+import { api as fullscreen } from 'vue-fullscreen'
+import VisitRadar from './components/deviceList/index.vue';
+import GlobalPreview from './components/globalPreview/index.vue'
+import StatisticsLine from './components/statisticsLine/index.vue'
+import VisitorTable from './components/visitorTable/index.vue'
+import ElectricalChart from './components/electricalChart/index.vue'
+import EnvironmentData from './components/environmentData/index.vue'
+import GpsLocation from './components/gpsLocation/index.vue'
+import GeoGap from './components/geograp/index.vue'
 import { useECharts } from '@/hooks/web/useECharts';
+import { Drag } from '@/utils/lib/hammerDrag';
 import mapsrc from '@/utils/city/zhuhai.json' //引入珠海市地图数据
+// import { FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
+import { ECharts } from 'echarts';
 const chartRef = ref<HTMLDivElement | null>(null);
 const chartRef2 = ref<HTMLDivElement | null>(null);
 const chartRef3 = ref<HTMLDivElement | null>(null);
 const chartRef4 = ref<HTMLDivElement | null>(null);
-
-const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>);
+const PlatformSourceRef = ref<ChartExpose>();
+const sheight = 'clac(100vh - 4.125rem)';
+const myheights = 'calc(2.7rem)';
+const bgimg = ref(80);
+const bgheight = ref(70);
+const mywidth = '300px';
+const staticHeight = '247px';
+// const mylayout = ref();
+const dragbg = ref();
+const myheight: Ref<HTMLDivElement | null> = ref(null);
+const root = ref();
+const { setOptions, echarts, resize } = useECharts(chartRef as Ref<HTMLDivElement>);
 const { setOptions: setOptions2, echarts: echart2 } = useECharts(chartRef2 as Ref<HTMLDivElement>);
 const { setOptions: setOptions3, echarts: echart3 } = useECharts(chartRef3 as Ref<HTMLDivElement>);
 const { setOptions: setOptions4, echarts: echart4 } = useECharts(chartRef4 as Ref<HTMLDivElement>);
+// 声明echarts实例
+interface ChartProps {
+  [key: string]: ECharts | null;
+}
 // const isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen || document.msFullscreenElement
+interface ChartExpose {
+  initChart: (params: any) => ECharts;
+}
 
 
-
-echart2.registerMap('zhuhai', mapsrc); //注册地图
+// echart2.registerMap('zhuhai', mapsrc); //注册地图
 
 const currentTime = ref(dayjs().format('YYYY/MM/DD HH:mm:ss'));
 const collapsed = false;
@@ -219,60 +134,33 @@ setOptions2({
     }
   }
 });
-setOptions({
-  grid: {
-    left: '0',
-    top: '0',
-    right: '0',
-    bottom: '0%',
-    containLabel: true
+let platFromData = [
+  {
+    value: 40,
+    name: "智慧文旅平台",
+    percentage: "40%"
   },
-  xAxis: {
-    show: false
+  {
+    value: 10,
+    name: "携程",
+    percentage: "10%"
   },
-  yAxis: [{
-    show: true,
-    data: ['空调', '排气扇', '路灯', '广播', '中央空调', '小型发电机', '柴油发电机', '光伏发电机', '巡逻车', '监控', '闸门', '中央空调', '呼吸机'],
-    inverse: true,
-    axisLine: { show: false },
-    splitLine: { show: false },
-    axisTick: { show: false },
-    axisLabel: {
-      textStyle: {
-        color: '#fff'
-      },
-    },
+  {
+    value: 20,
+    name: "飞猪",
+    percentage: "20%"
+  },
+  {
+    value: 30,
+    name: "其他渠道",
+    percentage: "30%"
+  }
+];
 
-  }, {
-    show: false,
-    inverse: true,
-    data: [683, 234, 234, 523, 345, 320, 280, 271, 254, 229, 210, 190, 182],
-    axisLabel: { textStyle: { color: '#fff' } },
-    axisLine: { show: false },
-    splitLine: { show: false },
-    axisTick: { show: false },
-  }],
-  series: [{
-    name: '条',
-    type: 'bar',
-    yAxisIndex: 0,
-    data: [683, 234, 234, 523, 345, 320, 280, 271, 254, 229, 210, 190, 182],
-    barWidth: 15,
-    itemStyle: {
-      normal: {
-        barBorderRadius: 50,
-        color: '#1089E7',
-      }
-    },
-    label: {
-      normal: {
-        show: true,
-        position: 'right',
-        formatter: '{c}',
-        textStyle: { color: 'rgba(255,255,255,.5)' }
-      }
-    },
-  }]
+const hammer = ref();
+const state = reactive({
+  fullscreen: false,
+  teleport: true,
 })
 var XData = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月"];
 var yData = [1243, 2315, 1164, 3021, 3521, 4121, 2001, 1983, 1432];
@@ -562,7 +450,112 @@ setOptions4({
 
   ]
 })
-onMounted(() => {
+onMounted(async () => {
+  // init()
+  Drag('#dragbg')
+  PlatformSourceRef.value?.initChart({
+    data: platFromData,
+    colors: ["#078dbc", "#6ad40b", "#6172fc", "#1786ff", "#ffbe2f", "#4dc89d", "#b797df", "#ffd3aa"]
+  })
+  setOptions({
+    grid: {
+      top: 30
+    },
+    colors: [
+      "#c4ebad",
+      "#6be6c1",
+      "#a0a7e6",
+      "#96dee8",
+      "#3fb1e3"],
+    xAxis: {
+      show: false
+    },
+    yAxis: [{
+      type: 'category',
+      // position: 'left',
+      offset: -18,
+      show: true,
+      data: ['空调', '排气扇', '路灯', '广播', '中央空调', '小型发电机', '柴油发电机', '光伏发电机', '巡逻车', '监控', '闸门', '中央空调', '呼吸机'],
+      // inverse: true,
+      axisLine: { show: false },
+      splitLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        align: "left",
+        verticalAlign: "bottom",
+        fontSize: 14,
+        lineHeight: 32,
+        color: '#FFFF'
+      }
+    }, {
+      type: 'category',
+      show: true,
+      inverse: true,
+      data: [683, 234, 234, 523, 345, 320, 280, 271, 254, 229, 210, 190, 182],
+      axisLabel: {
+        color: '#fff',
+        align: "right",
+        fontSize: 16,
+        lineHeight: 32,
+        verticalAlign: "bottom",
+        // textStyle: { color: '#fff' }
+      },
+      axisLine: { show: false },
+      splitLine: { show: false },
+      axisTick: { show: false },
+    }],
+    series: [{
+      type: 'bar',
+      showBackground: true,
+      backgroundStyle: {
+        color: 'rgba(220, 220, 220, 0.5)',
+        borderRadius: [20, 20, 20, 20] //半透明灰色
+        // barBorderRadius: [20, 20, 20, 20]
+      },
+      yAxisIndex: 0,
+      data: [683, 234, 234, 523, 345, 320, 280, 271, 254, 229, 210, 190, 182],
+      barWidth: 7,
+      // barOffset: '-50%',
+      itemStyle: {
+
+        // barBorderRadius: 50,
+        color: '#17FEF0', //蓝色
+      },
+      // label: {
+      //   normal: {
+      //     show: true,
+      //     position: 'right',
+      //     formatter: '{c}',
+      //     textStyle: { color: 'rgba(255,255,255,.5)' }
+      //   }
+      // },
+    }]
+  })
+  await nextTick();
+  // 设置初始高度
+  updateChartHeight(myheight.value?.$el.clientHeight, myheight.value?.$el.offsetWidth); // 设置初始高度
+  // resize();
+  // 监听window窗口变化
+  window.onresize = async () => {
+    // 获取指定元素的高度
+    await nextTick(() => {
+      console.log(myheight.value?.$el.clientHeight, '...layout...');
+      updateChartHeight(myheight.value?.$el.clientHeight, myheight.value?.$el.offsetWidth); // 设置初始高度
+      resize();
+    });
+
+
+
+
+  }
+
+  // window.addEventListener('resize', handleResize);
+  // const handleResize = () => {
+  //   setTimeout(() => {
+  //     updateChartHeight(myheight.value?.$el.clientHeight);
+  //   }, 100);
+  // }
+
   $('.fire1').click(function () {
 
     if ($("div").find('.device-box2').css('display') == 'none') {
@@ -571,12 +564,6 @@ onMounted(() => {
     } else {
       $("div").find('.device-box2').hide();
     }
-    // if ($('.device-box2').css('display') == 'none') {
-
-    //   $('.device-box2').show();
-    // } else {
-    //   $('.device-box2').hide();
-    // }
   })
 
   $('.fire2').click(function () {
@@ -587,20 +574,32 @@ onMounted(() => {
     } else {
       $("div").find('.device-box1').hide();
     }
-    // if ($('.device-box1').css('display') == 'none') {
-
-    //   $('.device-box1').show();
-    // } else {
-    //   $('.device-box1').hide();
-    // }
-    // alert('111')
   })
-  // jz?.style.backgroundSize = result;
   setInterval(() => {
     currentTime.value = dayjs().format('YYYY/MM/DD HH:mm:ss');
     // 滚动效果
   })
 })
+// onUnmounted(() => {
+//   window.removeEventListener('resize', handleResize);
+// });
+
+// 更新图表高度
+const updateChartHeight = (siderHeight, siderWidth) => {
+  // chartRef.value.style.height = `calc(${siderHeight}px - 80px)`; // 设置图表容器高度
+  // resize()
+  // chartRef.value.style.width = `${siderWidth}px`;
+  // echarts.resize(); // 调整图表大小以适应新的容器尺寸
+};
+
+function init() {
+  hammer.value = new Hammer(dragbg.value);
+  hammer.value.get('pan').set({ direction: Hammer.DIRECTION_ALL })
+}
+async function toggle() {
+  await fullscreen.toggle(document.querySelector('#show_screen'));
+  state.fullscreen = fullscreen.isFullscreen
+}
 // 显示隐藏内容
 function showFire(e) {
   // e?.target.id
@@ -675,33 +674,48 @@ function showFire(e) {
   // }
 
 }
-// 点击全屏事件
-function handleFullScreen() {
-  //  实现全屏方法
+function plusIcon(type) {
+  // if (type == 'plus') {
+  //   bgimg.value += 50;
+  //   bgheight.value += 50;
+  // } else {
+  //   bgimg.value -= 50;
+  //   bgheight.value -= 50;
+  // }
 
-  const elem = document.getElementById('show_screen') as HTMLElement;
-  elem.requestFullscreen();
-  document.addEventListener('fullscreenchange', (e) => {
-    console.log(elem, '...fullscreen...')
-    if (document.fullscreenElement === elem) {
-
-      const mywidth = document.getElementById('myboxall')
-
-
-      console.log(mywidth?.clientHeight, '...mywidth...');
-
-      // 进入全屏状态
-      // do something...
-      // elem.requestFullscreen();
+  if (type == 'plus') {
+    if (bgimg.value < 400) {
+      bgheight.value += 50;
+      bgimg.value += 50;
     } else {
-      // elem.requestFullscreen();
-      // elem.
+      // Toast('已缩放到最大')
     }
-  })
+  } else if (type == 'minus') {
+    if (bgimg.value > 100) {
+      bgimg.value -= 50
+      bgheight.value -= 50;
+      // locationIconSize.value -= 3
+    } else {
+      // Toast('已缩放到最小')
+    }
+  } else {
+    Drag('#dragbg', { isReset: true })
+    bgimg.value = 80
+    bgheight.value = 70
+  }
+  // 放大图像
+  // if(bgimg.value<200){
+
+
+  // }
 }
 </script>
 
 <style lang="less" scoped>
+#show_screen {
+  height: calc(100vh - 80px);
+}
+
 // 使用媒体查询解决问题
 // 屏幕大于 1024px 或小于 1440px 时应用该样式
 @media screen and (min-width: 500px) and (max-width: 1685px) {
@@ -712,7 +726,7 @@ function handleFullScreen() {
   //   border: 1px solid pink;
   // }
   // .content{
- 
+
   //   width: 100% !important;
   //   border: 1px solid green;
   // }
@@ -750,7 +764,22 @@ function handleFullScreen() {
 .brand {
   position: relative;
   margin-right: auto;
+  // margin-left: 0;
+  margin-left: .0625rem
+    /* 5/80 */
+  ;
   // style="position: relative;left: -30px;"
+}
+
+.ant-layout-header {
+  background: rgb(0, 4, 22);
+  padding: 0;
+}
+
+#showTime {
+  font-size: .225rem
+    /* 18/80 */
+  ;
 }
 
 .alltitle {
@@ -766,12 +795,13 @@ function handleFullScreen() {
   height: 90%;
 }
 
-.layout {
-  position: relative;
-  height: 10.975rem
-    /* 878/80 */
-  ;
-}
+// .layout {
+//   position: relative;
+//   // height: 10.975rem
+//   height: calc(100% - 48px);
+//     /* 878/80 */
+//   ;
+// }
 
 :v-deep .ayout.ant-layout-has-sider>.ant-layout-content {
   width: 13.3rem
@@ -792,7 +822,7 @@ function handleFullScreen() {
 .header {
   display: flex;
   align-items: center;
-  background-color: #001529;
+  background: rgb(0, 4, 22);
   color: #fff;
   // padding: 0 1.6rem
   /* 16/10 */
@@ -800,6 +830,14 @@ function handleFullScreen() {
   height: 1.3125rem
     /* 105/80 */
   ;
+}
+
+.my_content {
+  // height: calc(100% - 11.3125rem);
+  height: 6.85rem
+    /* 548/80 */
+  ;
+  // border: 1px solid rgb(243, 20, 57);
 }
 
 .count-base,
@@ -898,11 +936,44 @@ function handleFullScreen() {
 }
 
 .sider {
-  width: 20%;
-  background-color: #001529;
-  // padding: 16px;
-  // height: calc(100% - 2.7875rem);/* 223/80 */
+  width: 20% !important;
+  min-width: 20% !important;
+  max-width: 20% !important;
+  // border: 1px solid rgb(47, 95, 255);
+  background: rgb(0, 4, 22);
+  padding: 0 .2rem
+    /* 16/80 */
+    0 .2rem
+    /* 16/80 */
+  ;
+}
 
+::v-deep(.ant-layout-sider) {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  background: rgb(0, 4, 22);
+  padding: 0 .2rem;
+
+}
+
+@media (min-width: 768px) {
+  ::v-deep(.ant-layout-sider) {
+    width: 20% !important;
+    min-width: 20% !important;
+    max-width: 20% !important;
+    background: rgb(0, 4, 22);
+    padding: 0 .2rem;
+
+  }
+}
+
+.sider2 {
+  width: 20% !important;
+  min-width: 20% !important;
+  max-width: 20% !important;
+  // border: 1px solid greenyellow;
+  background: rgb(0, 4, 22);
   padding: 0 .2rem
     /* 16/80 */
     0 .2rem
@@ -935,24 +1006,24 @@ function handleFullScreen() {
 }
 
 .content {
-  background-color: #001529;
+  position: relative;
+  // background: rgb(0, 4, 22);
+  background: #1d1b1b;
   width: 13.3rem !important
     /* 1064/80 */
   ;
-  // height: calc(100% - 2.7875rem);/* 223/80 */
-
-  // padding: 16px;
+  overflow: hidden;
 }
 
 .footer {
-  background-color: #001529;
+  background: rgb(0, 4, 22);
+  // border: 1px solid green;
   color: #fff;
   padding: inherit;
   text-align: center;
   height: 2.8125rem
     /* 225/80 */
   ;
-  // height: 30%;
 }
 
 .boxall {
