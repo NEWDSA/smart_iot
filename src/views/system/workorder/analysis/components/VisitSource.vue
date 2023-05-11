@@ -4,13 +4,21 @@
       <div v-if="hasPermission(['haldkModal_workorderAnalysis'])" class="text-blue-600" @click="haldkModal()">管理</div>
     </template>
 
-    <div class="flex items-center flex-wrap border-b">
+    <div class="flex items-center flex-wrap border-b" v-if="shortcutList.length>0">
       <div class="w-1/3 text-center pb-5" v-for="(item, index) in shortcutList" :key="index" @click="topage(item.path)">
         <div>
           <Icon :icon="item.Icon" size="24"></Icon>
         </div>
         <div class="truncate ...">{{ item.MenuName }}</div>
       </div>
+    </div>
+
+    <div class="flex items-center flex-wrap border-b justify-center" v-else>
+      <div style="text-align: center;">
+        <img :src="forr" alt="">
+        <div class="mt-5">暂无数据</div>
+      </div>
+
     </div>
 
     <!-- <div>
@@ -54,7 +62,7 @@ import { Card, Tag } from 'ant-design-vue';
 import {usePermission} from '@/hooks/web/useButtonPermission';
 import { useDrawer } from '@/components/Drawer';
 import RoleDrawer from './modal/SourceDrawer.vue';
-
+import forr from '@/assets/images/404.png'
 import { shortCutMenu } from '@/api/sys/user'
 
 import { useGo } from '@/hooks/web/usePage';
@@ -100,7 +108,7 @@ function handleSuccess() {
   getShortCutMenu()
 }
 
-const shortcutList = ref()
+const shortcutList = ref([])
 
 
 const getShortCutMenu = () => {

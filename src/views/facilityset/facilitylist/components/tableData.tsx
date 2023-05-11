@@ -303,7 +303,7 @@ export const columns: BasicColumn[] = [
 ]
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'NickName',
+    field: 'UserName',
     label: '',
     component: 'Input',
     colProps: { span: 8 },

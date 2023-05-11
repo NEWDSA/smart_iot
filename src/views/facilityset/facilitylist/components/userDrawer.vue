@@ -68,7 +68,7 @@ export default defineComponent({
             useSearchForm: true,
             showTableSetting: true,
             bordered: true,
-            searchInfo:{Status : 1},
+            searchInfo:{Status : 0},
             // handleSearchInfoFn: (e) => {
             //     if(work.value != ''){
             //         e.Status = 1
