@@ -19,13 +19,13 @@ export default defineComponent({
             labelCol: {
                 span: 8,
             },
-            wrapperCol: {
-                span: 15,
-            },
+            // wrapperCol: {
+            //     span: 15,
+            // },
             schemas: schemas,
             actionColOptions: {
-                offset: 8,
-                span: 23,
+                // offset: 8,
+                span: 3,
             },
             // submitFunc
             submitButtonOptions: {
@@ -63,7 +63,7 @@ export default defineComponent({
     },
 });
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .form-wrap {
     padding: 24px;
     background-color: @component-background;

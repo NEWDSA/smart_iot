@@ -79,7 +79,8 @@
                       <div class="p-3">确认移出 {{ ModalDeviceName }} 此设备？</div>
                     </Modal>
                     <div class="bg-gray-100 py-2 px-4 mr-3 rounded"
-                      @click.stop="showModalClick(index, index2, facility.DeviceName)" v-if="facility.TypeId != -1">移出</div>
+                      @click.stop="showModalClick(index, index2, facility.DeviceName)" v-if="facility.TypeId != -1">移出
+                    </div>
                     <div v-if="hasPermission(['Edit_visitorsceneList'])" class="bg-gray-100 py-2 px-4 mr-3 rounded"
                       @click.stop="handleEdit(index, index2)">编辑</div>
                     <div class="sp-blue-bg text-white py-2 px-4 mr-3 rounded" enableDevice_DeviceList
@@ -992,7 +993,7 @@ export default defineComponent({
 })
 
 </script>
-<style lang="less">
+<style lang="less" scoped >
 body {
   font-family: 'Alibaba PuHuiTi';
 }

@@ -276,7 +276,7 @@ function computedStatus(status, type) {
 
 </script>
 
-<style lang="less">
+<style lang="less" scoped >
 body {
     font-family: 'Alibaba PuHuiTi';
 }

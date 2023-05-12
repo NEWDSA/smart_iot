@@ -1,13 +1,13 @@
 <template>
-    <BasicModal v-bind="$attrs" @register="registerModal" title="选择用户" @ok="handleSubmit" width="1200px">
-        <BasicTable @register="registerTab" :maxHeight="500">
-            <!-- <template #toolbar>
+  <BasicModal v-bind="$attrs" @register="registerModal" title="选择用户" @ok="handleSubmit" width="1200px">
+    <BasicTable @register="registerTab" :maxHeight="500">
+      <!-- <template #toolbar>
       <a-button type="primary" @click="expandAll">展开全部</a-button>
       <a-button type="primary" @click="collapseAll">折叠全部</a-button>
     </template> -->
-        </BasicTable>
+    </BasicTable>
 
-    </BasicModal>
+  </BasicModal>
 </template>
 <script lang="ts">
 import { defineComponent, ref, computed, unref, onMounted } from 'vue';
@@ -22,91 +22,92 @@ import { columns, searchFormSchema } from './tableData'
 
 import { array } from 'vue-types';
 export default defineComponent({
-    name: 'AccountModal',
-    components: { BasicModal, BasicTree, BasicTable },
-    emits: ['success', 'register', 'select'],
-    setup(_, { emit }) {
-        const checkedKeys = ref<Array<string | number>>([]);
-        const work = ref('')
-        const { createConfirm } = useMessage();
-        const checkData: any = ref();
-        const DataType = ref('');
-        const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-            console.log(data, 4564564)
-            DataType.value = data?.type
-            work.value = data?.work
-            // checkedKeys.value = []  
-            checkedKeys.value = await data?.data
-            console.log(work.value)
+  name: 'AccountModal',
+  components: { BasicModal, BasicTree, BasicTable },
+  emits: ['success', 'register', 'select'],
+  setup(_, { emit }) {
+    const checkedKeys = ref<Array<string | number>>([]);
+    const work = ref('')
+    const { createConfirm } = useMessage();
+    const checkData: any = ref();
+    const DataType = ref('');
+    const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+      console.log(data, 4564564)
+      DataType.value = data?.type
+      work.value = data?.work
+      // checkedKeys.value = []  
+      checkedKeys.value = await data?.data
+      console.log(work.value)
 
-        });
+    });
 
-        const [registerTab, { reload, updateTableDataRecord, getSelectRowKeys, getSelectRows, deleteTableDataRecord }] = useTable({
-            api: getAccountList,
-            title: '用户列表',
-            rowKey: 'UserId',
-            rowSelection: {
-                type: 'checkbox',
-                selectedRowKeys: checkedKeys,
-                onChange: onSelectChange,
-            },
-            columns,
-            fetchSetting: {
-                pageField: 'PageNum',
-                // 传给后台的每页显示多少条的字段
-                sizeField: 'PageSize',
-                // 接口返回表格数据的字段
-                listField: 'List',
-                // 接口返回表格总数的字段
-                totalField: 'Total'
-            },
-            formConfig: {
-                labelWidth: 120,
-                schemas: searchFormSchema,
-                autoSubmitOnEnter: true,
-            },
-            useSearchForm: true,
-            showTableSetting: true,
-            bordered: true,
-            searchInfo:{Status : 0},
-            // handleSearchInfoFn: (e) => {
-            //     if(work.value != ''){
-            //         e.Status = 1
-            //     }
-            // }
-        });
+    const [registerTab, { reload, updateTableDataRecord, getSelectRowKeys, getSelectRows, deleteTableDataRecord }] = useTable({
+      api: getAccountList,
+      title: '用户列表',
+      rowKey: 'UserId',
+      rowSelection: {
+        type: 'checkbox',
+        selectedRowKeys: checkedKeys,
+        onChange: onSelectChange,
+      },
+      columns,
+      fetchSetting: {
+        pageField: 'PageNum',
+        // 传给后台的每页显示多少条的字段
+        sizeField: 'PageSize',
+        // 接口返回表格数据的字段
+        listField: 'List',
+        // 接口返回表格总数的字段
+        totalField: 'Total'
+      },
+      formConfig: {
+        labelWidth: 120,
+        schemas: searchFormSchema,
+        autoSubmitOnEnter: true,
+      },
+      useSearchForm: true,
+      showTableSetting: true,
+      bordered: true,
+      searchInfo: { Status: 0 },
+      // handleSearchInfoFn: (e) => {
+      //     if(work.value != ''){
+      //         e.Status = 1
+      //     }
+      // }
+    });
 
-        function onSelectChange(selectedRowKeys: (string | number)[]) {
-            checkedKeys.value = selectedRowKeys;
+    function onSelectChange(selectedRowKeys: (string | number)[]) {
+      checkedKeys.value = selectedRowKeys;
+    }
+
+    async function handleSubmit() {
+      try {
+        checkData.value = getSelectRows()
+        var dataKey: any = []
+        var datawen: any = []
+        if (checkData.value.length > 0) {
+          for (let i = 0; i < checkData.value.length; i++) {
+            dataKey.push(checkData.value[i].UserId)
+            datawen.push(checkData.value[i].UserName)
+          }
         }
 
-        async function handleSubmit() {
-            try {
-                checkData.value = getSelectRows()
-                var dataKey: any = []
-                var datawen: any = []
-                if (checkData.value.length > 0) {
-                    for (let i = 0; i < checkData.value.length; i++) {
-                        dataKey.push(checkData.value[i].UserId)
-                        datawen.push(checkData.value[i].UserName)
-                    }
-                }
+        // 将数据传递给接口
+        setModalProps({ confirmLoading: true });
+        closeModal();
+        emit('success', dataKey, DataType.value, datawen);
+      } finally {
+        setModalProps({ confirmLoading: false });
+      }
+    }
 
-                // 将数据传递给接口
-                setModalProps({ confirmLoading: true });
-                closeModal();
-                emit('success', dataKey, DataType.value, datawen);
-            } finally {
-                setModalProps({ confirmLoading: false });
-            }
-        }
-
-        return { checkData, DataType, registerModal, onSelectChange, handleSubmit, registerTab, checkedKeys };
-    },
+    return { checkData, DataType, registerModal, onSelectChange, handleSubmit, registerTab, checkedKeys };
+  },
 });
 </script>
-<style>
+<style lang="less" scoped>
 .ant-modal {
-    top: 30px;
+  top: 30px;
 }
 </style>
+

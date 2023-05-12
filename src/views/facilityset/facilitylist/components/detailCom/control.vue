@@ -424,7 +424,7 @@ function videoStop(e) {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped >
 .fasility-set-select {
     .ant-select-selector {
         font-size: 14px;

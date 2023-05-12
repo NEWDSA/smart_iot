@@ -1,7 +1,6 @@
 <template>
-  <BasicModal @visible-change="ModelStatus" width="70%" :height="700" v-bind="$attrs" @register="registerModal" :title="getTitle"
-    @ok="handleSubmit">
-    <BasicTable  @register="registerTable" :max-height="400"  :searchInfo="searchInfo">
+  <BasicModal width="70%" :height="700" v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit">
+    <BasicTable @register="registerTable" :max-height="400" :searchInfo="searchInfo">
     </BasicTable>
   </BasicModal>
 </template>
@@ -24,13 +23,13 @@ export default defineComponent({
     const RoleId: any = ref();
     function onChange() {
     }
-    const [registerModal, {setModalProps, closeModal }] = useModalInner(async (data) => {
+    const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
       RoleId.value = data.RoleId;
       setModalProps({ confirmLoading: false });
       isUpdate.value = !!data?.isUpdate;
-      checkedKeys.value=[];
+      checkedKeys.value = [];
       // 清空Table分页信息
-      
+      reload()
     });
 
     const [registerTable, { reload }] = useTable({
@@ -47,10 +46,10 @@ export default defineComponent({
         schemas: searchFormSchema,
         autoSubmitOnEnter: true,
       },
-      api:RoleUnUserList,
-      beforeFetch:(p)=>{
-         p.RoleId=RoleId.value
-         return p
+      api: RoleUnUserList,
+      beforeFetch: (p) => {
+        p.RoleId = RoleId.value
+        return p
       },
       fetchSetting: {
         // 传给后台的当前页字段
@@ -75,11 +74,6 @@ export default defineComponent({
 
       checkedKeys.value = selectedRowKeys;
     }
-    function ModelStatus(isOpen) {
-      // isOpen ? getData() : ''
-    }
-
-
     async function handleSubmit() {
       try {
         const params = {
@@ -97,7 +91,7 @@ export default defineComponent({
       }
     }
 
-    return { registerModal, registerTable, handleSubmit, onSelectChange, ModelStatus, RoleId, checkedKeys, getTitle, searchInfo };
+    return { registerModal, registerTable, handleSubmit, onSelectChange, RoleId, checkedKeys, getTitle, searchInfo };
   },
 });
 </script>

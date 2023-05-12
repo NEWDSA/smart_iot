@@ -53,9 +53,9 @@ export const columns: BasicColumn[] = [
   }
 ]
 
-const isDir = (type: string) => type === 'M'
-const isMenu = (type: string) => type === 'C'
-const isButton = (type: string) => type === 'F'
+const isDir = (type: string) => type === 'M'      //目录
+const isMenu = (type: string) => type === 'C'    //菜单
+const isButton = (type: string) => type === 'F' //按钮
 export const formSchema: FormSchema[] = [
   {
     field: 'MenuType',
@@ -130,6 +130,7 @@ export const formSchema: FormSchema[] = [
     field: 'Status',
     label: '菜单状态',
     component: 'RadioButtonGroup',
+    ifShow: ({ values }) => !isButton(values.MenuType), // build
     defaultValue: '0',
     componentProps: {
       options: [
@@ -142,13 +143,13 @@ export const formSchema: FormSchema[] = [
     field: 'Visible',
     label: '显示状态',
     component: 'RadioButtonGroup',
+    ifShow: ({ values }) => !isButton(values.MenuType), // build
     defaultValue: '0',
     componentProps: {
       options: [
         { label: '是', value: '0' },
         { label: '否', value: '1' }
       ]
-    },
-    ifShow: ({ values }) => !isButton(values.type)
+    }
   }
 ]

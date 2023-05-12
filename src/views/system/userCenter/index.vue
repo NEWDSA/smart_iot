@@ -18,7 +18,8 @@
           </a-descriptions-item>
           <a-descriptions-item label="所属部门">{{ info.Dept.DeptName }}</a-descriptions-item>
           <a-descriptions-item label="手机号码">
-            <span class="mr-8px">{{ info.PhoneNumber === '' || info.PhoneNumber == null ? '暂无数据' : info.PhoneNumber }}</span>
+            <span class="mr-8px">{{ info.PhoneNumber === '' || info.PhoneNumber == null ? '暂无数据' : info.PhoneNumber
+            }}</span>
             <a @click="handleCopy(info.PhoneNumber)" v-if="info.PhoneNumber">复制</a>
           </a-descriptions-item>
           <a-descriptions-item label="角色类型">{{ info.Roles[0].RoleName === '' || info.Roles[0].RoleName === null ?
@@ -28,7 +29,7 @@
         </a-descriptions>
       </div>
     </a-card>
-    <a-card class="!mt-5 ">
+    <a-card class="!mt-5 cursor-pointer ">
       <!-- 默认选中修改密码 -->
       <div @click="changeStauts(1)"
         :class="checkStatus == 1 ? 'bg-gray-300 inline-block text-blue-500 p-1 rounded-xl' : '  inline-block text-black p-1 rounded-xl'">

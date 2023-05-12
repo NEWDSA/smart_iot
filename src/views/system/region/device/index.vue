@@ -30,6 +30,8 @@
       </template>
     </BasicTable>
     <AccountModal @register="registerModal" @success="handleSuccess" />
+    <!-- 批量设置权限 -->
+    <!-- 添加设备 -->
     <AccountTable @register="registerMyTable" @success="bulkPermission" />
   </PageWrapper>
 </template>
@@ -152,8 +154,7 @@ export default defineComponent({
           RegionId: 0
         }
         try {
-          const { Code } = await bulkDeviceOut(param);
-          console.log(Code,'...Code...?')
+          const Code = await bulkDeviceOut(param);
           Code == '0' ? createMessage.info('操作成功') : '';
         } finally {
           reload()
@@ -170,9 +171,12 @@ export default defineComponent({
     }
     async function bulkPermission() {
       await reload()
+      // 清空所选内容
+     await  clearSelectedRowKeys();
       // you don't flush the data
 
     }
+    // 批量权限设置
     function handleBulk(record: Recordable) {
       if (getSelectRowKeys().length > 0) {
         openModal2(true, {
@@ -204,7 +208,9 @@ export default defineComponent({
           RegionId: 0
         }
         await deleteTableDataRecord(record.DeviceId);
-        await bulkDeviceOut(param)
+        await bulkDeviceOut(param).then((res) => {
+          res == 0 ? createMessage.info('操作成功') : '';
+        })
 
 
       } finally {
@@ -213,8 +219,9 @@ export default defineComponent({
 
     }
     async function handleSuccess() {
-      // 清空所选内容
       await reload();
+      // 清空所选内容
+      clearSelectedRowKeys()
     }
     // 权限设置
     function handleEditPwd(record: Recordable) {

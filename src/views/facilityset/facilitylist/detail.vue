@@ -143,23 +143,23 @@ const getfacilityId = (id) => {
 }
 
 const computedStatus = (status, type) => {
-      // console.log(status)
-      switch (status) {
-        case 1:
-          return type ? 'bg-green-200' : 'bg-green-500'
-        case 2:
-          return type ? 'bg-gray-200' : 'bg-gray-500'
-        case 3:
-          return type ? 'bg-yellow-500' : 'bg-white'
-        case 4:
-          return type ? 'bg-red-200' : 'bg-red-500'
-        case 5:
-          return type ? 'bg-blue-500' : 'bg-white'
+  // console.log(status)
+  switch (status) {
+    case 1:
+      return type ? 'bg-green-200' : 'bg-green-500'
+    case 2:
+      return type ? 'bg-gray-200' : 'bg-gray-500'
+    case 3:
+      return type ? 'bg-yellow-500' : 'bg-white'
+    case 4:
+      return type ? 'bg-red-200' : 'bg-red-500'
+    case 5:
+      return type ? 'bg-blue-500' : 'bg-white'
 
-        default:
-          return type ? 'bg-gray-200' : 'bg-gray-500'
-      }
-    }
+    default:
+      return type ? 'bg-gray-200' : 'bg-gray-500'
+  }
+}
 
 const goBack = () => {
   // 本例的效果时点击返回始终跳转到账号列表页，实际应用时可返回上一页
@@ -167,7 +167,7 @@ const goBack = () => {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped >
 body {
   font-family: 'Alibaba PuHuiTi';
 }

@@ -169,7 +169,10 @@ export default defineComponent({
 
         console.log(checkedKeys.value.length)
         setModalProps({ confirmLoading: true });
-        !unref(isUpdate) ? await editDeviceArea(params) : ''
+        !unref(isUpdate) ?   await editDeviceArea(params).then((res)=>{
+          // 消息提醒
+          res==0?createMessage.info('操作成功'):'';
+        }) : ''
         checkedKeys.value.length > 0 ? closeModal() : createMessage.info('请选择设备');
         emit('success');
       } finally {

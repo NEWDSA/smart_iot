@@ -64,7 +64,7 @@ export default defineComponent({
     }
     var pagination = reactive({ PageNum: 1, PageSize: 10 })
     const internalInstance = getCurrentInstance()
-    const [registerTable, { reload, getSelectRowKeys, setPagination, deleteTableDataRecord }] = useTable({
+    const [registerTable, { reload, getSelectRowKeys, setPagination, deleteTableDataRecord,clearSelectedRowKeys }] = useTable({
       title: '用户列表',
       rowKey: 'UserId',
       onChange,
@@ -140,7 +140,6 @@ export default defineComponent({
           UserIds: toRaw(checkedKeys.value)
         })
       } finally {
-        // reload();
         roleAccount();
       }
 
@@ -192,6 +191,7 @@ export default defineComponent({
 
     async function handleSuccess() {
        await roleAccount()
+       clearSelectedRowKeys();
     //  await reload();
     }
     function handleSelect(params = '') {

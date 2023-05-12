@@ -131,10 +131,8 @@ export default defineComponent({
     watch(
       () => [settingList.value, itemIndex.value],
       (newValue, oldValue) => {
-        console.log(newValue, '...newVlaeee??')
         settingList.value = newValue[0];
         itemIndex.value = newValue[1];
-        console.log(newValue[1], '...settingList...?');
       }
     )
     onMounted(async () => {
@@ -159,8 +157,13 @@ export default defineComponent({
       return dayjs.unix(result).format('YYYY-MM-DD HH:mm:ss')
     }
     async function Tab_Click(e) {
-      tabIndex.value = e
-      settingList.value[tabIndex.value]
+      ListRef.value[tabIndex.value].myselectedIndex = null;
+      // 右侧的内容也需要清空
+
+      tabIndex.value = e;
+      itemIndex.value = null; //清空所选内容
+      infoDetail.Detail = null;
+      // settingList.value[tabIndex.value].
     }
     async function getData(type) {
       const data = await NoticeList({
@@ -169,23 +172,31 @@ export default defineComponent({
         Type: type
       })
       // settingList.value=[];
-      console.log(PageNum.value, '...PageNum.value...')
-      settingList.value.push({
-        key: type,
-        name: type == 0 ? '全部' : type == 1 ? '设备告警' : type == 2 ? '工单' : '',
-        component: '',
-        current: PageNum.value,
-        list: data.Detail,
-        total: data.Total,
-        params: {
+      console.log(PageNum.value, '...PageNum.value...');
+      console.log(settingList.value, '...settingList...');
+      if (settingList.value.length > 2) {
+        Object.assign(settingList.value, settingList.value)
+      } else {
+        settingList.value.push({
+          key: type,
+          name: type == 0 ? '全部' : type == 1 ? '设备告警' : type == 2 ? '工单' : '',
+          component: '',
           current: PageNum.value,
-          PageSize: 9,
-          Total: data.Total
-        }
-      })
+          list: data.Detail,
+          total: data.Total,
+          params: {
+            current: PageNum.value,
+            PageSize: 9,
+            Total: data.Total
+          }
+        })
+      }
+
     }
 
     async function onNoticeClick(record, index) {
+
+      console.log(index, '...index...');
       //  显示详细内容到其他div
       // record.NoticeId
       // 对record进行类型判断
@@ -200,17 +211,22 @@ export default defineComponent({
       const Code = await NoticeRead({ NoticeId: [NoticeId] })
       if (Code == 0) {
         // 所有类型的数据都应刷新 so i make wrong
-        settingList.value = []
+        // settingList.value = []
 
         for (var i = 0; i <= 2; i++) {
           await getData(i)
         }
+
+        // ListRef.value[tabIndex.value].Datalist[ListRef.value[tabIndex.value].myselectedIndex]
         // but still have a lot problmes in blow 
         // first it's can't remeber pagenation
         // ok it have select probolems wait soloved
 
+        // 保持选中状态
 
 
+
+        // 
 
         // 调用其它接口使弹窗变已读
         emitter.emit('NotifygetData', tabIndex.value)
@@ -313,14 +329,14 @@ export default defineComponent({
         ListRef.value[tabIndex.value].myselectedIndex <
         settingList.value[tabIndex.value].list.length - 1
       ) {
-        ++ListRef.value[tabIndex.value].myselectedIndex
+
+        console.log(++ListRef.value[tabIndex.value].myselectedIndex, '.....my name is linda.....');
         onNoticeClick(
           ListRef.value[tabIndex.value].Datalist[ListRef.value[tabIndex.value].myselectedIndex],
           ''
         )
       } else {
         ListRef.value[tabIndex.value].myselectedIndex = 0
-        // console.log(ListRef.value[tabIndex.value].Datalist[ListRef.value[tabIndex.value].myselectedIndex],'?...520...?');
         onNoticeClick(
           ListRef.value[tabIndex.value].Datalist[ListRef.value[tabIndex.value].myselectedIndex],
           ''
